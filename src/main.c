@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, Botan-janet Seungki Kim
+ * Copyright (c) 2024, Janet-botan Seungki Kim
  *
  * Botan-janet is released under the Simplified BSD License. (see LICENSE)
  */
