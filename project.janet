@@ -1,11 +1,11 @@
 (declare-project
- :name "botan-janet"
+ :name "botan"
  :description "Janet bindings to Botan."
  :url "https://github.com/tttuuu888/botan-janet"
  :author "Seungki Kim <tttuuu888@gmail.com>")
 
 (declare-native
- :name "botan-janet"
+ :name "botan"
  :cflags ["-I." "-Ibotan/build/include/public/botan" ;default-cflags]
  :lflags ["-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
  :source ["src/main.c"])

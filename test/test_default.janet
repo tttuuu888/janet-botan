@@ -1,4 +1,4 @@
-(use ../build/botan-janet)
+(use ../build/botan)
 
 (assert (= (ffi-api-version) 20231009))
 
