@@ -28,6 +28,27 @@ static Janet cfun_version_string(int32_t argc, Janet *argv) {
     return janet_wrap_string((const uint8_t *)version);
 }
 
+static Janet cfun_version_major(int32_t argc, Janet *argv) {
+    (void)argc;
+    (void)argv;
+    uint32_t version = botan_version_major();
+    return janet_wrap_number((double)version);
+}
+
+static Janet cfun_version_minor(int32_t argc, Janet *argv) {
+    (void)argc;
+    (void)argv;
+    uint32_t version = botan_version_minor();
+    return janet_wrap_number((double)version);
+}
+
+static Janet cfun_version_patch(int32_t argc, Janet *argv) {
+    (void)argc;
+    (void)argv;
+    uint32_t version = botan_version_patch();
+    return janet_wrap_number((double)version);
+}
+
 static JanetReg default_cfuns[] = {
     {"ffi-api-version", cfun_ffi_api_version, "(ffi-api-version)\n\n"
       "Return the version of the currently supported FFI API."
@@ -37,6 +58,15 @@ static JanetReg default_cfuns[] = {
     },
     {"version-string", cfun_version_string, "(version-string)\n\n"
      "Returns a free-form string describing the version."
+    },
+    {"version-major", cfun_version_major, "(version-major)\n\n"
+     "Returns the major version of the library."
+    },
+    {"version-minor", cfun_version_minor, "(version-minor)\n\n"
+     "Returns the minor version of the library."
+    },
+    {"version-patch", cfun_version_patch, "(version-patch)\n\n"
+     "Returns the patch version of the library."
     },
     {NULL, NULL, NULL}
 };
