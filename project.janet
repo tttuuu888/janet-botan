@@ -2,7 +2,8 @@
  :name "botan"
  :description "Janet bindings to Botan."
  :url "https://github.com/tttuuu888/botan-janet"
- :author "Seungki Kim <tttuuu888@gmail.com>")
+ :author "Seungki Kim <tttuuu888@gmail.com>"
+ :dependencies ["spork"])
 
 (declare-native
  :name "botan"
