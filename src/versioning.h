@@ -49,6 +49,13 @@ static Janet cfun_version_patch(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)version);
 }
 
+static Janet cfun_version_datestamp(int32_t argc, Janet *argv) {
+    (void)argc;
+    (void)argv;
+    uint32_t version = botan_version_datestamp();
+    return janet_wrap_number((double)version);
+}
+
 static JanetReg default_cfuns[] = {
     {"ffi-api-version", cfun_ffi_api_version, "(ffi-api-version)\n\n"
       "Return the version of the currently supported FFI API."
@@ -67,6 +74,10 @@ static JanetReg default_cfuns[] = {
     },
     {"version-patch", cfun_version_patch, "(version-patch)\n\n"
      "Returns the patch version of the library."
+    },
+    {"version-datestamp", cfun_version_datestamp, "(version-datestamp)\n\n"
+     "Returns the date this version was released as an integer YYYYMMDD,"
+     "or 0 if an unreleased version."
     },
     {NULL, NULL, NULL}
 };

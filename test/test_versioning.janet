@@ -15,4 +15,6 @@
 
 (assert (= (version-patch) 0))
 
+(assert (= (version-datestamp) 0))
+
 (end-suite)
