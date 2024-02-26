@@ -4,8 +4,8 @@
  * Botan-janet is released under the Simplified BSD License. (see LICENSE)
  */
 
-#ifndef DEFAULT_H
-#define DEFAULT_H
+#ifndef VERSIONING_H
+#define VERSIONING_H
 
 static Janet cfun_ffi_api_version(int32_t argc, Janet *argv) {
     (void)argc;
@@ -31,4 +31,4 @@ static JanetReg default_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* DEFAULT_H */
+#endif /* VERSIONING_H */

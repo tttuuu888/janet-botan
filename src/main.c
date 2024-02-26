@@ -7,8 +7,8 @@
 #include <janet.h>
 #include <ffi.h>
 
-#include "default.h"
+#include "versioning.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
-    janet_cfuns(env, "botan-janet", default_cfuns);
+    janet_cfuns(env, "botan", default_cfuns);
 }
