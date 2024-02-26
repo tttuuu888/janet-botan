@@ -11,12 +11,22 @@ static Janet cfun_ffi_api_version(int32_t argc, Janet *argv) {
     (void)argc;
     (void)argv;
     uint32_t version = botan_ffi_api_version();
-    return janet_wrap_number((double) version);
+    return janet_wrap_number((double)version);
+}
+
+static Janet cfun_ffi_supports_api(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    int64_t version = janet_getinteger64(argv, 0);
+    int ret = botan_ffi_supports_api((uint32_t)version);
+    return janet_wrap_number((double)ret);
 }
 
 static JanetReg default_cfuns[] = {
-    { "ffi-api-version", cfun_ffi_api_version, "(ffi-api-version)\n\n"
+    {"ffi-api-version", cfun_ffi_api_version, "(ffi-api-version)\n\n"
       "Return the version of the currently supported FFI API."
+    },
+    {"ffi-supports-api", cfun_ffi_supports_api, "(ffi-supports-api)\n\n"
+     "Returns 0 if the FFI version specified is supported by this library."
     },
     {NULL, NULL, NULL}
 };
