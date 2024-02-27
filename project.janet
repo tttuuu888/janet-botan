@@ -15,9 +15,8 @@
 
 (rule "botan-library" ["./botan"]
       (unless (os/stat "./botan/libbotan-3.a")
-        (print "Build botan library...")
-        (os/cd project-path)
         (os/cd "botan")
+        (print "Build botan library...")
         (unless (os/stat "build")
           (os/execute ["./configure.py" "--without-documentation"] :p))
         (os/execute ["make" "-j8"] :p)
@@ -25,8 +24,8 @@
 
 (rule "botan-header" ["botan-library"]
       (unless (os/stat "botan/build.h")
-        (print "Copy botan header...")
         (os/cd project-path)
+        (print "Copy botan header...")
         (copyfile "botan/build/build.h" "botan/build.h")))
 
 (task "build-botan" ["botan-header"])
