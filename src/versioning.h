@@ -8,8 +8,8 @@
 #define VERSIONING_H
 
 static Janet cfun_ffi_api_version(int32_t argc, Janet *argv) {
-    (void)argc;
     (void)argv;
+    janet_fixarity(argc, 0);
     uint32_t version = botan_ffi_api_version();
     return janet_wrap_number((double)version);
 }
@@ -22,36 +22,36 @@ static Janet cfun_ffi_supports_api(int32_t argc, Janet *argv) {
 }
 
 static Janet cfun_version_string(int32_t argc, Janet *argv) {
-    (void)argc;
     (void)argv;
+    janet_fixarity(argc, 0);
     const char *version = botan_version_string();
     return janet_wrap_string((const uint8_t *)version);
 }
 
 static Janet cfun_version_major(int32_t argc, Janet *argv) {
-    (void)argc;
     (void)argv;
+    janet_fixarity(argc, 0);
     uint32_t version = botan_version_major();
     return janet_wrap_number((double)version);
 }
 
 static Janet cfun_version_minor(int32_t argc, Janet *argv) {
-    (void)argc;
     (void)argv;
+    janet_fixarity(argc, 0);
     uint32_t version = botan_version_minor();
     return janet_wrap_number((double)version);
 }
 
 static Janet cfun_version_patch(int32_t argc, Janet *argv) {
-    (void)argc;
     (void)argv;
+    janet_fixarity(argc, 0);
     uint32_t version = botan_version_patch();
     return janet_wrap_number((double)version);
 }
 
 static Janet cfun_version_datestamp(int32_t argc, Janet *argv) {
-    (void)argc;
     (void)argv;
+    janet_fixarity(argc, 0);
     uint32_t version = botan_version_datestamp();
     return janet_wrap_number((double)version);
 }
