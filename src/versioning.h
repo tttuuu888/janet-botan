@@ -56,7 +56,7 @@ static Janet cfun_version_datestamp(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)version);
 }
 
-static JanetReg default_cfuns[] = {
+static JanetReg versioning_cfuns[] = {
     {"ffi-api-version", cfun_ffi_api_version, "(ffi-api-version)\n\n"
       "Return the version of the currently supported FFI API."
     },

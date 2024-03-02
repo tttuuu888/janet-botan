@@ -10,5 +10,5 @@
 #include "versioning.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
-    janet_cfuns(env, "botan", default_cfuns);
+    janet_cfuns(env, "botan", versioning_cfuns);
 }
