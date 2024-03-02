@@ -14,7 +14,8 @@
 (def project-path (os/cwd))
 
 (rule "botan-library" ["./botan"]
-      (unless (os/stat "./botan/libbotan-3.a")
+      (unless (and (os/stat "./botan/libbotan-3.a")
+                   (os/stat "./botan/libbotan-3.so.3"))
         (os/cd "botan")
         (print "Build botan library...")
         (unless (os/stat "build")
