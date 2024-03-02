@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2024, Janet-botan Seungki Kim
  *
- * Botan-janet is released under the Simplified BSD License. (see LICENSE)
+ * Janet-botan is released under the Simplified BSD License. (see LICENSE)
  */
 
 #include <janet.h>

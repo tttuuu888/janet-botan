@@ -1,7 +1,7 @@
 (declare-project
  :name "botan"
  :description "Janet bindings to Botan."
- :url "https://github.com/tttuuu888/botan-janet"
+ :url "https://github.com/tttuuu888/janet-botan"
  :author "Seungki Kim <tttuuu888@gmail.com>"
  :dependencies ["spork"])
 
