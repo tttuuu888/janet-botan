@@ -39,13 +39,13 @@ static Janet cfun_hex_decode(int32_t argc, Janet *argv) {
 static JanetReg utility_cfuns[] = {
     {"constant-time-compare", cfun_constant_time_compare,
      "(constant-time-compare x y)\n\n"
-     "Check if buffer x equals buffer y. Returns a boolean."
+     "Check if buffer `x` equals buffer `y`. Returns a boolean."
     },
     {"hex-encode", cfun_hex_encode, "(hex-encode bin)\n\n"
-     "Performs hex encoding of binary data in bin. Returns the buffer."
+     "Performs hex encoding of binary data in `bin`. Returns the buffer."
     },
     {"hex-decode", cfun_hex_decode, "(hex-decode str)\n\n"
-     "Performs hex decoding of string data in str. Returns the buffer."
+     "Performs hex decoding of string data in `str`. Returns the buffer."
     },
     {NULL, NULL, NULL}
 };
