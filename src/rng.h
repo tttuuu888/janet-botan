@@ -111,7 +111,7 @@ static JanetReg rng_cfuns[] = {
      "from given the source rng `src`"
     },
     {"rng/add-entropy", cfun_rng_add_entropy,
-     "(rng/reseed-add-entropy rng seed)\n\n"
+     "(rng/add-entropy rng seed)\n\n"
      "Adds the provided `seed` array or tuple to the `rng`."
     },
     {NULL, NULL, NULL}
