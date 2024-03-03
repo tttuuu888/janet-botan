@@ -6,13 +6,15 @@
 
 #include <janet.h>
 #include <ffi.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "versioning.h"
 #include "utility.h"
-#include "random.h"
+#include "rng.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "botan", versioning_cfuns);
     janet_cfuns(env, "botan", utility_cfuns);
-    janet_cfuns(env, "botan", random_cfuns);
+    janet_cfuns(env, "botan/rng", rng_cfuns);
 }

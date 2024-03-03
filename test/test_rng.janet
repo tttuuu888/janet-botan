@@ -1,8 +1,8 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "random")
+(start-suite "rng")
 
-(assert (deep-not= (rng-get 30) (rng-get 30)))
+(assert (deep-not= (rng/generate 30) (rng/generate 30)))
 
 (end-suite)
