@@ -12,9 +12,11 @@
 #include "versioning.h"
 #include "utility.h"
 #include "rng.h"
+#include "block_cipher.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "botan", versioning_cfuns);
     janet_cfuns(env, "botan", utility_cfuns);
     janet_cfuns(env, "botan/rng", rng_cfuns);
+    janet_cfuns(env, "botan/block-cipher", block_cipher_cfuns);
 }
