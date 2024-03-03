@@ -7,7 +7,7 @@
 #ifndef RNG_H
 #define RNG_H
 
-static Janet cfun_rng_create(int32_t argc, Janet *argv) {
+static Janet cfun_rng_init(int32_t argc, Janet *argv) {
     janet_arity(argc, 0, 1);
     const char *type = (argc == 0) ? "system" : janet_getcstring(argv, 0);
     bool valid_type = false;
@@ -86,7 +86,7 @@ static Janet cfun_rng_add_entropy(int32_t argc, Janet *argv) {
 }
 
 static JanetReg rng_cfuns[] = {
-    {"rng/create", cfun_rng_create, "(rng/create &opt type)\n\n"
+    {"rng/init", cfun_rng_init, "(rng/init &opt type)\n\n"
      "Initialize a random number generator from the given `type`:\n\n"
      "\"system\": System-RNG (defaulting to \"system\" type rng)\n\n"
      "\"user\": AutoSeeded-RNG\n\n"
@@ -95,13 +95,9 @@ static JanetReg rng_cfuns[] = {
      "\"hwrnd\" or \"rdrand\": Processor-RNG (if available)"
     },
     {"rng/destroy", cfun_rng_destroy, "(rng/destroy rng)\n\n"
-     "Destroy the `rng` object created by `rng/create`"
+     "Destroy the `rng` object created by `rng/init`"
     },
-    {"rng/generate", cfun_rng_get, "(rng/generate len &opt rng)\n\n"
-     "Generate random bytes of length len from a random number generator `rng`."
-     "(defaulting to \"system\" type rng)"
-    },
-    {"rng/generate", cfun_rng_get, "(rng/generate len &opt rng)\n\n"
+    {"rng/get", cfun_rng_get, "(rng/get len &opt rng)\n\n"
      "Generate random bytes of length len from a random number generator `rng`."
      "(defaulting to \"system\" type rng)"
     },
