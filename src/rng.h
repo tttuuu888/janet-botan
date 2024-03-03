@@ -61,11 +61,29 @@ static Janet cfun_rng_get(int32_t argc, Janet *argv) {
 
 static Janet cfun_rng_reseed(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
-    /* int64_t bits = janet_getinteger64(argv, 0); */
-    /* int ret = botan_rng_reseed2(rng); */
+    botan_rng_t rng = janet_getpointer(argv, 0);
+    int64_t bits = janet_getinteger64(argv, 1);
+    int ret = botan_rng_reseed(rng, bits);
     return janet_wrap_nil();
 }
 
+static Janet cfun_rng_reseed_from_rng(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+    botan_rng_t rng = janet_getpointer(argv, 0);
+    botan_rng_t src = janet_getpointer(argv, 1);
+    int64_t bits = janet_getinteger64(argv, 2);
+    int ret = botan_rng_reseed_from_rng(rng, src, bits);
+    return janet_wrap_nil();
+}
+
+static Janet cfun_rng_add_entropy(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+    botan_rng_t rng = janet_getpointer(argv, 0);
+    const char *seed = janet_getstring(argv, 1);
+    int len = strlen(seed);
+    int ret = botan_rng_add_entropy(rng, seed, len);
+    return janet_wrap_nil();
+}
 
 static JanetReg rng_cfuns[] = {
     {"rng/create", cfun_rng_create, "(rng/create &opt type)\n\n"
@@ -90,6 +108,15 @@ static JanetReg rng_cfuns[] = {
     {"rng/reseed", cfun_rng_reseed, "(rng/reseed rng bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` from"
      " the System-RNG."
+    },
+    {"rng/reseed-from-rng", cfun_rng_reseed_from_rng,
+     "(rng/reseed-from-rng rng src bits)\n\n"
+     "Reseeds the random number generator `rng` with bits number of `bits` taken "
+     "from given the source rng `src`"
+    },
+    {"rng/add-entropy", cfun_rng_add_entropy,
+     "(rng/reseed-add-entropy rng seed)\n\n"
+     "Adds the provided `seed` array or tuple to the `rng`."
     },
     {NULL, NULL, NULL}
 };
