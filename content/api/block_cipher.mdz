@@ -1,0 +1,13 @@
+{:title "Block Ciphers"
+ :author "Seungki Kim"
+ :license "BSD-2-Clause license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][block-cipher/]
+
+## Reference
+
+@api-docs[/build/botan][block-cipher/]

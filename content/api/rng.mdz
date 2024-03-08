@@ -1,0 +1,13 @@
+{:title "Random Number Generators"
+ :author "Seungki Kim"
+ :license "BSD-2-Clause license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][rng/]
+
+## Reference
+
+@api-docs[/build/botan][rng/]

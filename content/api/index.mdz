@@ -1,0 +1,14 @@
+{:title "API"
+ :author "Seungki Kim"
+ :license "BSD-2-Clause license"
+ :template "mdzdoc/main.html"
+ :order 1}
+---
+
+## Index
+
+@api-index[/build/botan]
+
+## Reference
+
+@api-docs[/build/botan]

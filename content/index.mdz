@@ -1,0 +1,18 @@
+{:title "Janet-botan"
+ :author "Seungki Kim"
+ :license "BSD-2-Clause license"
+ :template "mdzdoc/main.html"
+ :order 0}
+---
+
+Janet-botan is a Janet bindings to Botan.
+
+## Source code
+
+@p{@link[https://github.com/tttuuu888/janet-botan]}
+
+## Install
+
+@codeblock```
+[sudo] jpm install https://github.com/tttuuu888/janet-botan.git
+```
