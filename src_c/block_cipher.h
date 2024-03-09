@@ -92,6 +92,20 @@ static Janet cfun_block_cipher_encrypt_blocks(int32_t argc, Janet *argv) {
     return janet_wrap_buffer(output);
 }
 
+static Janet cfun_block_cipher_decrypt_blocks(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+    botan_block_cipher_t bc = janet_getpointer(argv, 0);
+    JanetByteView input = janet_getbytes(argv, 1);
+    int ret = botan_block_cipher_decrypt_blocks(bc, input.bytes, (uint8_t *)input.bytes, 1);
+    if (ret)
+        return janet_wrap_boolean(ret == 0);
+
+    JanetBuffer *output = janet_buffer(input.len);
+    memcpy(output->data, input.bytes, input.len);
+    output->count = input.len;
+    return janet_wrap_buffer(output);
+}
+
 static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/init", cfun_block_cipher_init,
      "(block-cipher/init name)\n\n"
@@ -135,6 +149,10 @@ static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/encrypt", cfun_block_cipher_encrypt_blocks,
      "(block-cipher/encrypt bc input)\n\n"
      "Encrypt `input` data. The key must have been set beforehand."
+    },
+    {"block-cipher/decrypt", cfun_block_cipher_decrypt_blocks,
+     "(block-cipher/decrypt bc input)\n\n"
+     "Decrypt `input` data. The key must have been set beforehand."
     },
     {NULL, NULL, NULL}
 };
