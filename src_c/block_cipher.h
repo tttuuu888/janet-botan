@@ -38,6 +38,30 @@ static Janet cfun_block_cipher_name(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string_end(out));
 }
 
+static Janet cfun_block_cipher_get_min_keylen(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_block_cipher_t bc = janet_getpointer(argv, 0);
+    size_t spec;
+    int ret = botan_block_cipher_get_keyspec(bc, &spec, NULL, NULL);
+    return janet_wrap_number((double)spec);
+}
+
+static Janet cfun_block_cipher_get_max_keylen(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_block_cipher_t bc = janet_getpointer(argv, 0);
+    size_t spec;
+    int ret = botan_block_cipher_get_keyspec(bc, NULL, &spec, NULL);
+    return janet_wrap_number((double)spec);
+}
+
+static Janet cfun_block_cipher_get_keylength_modulo(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_block_cipher_t bc = janet_getpointer(argv, 0);
+    size_t spec;
+    int ret = botan_block_cipher_get_keyspec(bc, NULL, NULL, &spec);
+    return janet_wrap_number((double)spec);
+}
+
 static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/init", cfun_block_cipher_init,
      "(block-cipher/init name)\n\n"
@@ -56,6 +80,18 @@ static JanetReg block_cipher_cfuns[] = {
      "(block-cipher/name bc)\n\n"
      "Return the name of this block cipher algorithm, which may nor may not "
      " exactly match what was passed to `block-cipher/init`."
+    },
+    {"block-cipher/get-min-keylen", cfun_block_cipher_get_min_keylen,
+     "(block-cipher/get-min-keylen bc)\n\n"
+     "Return the minimum-keylength which can be provided to this cipher."
+    },
+    {"block-cipher/get-max-keylen", cfun_block_cipher_get_max_keylen,
+     "(block-cipher/get-max-keylen bc)\n\n"
+     "Return the maximum-keylength which can be provided to this cipher."
+    },
+    {"block-cipher/get-keylen-modulo", cfun_block_cipher_get_keylength_modulo,
+     "(block-cipher/get-min-keylen bc)\n\n"
+     "Return the keylength-modulo which can be provided to this cipher."
     },
     {NULL, NULL, NULL}
 };
