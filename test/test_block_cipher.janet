@@ -14,6 +14,11 @@
 
   (assert (= (block-cipher/clear cipher) true))
 
+  (assert (= (block-cipher/set-key
+              cipher
+              (hex-decode "00010203040506070001020304050607"))
+             true))
+
   (block-cipher/destroy cipher))
 
 (end-suite)

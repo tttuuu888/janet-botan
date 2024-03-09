@@ -70,6 +70,14 @@ static Janet cfun_block_cipher_clear(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
+static Janet cfun_block_cipher_set_key(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+    botan_block_cipher_t bc = janet_getpointer(argv, 0);
+    JanetByteView key = janet_getbytes(argv, 1);
+    int ret = botan_block_cipher_set_key(bc, key.bytes, key.len);
+    return janet_wrap_boolean(ret == 0);
+}
+
 static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/init", cfun_block_cipher_init,
      "(block-cipher/init name)\n\n"
@@ -105,6 +113,10 @@ static JanetReg block_cipher_cfuns[] = {
      "(block-cipher/clear bc)\n\n"
      "Clear the internal state (such as keys) of this cipher object, "
      "but do not deallocate it."
+    },
+    {"block-cipher/set-key", cfun_block_cipher_set_key,
+     "(block-cipher/clear bc key)\n\n"
+     "Set the cipher key, which is required before encrypting or decrypting."
     },
     {NULL, NULL, NULL}
 };
