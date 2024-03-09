@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024, Janet-botan Seungki Kim
+ *
+ * Janet-botan is released under the Simplified BSD License. (see LICENSE)
+ */
+
 #ifndef BLOCK_CIPHER_H
 #define BLOCK_CIPHER_H
 
