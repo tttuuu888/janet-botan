@@ -3,8 +3,11 @@
 
 (start-suite "block-cipher")
 
+(assert-error "Error expected" (block-cipher/init "AES-129"))
+
 (let [cipher (block-cipher/init "AES-128")]
   (assert (= (block-cipher/block-size cipher) 16))
+
 
   (assert (= (block-cipher/name cipher) "AES-128"))
 
@@ -12,12 +15,11 @@
   (assert (= (block-cipher/get-max-keylen cipher) 16))
   (assert (= (block-cipher/get-keylen-modulo cipher) 1))
 
-  (assert (= (block-cipher/clear cipher) true))
+  (assert (not (block-cipher/clear cipher)))
 
-  (assert (= (block-cipher/set-key
-              cipher
-              (hex-decode "00000000000000000000000000000000"))
-             true))
+  (assert (not (block-cipher/set-key
+                cipher
+                (hex-decode "00000000000000000000000000000000"))))
 
   (assert (deep= (hex-encode (block-cipher/encrypt
                               cipher

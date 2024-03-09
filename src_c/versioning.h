@@ -18,7 +18,7 @@ static Janet cfun_ffi_supports_api(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     int64_t version = janet_getinteger64(argv, 0);
     int ret = botan_ffi_supports_api((uint32_t)version);
-    return janet_wrap_number((double)ret);
+    return janet_wrap_boolean(ret == 0);
 }
 
 static Janet cfun_version_string(int32_t argc, Janet *argv) {

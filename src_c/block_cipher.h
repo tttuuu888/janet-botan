@@ -12,9 +12,9 @@ static Janet cfun_block_cipher_init(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc;
     const char *name = janet_getstring(argv, 0);
     int ret = botan_block_cipher_init(&bc, name);
-    if (ret)
-        return janet_wrap_nil();
-
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
     return janet_wrap_pointer(bc);
 }
 
@@ -22,6 +22,9 @@ static Janet cfun_block_cipher_destroy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     int ret = botan_block_cipher_destroy(bc);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
     return janet_wrap_nil();
 }
 
@@ -29,6 +32,9 @@ static Janet cfun_block_cipher_block_size(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     int size = botan_block_cipher_block_size(bc);
+    if (size < 0) {
+        janet_panic(getBotanError(size));
+    }
     return janet_wrap_number((double)size);
 }
 
@@ -38,6 +44,9 @@ static Janet cfun_block_cipher_name(int32_t argc, Janet *argv) {
     size_t len = 32;
     char name[32] = {0,};
     int ret = botan_block_cipher_name(bc, name, &len);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
     int name_len = strlen(name);
     uint8_t *out = janet_string_begin(name_len);
     memcpy(out, name, name_len);
@@ -49,6 +58,9 @@ static Janet cfun_block_cipher_get_min_keylen(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     size_t spec;
     int ret = botan_block_cipher_get_keyspec(bc, &spec, NULL, NULL);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
     return janet_wrap_number((double)spec);
 }
 
@@ -57,6 +69,9 @@ static Janet cfun_block_cipher_get_max_keylen(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     size_t spec;
     int ret = botan_block_cipher_get_keyspec(bc, NULL, &spec, NULL);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
     return janet_wrap_number((double)spec);
 }
 
@@ -65,6 +80,9 @@ static Janet cfun_block_cipher_get_keylength_modulo(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     size_t spec;
     int ret = botan_block_cipher_get_keyspec(bc, NULL, NULL, &spec);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
     return janet_wrap_number((double)spec);
 }
 
@@ -73,7 +91,10 @@ static Janet cfun_block_cipher_clear(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     size_t spec;
     int ret = botan_block_cipher_get_keyspec(bc, NULL, NULL, &spec);
-    return janet_wrap_boolean(ret == 0);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+    return janet_wrap_nil();
 }
 
 static Janet cfun_block_cipher_set_key(int32_t argc, Janet *argv) {
@@ -81,7 +102,10 @@ static Janet cfun_block_cipher_set_key(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     JanetByteView key = janet_getbytes(argv, 1);
     int ret = botan_block_cipher_set_key(bc, key.bytes, key.len);
-    return janet_wrap_boolean(ret == 0);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+    return janet_wrap_nil();
 }
 
 static Janet cfun_block_cipher_encrypt_blocks(int32_t argc, Janet *argv) {
@@ -89,8 +113,9 @@ static Janet cfun_block_cipher_encrypt_blocks(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     JanetByteView input = janet_getbytes(argv, 1);
     int ret = botan_block_cipher_encrypt_blocks(bc, input.bytes, (uint8_t *)input.bytes, 1);
-    if (ret)
-        return janet_wrap_boolean(ret == 0);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
 
     JanetBuffer *output = janet_buffer(input.len);
     memcpy(output->data, input.bytes, input.len);
@@ -103,8 +128,9 @@ static Janet cfun_block_cipher_decrypt_blocks(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     JanetByteView input = janet_getbytes(argv, 1);
     int ret = botan_block_cipher_decrypt_blocks(bc, input.bytes, (uint8_t *)input.bytes, 1);
-    if (ret)
-        return janet_wrap_boolean(ret == 0);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
 
     JanetBuffer *output = janet_buffer(input.len);
     memcpy(output->data, input.bytes, input.len);

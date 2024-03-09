@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "errors.h"
 #include "versioning.h"
 #include "utility.h"
 #include "rng.h"

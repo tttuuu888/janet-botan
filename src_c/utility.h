@@ -22,6 +22,9 @@ static Janet cfun_hex_encode(int32_t argc, Janet *argv) {
     JanetByteView bin = janet_getbytes(argv, 0);
     JanetBuffer *encoded = janet_buffer(bin.len * 2);
     int ret = botan_hex_encode(bin.bytes, bin.len, (char*)encoded->data, 0);
+    if (ret) {
+        janet_panic("botan_hex_encode failed.");
+    }
     encoded->count = bin.len * 2;
     return janet_wrap_buffer(encoded);
 }
@@ -32,6 +35,9 @@ static Janet cfun_hex_decode(int32_t argc, Janet *argv) {
     JanetBuffer *decoded = janet_buffer(str.len);
     size_t out_len;
     int ret = botan_hex_decode(str.bytes, str.len, (char*)decoded->data, &out_len);
+    if (ret) {
+        janet_panic("botan_hex_decode failed.");
+    }
     decoded->count = out_len;
     return janet_wrap_buffer(decoded);
 }
