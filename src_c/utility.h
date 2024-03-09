@@ -20,7 +20,7 @@ static Janet cfun_constant_time_compare(int32_t argc, Janet *argv) {
 static Janet cfun_hex_encode(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     JanetByteView bin = janet_getbytes(argv, 0);
-    JanetBuffer *encoded = janet_buffer(bin.len * 2 + 1);
+    JanetBuffer *encoded = janet_buffer(bin.len * 2);
     int ret = botan_hex_encode(bin.bytes, bin.len, (char*)encoded->data, 0);
     encoded->count = bin.len * 2;
     return janet_wrap_buffer(encoded);
