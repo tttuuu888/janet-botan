@@ -62,6 +62,14 @@ static Janet cfun_block_cipher_get_keylength_modulo(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)spec);
 }
 
+static Janet cfun_block_cipher_clear(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_block_cipher_t bc = janet_getpointer(argv, 0);
+    size_t spec;
+    int ret = botan_block_cipher_get_keyspec(bc, NULL, NULL, &spec);
+    return janet_wrap_boolean(ret == 0);
+}
+
 static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/init", cfun_block_cipher_init,
      "(block-cipher/init name)\n\n"
@@ -92,6 +100,11 @@ static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/get-keylen-modulo", cfun_block_cipher_get_keylength_modulo,
      "(block-cipher/get-min-keylen bc)\n\n"
      "Return the keylength-modulo which can be provided to this cipher."
+    },
+    {"block-cipher/clear", cfun_block_cipher_clear,
+     "(block-cipher/clear bc)\n\n"
+     "Clear the internal state (such as keys) of this cipher object, "
+     "but do not deallocate it."
     },
     {NULL, NULL, NULL}
 };

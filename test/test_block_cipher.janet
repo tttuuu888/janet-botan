@@ -8,9 +8,11 @@
 
   (assert (= (block-cipher/name cipher) "AES-128"))
 
-  (assert (= 16 (block-cipher/get-min-keylen cipher)))
-  (assert (= 16 (block-cipher/get-max-keylen cipher)))
-  (assert (= 1 (block-cipher/get-keylen-modulo cipher)))
+  (assert (= (block-cipher/get-min-keylen cipher) 16))
+  (assert (= (block-cipher/get-max-keylen cipher) 16))
+  (assert (= (block-cipher/get-keylen-modulo cipher) 1))
+
+  (assert (= (block-cipher/clear cipher) true))
 
   (block-cipher/destroy cipher))
 
