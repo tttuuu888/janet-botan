@@ -16,8 +16,12 @@
 
   (assert (= (block-cipher/set-key
               cipher
-              (hex-decode "00010203040506070001020304050607"))
+              (hex-decode "00000000000000000000000000000000"))
              true))
+  (assert (deep= (hex-encode (block-cipher/encrypt
+                              cipher
+                              (hex-decode "00000000000000000000000000000000")))
+                 @"66E94BD4EF8A2C3B884CFA59CA342B2E"))
 
   (block-cipher/destroy cipher))
 
