@@ -26,6 +26,18 @@ static Janet cfun_block_cipher_block_size(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)size);
 }
 
+static Janet cfun_block_cipher_name(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_block_cipher_t bc = janet_getpointer(argv, 0);
+    size_t len = 32;
+    char name[32] = {0,};
+    int ret = botan_block_cipher_name(bc, name, &len);
+    int name_len = strlen(name);
+    uint8_t *out = janet_string_begin(name_len);
+    memcpy(out, name, name_len);
+    return janet_wrap_string(janet_string_end(out));
+}
+
 static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/init", cfun_block_cipher_init,
      "(block-cipher/init name)\n\n"
@@ -39,6 +51,11 @@ static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/block-size", cfun_block_cipher_block_size,
      "(block-cipher/block-size bc)\n\n"
      "Return the block size of this cipher."
+    },
+    {"block-cipher/name", cfun_block_cipher_name,
+     "(block-cipher/name bc)\n\n"
+     "Return the name of this block cipher algorithm, which may nor may not "
+     " exactly match what was passed to `block-cipher/init`."
     },
     {NULL, NULL, NULL}
 };
