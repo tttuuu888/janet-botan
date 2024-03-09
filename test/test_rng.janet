@@ -9,10 +9,6 @@
   (assert (not (rng/reseed rng 32)))
   (rng/destroy rng))
 
-(let [rng (rng/init)]
-  (assert (not (rng/reseed rng 32)))
-  (rng/destroy rng))
-
 (let [rng (rng/init)
       rng-src (rng/init)]
   (assert (not (rng/reseed-from-rng rng rng-src 32)))
