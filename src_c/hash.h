@@ -76,6 +76,34 @@ static Janet cfun_hash_output_length(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)output_len);
 }
 
+static Janet cfun_hash_update(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+    botan_hash_t hash = janet_getpointer(argv, 0);
+    JanetByteView input = janet_getbytes(argv, 1);
+    int ret = botan_hash_update(hash, input.bytes, input.len);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+    return janet_wrap_nil();
+}
+
+static Janet cfun_hash_final(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_hash_t hash = janet_getpointer(argv, 0);
+    size_t output_len;
+    int ret = botan_hash_output_length(hash, &output_len);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+
+    uint8_t *output = janet_string_begin(output_len);
+    ret = botan_hash_final(hash, output);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+    return janet_wrap_string(janet_string_end(output));
+}
+
 static JanetReg hash_cfuns[] = {
     {"hash/init", cfun_hash_init, "(hash/init name)\n\n"
      "Creates a hash of the given name, e.g., \"SHA-384\"."
@@ -95,6 +123,12 @@ static JanetReg hash_cfuns[] = {
     },
     {"hash/output-len", cfun_hash_output_length, "(hash/output-len hash)\n\n"
      "Return the output length of the `hash`"
+    },
+    {"hash/update", cfun_hash_update, "(hash/update hash input)\n\n"
+     "Add input to the hash computation."
+    },
+    {"hash/final", cfun_hash_final, "(hash/final hash)\n\n"
+     "Finalize the hash and return the output"
     },
     {NULL, NULL, NULL}
 };
