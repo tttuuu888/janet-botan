@@ -12,6 +12,10 @@
     (assert (= (hash/name hash2) "SHA-256"))
     (assert (not (hash/destroy hash2))))
 
+  (assert (not (hash/clear hash)))
+
+  (assert (= (hash/output-len hash) 32))
+
   (assert (not (hash/destroy hash))))
 
 (end-suite)

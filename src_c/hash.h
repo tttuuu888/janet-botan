@@ -55,6 +55,27 @@ static Janet cfun_hash_copy_state(int32_t argc, Janet *argv) {
     return janet_wrap_pointer(hash2);
 }
 
+static Janet cfun_hash_clear(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_hash_t hash = janet_getpointer(argv, 0);
+    int ret = botan_hash_clear(hash);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+    return janet_wrap_nil();
+}
+
+static Janet cfun_hash_output_length(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_hash_t hash = janet_getpointer(argv, 0);
+    size_t output_len;
+    int ret = botan_hash_output_length(hash, &output_len);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+    return janet_wrap_number((double)output_len);
+}
+
 static JanetReg hash_cfuns[] = {
     {"hash/init", cfun_hash_init, "(hash/init name)\n\n"
      "Creates a hash of the given name, e.g., \"SHA-384\"."
@@ -67,6 +88,13 @@ static JanetReg hash_cfuns[] = {
     },
     {"hash/copy", cfun_hash_copy_state, "(hash/copy hash)\n\n"
      "Return a new hash object copied from `hash`."
+    },
+    {"hash/clear", cfun_hash_clear, "(hash/clear hash)\n\n"
+     "Reset the state of `hash` back to clean, "
+     "as if no input has been supplied."
+    },
+    {"hash/output-len", cfun_hash_output_length, "(hash/output-len hash)\n\n"
+     "Return the output length of the `hash`"
     },
     {NULL, NULL, NULL}
 };
