@@ -7,6 +7,11 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
+#define JANET_BOTAN_ASSERT(ret_from_ffi)            \
+    if (ret_from_ffi) {                             \
+        janet_panic(getBotanError(ret_from_ffi));   \
+    }                                               \
+
 static const char* getBotanError(int error) {
     switch(error) {
     case 0:     return "BOTAN_FFI_SUCCESS";
@@ -34,6 +39,5 @@ static const char* getBotanError(int error) {
     default:    return "BOTAN_FFI_ERROR_UNKNOWN_ERROR";
     }
 }
-
 
 #endif /* ERRORS_H */

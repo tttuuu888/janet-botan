@@ -13,6 +13,7 @@ static Janet cfun_constant_time_compare(int32_t argc, Janet *argv) {
     JanetByteView y = janet_getbytes(argv, 1);
     if (x.len != y.len)
         return janet_wrap_false();
+
     int ret = botan_constant_time_compare(x.bytes, y.bytes, x.len);
     return janet_wrap_boolean(ret == 0);
 }
@@ -21,10 +22,10 @@ static Janet cfun_hex_encode(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     JanetByteView bin = janet_getbytes(argv, 0);
     JanetBuffer *encoded = janet_buffer(bin.len * 2);
+
     int ret = botan_hex_encode(bin.bytes, bin.len, (char*)encoded->data, 0);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     encoded->count = bin.len * 2;
     return janet_wrap_string(janet_string(encoded->data, encoded->count));
 }
@@ -34,10 +35,10 @@ static Janet cfun_hex_decode(int32_t argc, Janet *argv) {
     JanetByteView str = janet_getbytes(argv, 0);
     JanetBuffer *decoded = janet_buffer(str.len);
     size_t out_len;
+
     int ret = botan_hex_decode(str.bytes, str.len, (char*)decoded->data, &out_len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     decoded->count = out_len;
     return janet_wrap_string(janet_string(decoded->data, decoded->count));
 }

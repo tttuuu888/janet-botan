@@ -12,30 +12,30 @@ static Janet cfun_cipher_init(int32_t argc, Janet *argv) {
     uint32_t flag = (argc == 0) ? 0 : 1;
     const char *name = janet_getcstring(argv, 0);
     botan_cipher_t cipher;
+
     int ret = botan_cipher_init(&cipher, name, flag);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_pointer(cipher);
 }
 
 static Janet cfun_cipher_destroy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_cipher_t cipher = janet_getpointer(argv, 0);
+
     int ret = botan_cipher_destroy(cipher);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
 static Janet cfun_cipher_clear(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_cipher_t cipher = janet_getpointer(argv, 0);
+
     int ret = botan_cipher_clear(cipher);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
@@ -43,10 +43,10 @@ static Janet cfun_cipher_get_min_keylen(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_cipher_t cipher = janet_getpointer(argv, 0);
     size_t spec;
+
     int ret = botan_cipher_get_keyspec(cipher, &spec, NULL, NULL);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_number((double)spec);
 }
 
@@ -54,10 +54,10 @@ static Janet cfun_cipher_get_max_keylen(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_cipher_t cipher = janet_getpointer(argv, 0);
     size_t spec;
+
     int ret = botan_cipher_get_keyspec(cipher, NULL, &spec, NULL);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_number((double)spec);
 }
 
@@ -65,10 +65,10 @@ static Janet cfun_cipher_set_key(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_cipher_t cipher = janet_getpointer(argv, 0);
     JanetByteView key = janet_getbytes(argv, 1);
+
     int ret = botan_cipher_set_key(cipher, key.bytes, key.len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 

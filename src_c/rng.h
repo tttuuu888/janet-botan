@@ -22,20 +22,20 @@ static Janet cfun_rng_init(int32_t argc, Janet *argv) {
 
     const char *type_input = valid_type ? type : "system";
     botan_rng_t rng;
+
     int ret = botan_rng_init(&rng, type_input);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_pointer(rng);
 }
 
 static Janet cfun_rng_destroy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_rng_t rng = janet_getpointer(argv, 0);
+
     int ret = botan_rng_destroy(rng);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
@@ -53,9 +53,8 @@ static Janet cfun_rng_get(int32_t argc, Janet *argv) {
     uint8_t *out_raw = janet_smalloc(len);
 
     ret = botan_rng_get(rng, out_raw, len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
 
     for(int i=0; i<len; i++)
         out->data[i] = janet_wrap_number(out_raw[i]);
@@ -73,10 +72,10 @@ static Janet cfun_rng_reseed(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_rng_t rng = janet_getpointer(argv, 0);
     int64_t bits = janet_getinteger64(argv, 1);
+
     int ret = botan_rng_reseed(rng, bits);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
@@ -85,10 +84,10 @@ static Janet cfun_rng_reseed_from_rng(int32_t argc, Janet *argv) {
     botan_rng_t rng = janet_getpointer(argv, 0);
     botan_rng_t src = janet_getpointer(argv, 1);
     int64_t bits = janet_getinteger64(argv, 2);
+
     int ret = botan_rng_reseed_from_rng(rng, src, bits);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
@@ -97,10 +96,10 @@ static Janet cfun_rng_add_entropy(int32_t argc, Janet *argv) {
     botan_rng_t rng = janet_getpointer(argv, 0);
     const char *seed = janet_getstring(argv, 1);
     int len = strlen(seed);
+
     int ret = botan_rng_add_entropy(rng, seed, len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 

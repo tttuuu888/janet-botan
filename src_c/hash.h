@@ -11,20 +11,20 @@ static Janet cfun_hash_init(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     const char *name = janet_getcstring(argv, 0);
     botan_hash_t hash;
+
     int ret = botan_hash_init(&hash, name, 0);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_pointer(hash);
 }
 
 static Janet cfun_hash_destroy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_hash_t hash = janet_getpointer(argv, 0);
+
     int ret = botan_hash_destroy(hash);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
@@ -33,10 +33,10 @@ static Janet cfun_hash_name(int32_t argc, Janet *argv) {
     botan_hash_t hash = janet_getpointer(argv, 0);
     char name_buf[32] = {0,};
     size_t name_len = 32;
+
     int ret = botan_hash_name(hash, name_buf, &name_len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
 
     name_len -= 1;              /* A length except the last null character */
     uint8_t *name = janet_string_begin(name_len);
@@ -48,20 +48,20 @@ static Janet cfun_hash_copy_state(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_hash_t hash = janet_getpointer(argv, 0);
     botan_hash_t hash2;
+
     int ret = botan_hash_copy_state(&hash2, hash);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_pointer(hash2);
 }
 
 static Janet cfun_hash_clear(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_hash_t hash = janet_getpointer(argv, 0);
+
     int ret = botan_hash_clear(hash);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
@@ -69,10 +69,10 @@ static Janet cfun_hash_output_length(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_hash_t hash = janet_getpointer(argv, 0);
     size_t output_len;
+
     int ret = botan_hash_output_length(hash, &output_len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_number((double)output_len);
 }
 
@@ -80,10 +80,10 @@ static Janet cfun_hash_update(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_hash_t hash = janet_getpointer(argv, 0);
     JanetByteView input = janet_getbytes(argv, 1);
+
     int ret = botan_hash_update(hash, input.bytes, input.len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_nil();
 }
 
@@ -91,16 +91,14 @@ static Janet cfun_hash_final(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_hash_t hash = janet_getpointer(argv, 0);
     size_t output_len;
+
     int ret = botan_hash_output_length(hash, &output_len);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
 
     uint8_t *output = janet_string_begin(output_len);
     ret = botan_hash_final(hash, output);
-    if (ret) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
+
     return janet_wrap_string(janet_string_end(output));
 }
 
