@@ -13,7 +13,7 @@
 
   (assert (= (block-cipher/get-min-keylen cipher) 16))
   (assert (= (block-cipher/get-max-keylen cipher) 16))
-  (assert (= (block-cipher/get-keylen-modulo cipher) 1))
+  (assert (= (block-cipher/get-mod-keylen cipher) 1))
 
   (assert (not (block-cipher/clear cipher)))
 

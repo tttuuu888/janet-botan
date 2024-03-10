@@ -75,7 +75,7 @@ static Janet cfun_block_cipher_get_max_keylen(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)spec);
 }
 
-static Janet cfun_block_cipher_get_keylength_modulo(int32_t argc, Janet *argv) {
+static Janet cfun_block_cipher_get_mod_keylen(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     size_t spec;
@@ -165,8 +165,8 @@ static JanetReg block_cipher_cfuns[] = {
      "(block-cipher/get-max-keylen bc)\n\n"
      "Return the maximum-keylength which can be provided to this cipher."
     },
-    {"block-cipher/get-keylen-modulo", cfun_block_cipher_get_keylength_modulo,
-     "(block-cipher/get-min-keylen bc)\n\n"
+    {"block-cipher/get-mod-keylen", cfun_block_cipher_get_mod_keylen,
+     "(block-cipher/get-mod-keylen bc)\n\n"
      "Return the keylength-modulo which can be provided to this cipher."
     },
     {"block-cipher/clear", cfun_block_cipher_clear,
