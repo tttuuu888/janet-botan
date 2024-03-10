@@ -6,6 +6,7 @@
 (assert-error "Error expected" (hash/init "SHA-255"))
 
 (let [hash (assert (hash/init "SHA-256"))]
+  (assert (= (hash/name hash) "SHA-256"))
 
   (assert (not (hash/destroy hash))))
 

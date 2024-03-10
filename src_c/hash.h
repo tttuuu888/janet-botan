@@ -28,12 +28,31 @@ static Janet cfun_hash_destroy(int32_t argc, Janet *argv) {
     return janet_wrap_nil();
 }
 
+static Janet cfun_hash_name(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_hash_t hash = janet_getpointer(argv, 0);
+    char name_buf[32] = {0,};
+    size_t name_len = 32;
+    int ret = botan_hash_name(hash, name_buf, &name_len);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+
+    name_len -= 1;              /* A length except the last null character */
+    uint8_t *name = janet_string_begin(name_len);
+    strcpy(name, name_buf);
+    return janet_wrap_string(janet_string_end(name));
+}
+
 static JanetReg hash_cfuns[] = {
     {"hash/init", cfun_hash_init, "(hash/init name)\n\n"
      "Creates a hash of the given name, e.g., \"SHA-384\"."
     },
-    {"hash/destroy", cfun_hash_destroy, "(hash/destroy name)\n\n"
+    {"hash/destroy", cfun_hash_destroy, "(hash/destroy hash)\n\n"
      "Destroy the object created by `hash/init`."
+    },
+    {"hash/name", cfun_hash_name, "(hash/name hash)\n\n"
+     "Return the name of the hash function."
     },
     {NULL, NULL, NULL}
 };
