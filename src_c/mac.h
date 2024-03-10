@@ -132,7 +132,8 @@ static JanetReg mac_cfuns[] = {
      "Reset the state of `mac` back to clean, "
      "as if no key and input has been supplied."
     },
-    {"mac/output-len", cfun_mac_output_length, "(mac/output-len mac)\n\n"
+    {"mac/output-length", cfun_mac_output_length,
+     "(mac/output-length mac)\n\n"
      "Return the output length of the `mac`"
     },
     {"mac/get-min-keylen", cfun_mac_get_min_keylen,

@@ -121,7 +121,8 @@ static JanetReg hash_cfuns[] = {
      "Reset the state of `hash` back to clean, "
      "as if no input has been supplied."
     },
-    {"hash/output-len", cfun_hash_output_length, "(hash/output-len hash)\n\n"
+    {"hash/output-length", cfun_hash_output_length,
+     "(hash/output-length hash)\n\n"
      "Return the output length of the `hash`"
     },
     {"hash/update", cfun_hash_update, "(hash/update hash input)\n\n"

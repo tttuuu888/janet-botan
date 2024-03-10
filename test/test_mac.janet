@@ -6,7 +6,7 @@
 (assert-error "Error expected" (mac/init "HMAC(SHA-255)"))
 
 (let [mac (assert (mac/init "HMAC(SHA-256)"))]
-  (assert (= (mac/output-len mac) 32))
+  (assert (= (mac/output-length mac) 32))
   (assert (= (mac/get-min-keylen mac) 0))
   (assert (= (mac/get-max-keylen mac) 4096))
 

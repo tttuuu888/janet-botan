@@ -7,7 +7,7 @@
 
 (let [hash (assert (hash/init "SHA-256"))]
   (assert (= (hash/name hash) "SHA-256"))
-  (assert (= (hash/output-len hash) 32))
+  (assert (= (hash/output-length hash) 32))
 
   (assert (not (hash/update hash "ABC")))
   (assert (deep= (hex-encode (hash/final hash))
