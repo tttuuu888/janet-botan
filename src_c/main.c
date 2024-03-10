@@ -14,6 +14,7 @@
 #include "utility.h"
 #include "rng.h"
 #include "block_cipher.h"
+#include "hash.h"
 
 extern const unsigned char *src_janet___botan_lib_embed;
 extern size_t src_janet___botan_lib_embed_size;
@@ -23,6 +24,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "botan", utility_cfuns);
     janet_cfuns(env, "botan/rng", rng_cfuns);
     janet_cfuns(env, "botan/block-cipher", block_cipher_cfuns);
+    janet_cfuns(env, "botan/hash", hash_cfuns);
     janet_dobytes(env,
                   src_janet___botan_lib_embed,
                   src_janet___botan_lib_embed_size,
