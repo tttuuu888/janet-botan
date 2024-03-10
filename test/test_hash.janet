@@ -8,6 +8,10 @@
 (let [hash (assert (hash/init "SHA-256"))]
   (assert (= (hash/name hash) "SHA-256"))
 
+  (let [hash2 (assert (hash/copy hash))]
+    (assert (= (hash/name hash2) "SHA-256"))
+    (assert (not (hash/destroy hash2))))
+
   (assert (not (hash/destroy hash))))
 
 (end-suite)

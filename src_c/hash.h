@@ -44,6 +44,17 @@ static Janet cfun_hash_name(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string_end(name));
 }
 
+static Janet cfun_hash_copy_state(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_hash_t hash = janet_getpointer(argv, 0);
+    botan_hash_t hash2;
+    int ret = botan_hash_copy_state(&hash2, hash);
+    if (ret) {
+        janet_panic(getBotanError(ret));
+    }
+    return janet_wrap_pointer(hash2);
+}
+
 static JanetReg hash_cfuns[] = {
     {"hash/init", cfun_hash_init, "(hash/init name)\n\n"
      "Creates a hash of the given name, e.g., \"SHA-384\"."
@@ -53,6 +64,9 @@ static JanetReg hash_cfuns[] = {
     },
     {"hash/name", cfun_hash_name, "(hash/name hash)\n\n"
      "Return the name of the hash function."
+    },
+    {"hash/copy", cfun_hash_copy_state, "(hash/copy hash)\n\n"
+     "Return a new hash object copied from `hash`."
     },
     {NULL, NULL, NULL}
 };
