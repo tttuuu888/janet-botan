@@ -26,7 +26,7 @@ static Janet cfun_hex_encode(int32_t argc, Janet *argv) {
         janet_panic(getBotanError(ret));
     }
     encoded->count = bin.len * 2;
-    return janet_wrap_buffer(encoded);
+    return janet_wrap_string(janet_string(encoded->data, encoded->count));
 }
 
 static Janet cfun_hex_decode(int32_t argc, Janet *argv) {
@@ -39,7 +39,7 @@ static Janet cfun_hex_decode(int32_t argc, Janet *argv) {
         janet_panic(getBotanError(ret));
     }
     decoded->count = out_len;
-    return janet_wrap_buffer(decoded);
+    return janet_wrap_string(janet_string(decoded->data, decoded->count));
 }
 
 static JanetReg utility_cfuns[] = {

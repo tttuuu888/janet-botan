@@ -24,12 +24,12 @@
   (assert (deep= (hex-encode (block-cipher/encrypt
                               cipher
                               (hex-decode "00000000000000000000000000000000")))
-                 @"66E94BD4EF8A2C3B884CFA59CA342B2E"))
+                 "66E94BD4EF8A2C3B884CFA59CA342B2E"))
 
   (assert (deep= (hex-encode (block-cipher/decrypt
                               cipher
                               (hex-decode "66E94BD4EF8A2C3B884CFA59CA342B2E")))
-                 @"00000000000000000000000000000000"))
+                 "00000000000000000000000000000000"))
 
   (assert (not (block-cipher/destroy cipher))))
 
