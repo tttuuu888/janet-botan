@@ -39,26 +39,18 @@ static Janet cfun_cipher_clear(int32_t argc, Janet *argv) {
     return janet_wrap_nil();
 }
 
-static Janet cfun_cipher_get_min_keylen(int32_t argc, Janet *argv) {
+static Janet cfun_cipher_get_keyspec(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
-    botan_cipher_t cipher = janet_getpointer(argv, 0);
-    size_t spec;
+    botan_cipher_t bc = janet_getpointer(argv, 0);
+    size_t min_key, max_key, mod_key;
 
-    int ret = botan_cipher_get_keyspec(cipher, &spec, NULL, NULL);
+    int ret = botan_cipher_get_keyspec(bc, &min_key, &max_key, &mod_key);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_number((double)spec);
-}
-
-static Janet cfun_cipher_get_max_keylen(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_cipher_t cipher = janet_getpointer(argv, 0);
-    size_t spec;
-
-    int ret = botan_cipher_get_keyspec(cipher, NULL, &spec, NULL);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_number((double)spec);
+    Janet spec[3] = {janet_wrap_number((double)min_key),
+                     janet_wrap_number((double)max_key),
+                     janet_wrap_number((double)mod_key)};
+    return janet_wrap_tuple(janet_tuple_n(spec, 3));
 }
 
 static Janet cfun_cipher_set_key(int32_t argc, Janet *argv) {
@@ -84,13 +76,10 @@ static JanetReg cipher_cfuns[] = {
      "Reset the state of `cipher` back to clean, "
      "as if no key and input has been supplied."
     },
-    {"cipher/get-min-keylen", cfun_cipher_get_min_keylen,
-     "(cipher/get-min-keylen cipher)\n\n"
-     "Return the smallest key length that is acceptable for the algorithm."
-    },
-    {"cipher/get-max-keylen", cfun_cipher_get_max_keylen,
-     "(cipher/get-max-keylen cipher)\n\n"
-     "Return the largest key length that is acceptable for the algorithm."
+    {"cipher/get-keyspec", cfun_cipher_get_keyspec,
+     "(cipher/get-keyspec cipher)\n\n"
+     "Return the key spec of this `cipher` in format of "
+     "[max-key-length min-key-length mod-key-length]."
     },
     {"cipher/set-key", cfun_cipher_set_key, "(cipher/set-key cipher key)\n\n"
      "Set the symmetric key to be used."

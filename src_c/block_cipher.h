@@ -55,37 +55,18 @@ static Janet cfun_block_cipher_name(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string_end(out));
 }
 
-static Janet cfun_block_cipher_get_min_keylen(int32_t argc, Janet *argv) {
+static Janet cfun_block_cipher_get_keyspec(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
-    size_t spec;
+    size_t min_key, max_key, mod_key;
 
-    int ret = botan_block_cipher_get_keyspec(bc, &spec, NULL, NULL);
+    int ret = botan_block_cipher_get_keyspec(bc, &min_key, &max_key, &mod_key);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_number((double)spec);
-}
-
-static Janet cfun_block_cipher_get_max_keylen(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_block_cipher_t bc = janet_getpointer(argv, 0);
-    size_t spec;
-
-    int ret = botan_block_cipher_get_keyspec(bc, NULL, &spec, NULL);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_number((double)spec);
-}
-
-static Janet cfun_block_cipher_get_mod_keylen(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_block_cipher_t bc = janet_getpointer(argv, 0);
-    size_t spec;
-
-    int ret = botan_block_cipher_get_keyspec(bc, NULL, NULL, &spec);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_number((double)spec);
+    Janet spec[3] = {janet_wrap_number((double)min_key),
+                     janet_wrap_number((double)max_key),
+                     janet_wrap_number((double)mod_key)};
+    return janet_wrap_tuple(janet_tuple_n(spec, 3));
 }
 
 static Janet cfun_block_cipher_clear(int32_t argc, Janet *argv) {
@@ -157,17 +138,10 @@ static JanetReg block_cipher_cfuns[] = {
      "Return the name of this block cipher algorithm, which may nor may not "
      " exactly match what was passed to `block-cipher/init`."
     },
-    {"block-cipher/get-min-keylen", cfun_block_cipher_get_min_keylen,
-     "(block-cipher/get-min-keylen bc)\n\n"
-     "Return the minimum-keylength which can be provided to this cipher."
-    },
-    {"block-cipher/get-max-keylen", cfun_block_cipher_get_max_keylen,
-     "(block-cipher/get-max-keylen bc)\n\n"
-     "Return the maximum-keylength which can be provided to this cipher."
-    },
-    {"block-cipher/get-mod-keylen", cfun_block_cipher_get_mod_keylen,
-     "(block-cipher/get-mod-keylen bc)\n\n"
-     "Return the keylength-modulo which can be provided to this cipher."
+    {"block-cipher/get-keyspec", cfun_block_cipher_get_keyspec,
+     "(block-cipher/get-keyspec mac)\n\n"
+     "Return the key spec of this cipher in format of "
+     "[max-key-length min-key-length mod-key-length]."
     },
     {"block-cipher/clear", cfun_block_cipher_clear,
      "(block-cipher/clear bc)\n\n"

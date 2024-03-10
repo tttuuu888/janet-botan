@@ -49,26 +49,18 @@ static Janet cfun_mac_output_length(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)output_len);
 }
 
-static Janet cfun_mac_get_min_keylen(int32_t argc, Janet *argv) {
+static Janet cfun_mac_get_keyspec(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_mac_t mac = janet_getpointer(argv, 0);
-    size_t spec;
+    size_t min_key, max_key, mod_key;
 
-    int ret = botan_mac_get_keyspec(mac, &spec, NULL, NULL);
+    int ret = botan_mac_get_keyspec(mac, &min_key, &max_key, &mod_key);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_number((double)spec);
-}
-
-static Janet cfun_mac_get_max_keylen(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_mac_t mac = janet_getpointer(argv, 0);
-    size_t spec;
-
-    int ret = botan_mac_get_keyspec(mac, NULL, &spec, NULL);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_number((double)spec);
+    Janet spec[3] = {janet_wrap_number((double)min_key),
+                     janet_wrap_number((double)max_key),
+                     janet_wrap_number((double)mod_key)};
+    return janet_wrap_tuple(janet_tuple_n(spec, 3));
 }
 
 static Janet cfun_mac_set_key(int32_t argc, Janet *argv) {
@@ -134,13 +126,10 @@ static JanetReg mac_cfuns[] = {
      "(mac/output-length mac)\n\n"
      "Return the output length of the `mac`"
     },
-    {"mac/get-min-keylen", cfun_mac_get_min_keylen,
-     "(mac/get-min-keylen mac)\n\n"
-     "Return the minimum-keylength which can be provided to MAC computation."
-    },
-    {"mac/get-max-keylen", cfun_mac_get_max_keylen,
-     "(mac/get-max-keylen mac)\n\n"
-     "Return the maximum-keylength which can be provided to MAC computation."
+    {"mac/get-keyspec", cfun_mac_get_keyspec,
+     "(mac/get-keyspec mac)\n\n"
+     "Return the key spec of the `mac` in format of "
+     "[max-key-length min-key-length mod-key-length]."
     },
     {"mac/set-key", cfun_mac_set_key, "(mac/set-key mac key)\n\n"
      "Set the `key` for the MAC calculation."

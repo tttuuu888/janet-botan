@@ -11,9 +11,10 @@
 
   (assert (= (block-cipher/name cipher) "AES-128"))
 
-  (assert (= (block-cipher/get-min-keylen cipher) 16))
-  (assert (= (block-cipher/get-max-keylen cipher) 16))
-  (assert (= (block-cipher/get-mod-keylen cipher) 1))
+  (let [[min-key max-key mod-key] (block-cipher/get-keyspec cipher)]
+    (assert (= min-key 16))
+    (assert (= max-key 16))
+    (assert (= mod-key 1)))
 
   (assert (not (block-cipher/clear cipher)))
 
