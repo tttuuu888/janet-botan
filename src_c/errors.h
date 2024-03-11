@@ -8,7 +8,7 @@
 #define ERRORS_H
 
 #define JANET_BOTAN_ASSERT(ret_from_ffi)            \
-    if (ret_from_ffi) {                             \
+    if (ret_from_ffi < 0) {                         \
         janet_panic(getBotanError(ret_from_ffi));   \
     }                                               \
 
