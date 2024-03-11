@@ -39,7 +39,7 @@ static Janet cfun_hash_name(int32_t argc, Janet *argv) {
 
 
     name_len -= 1;              /* A length except the last null character */
-    return janet_wrap_string(janet_string(name_buf, name_len));
+    return janet_wrap_string(janet_string((const uint8_t *)name_buf, name_len));
 }
 
 static Janet cfun_hash_copy_state(int32_t argc, Janet *argv) {

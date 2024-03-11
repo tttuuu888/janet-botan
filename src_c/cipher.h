@@ -39,7 +39,7 @@ static Janet cfun_cipher_name(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     name_len -= 1;              /* A length except the last null character */
-    return janet_wrap_string(janet_string(name_buf, name_len));
+    return janet_wrap_string(janet_string((const uint8_t *)name_buf, name_len));
 }
 
 static Janet cfun_cipher_clear(int32_t argc, Janet *argv) {

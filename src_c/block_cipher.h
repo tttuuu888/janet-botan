@@ -10,7 +10,7 @@
 static Janet cfun_block_cipher_init(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_block_cipher_t bc;
-    const char *name = janet_getstring(argv, 0);
+    const char *name = (const char *)janet_getstring(argv, 0);
 
     int ret = botan_block_cipher_init(&bc, name);
     JANET_BOTAN_ASSERT(ret);
@@ -47,7 +47,7 @@ static Janet cfun_block_cipher_name(int32_t argc, Janet *argv) {
     int ret = botan_block_cipher_name(bc, name, &len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_string(janet_string(name, strlen(name)));
+    return janet_wrap_string(janet_string((const uint8_t *)name, strlen(name)));
 }
 
 static Janet cfun_block_cipher_get_keyspec(int32_t argc, Janet *argv) {

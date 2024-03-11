@@ -94,10 +94,10 @@ static Janet cfun_rng_reseed_from_rng(int32_t argc, Janet *argv) {
 static Janet cfun_rng_add_entropy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_rng_t rng = janet_getpointer(argv, 0);
-    const char *seed = janet_getstring(argv, 1);
+    const char *seed = (const char *)janet_getstring(argv, 1);
     int len = strlen(seed);
 
-    int ret = botan_rng_add_entropy(rng, seed, len);
+    int ret = botan_rng_add_entropy(rng, (const uint8_t *)seed, len);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_nil();
