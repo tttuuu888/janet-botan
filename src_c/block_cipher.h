@@ -33,9 +33,7 @@ static Janet cfun_block_cipher_block_size(int32_t argc, Janet *argv) {
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
 
     int size = botan_block_cipher_block_size(bc);
-    if (size < 0) {
-        janet_panic(getBotanError(size));
-    }
+    JANET_BOTAN_ASSERT(size);
 
     return janet_wrap_number((double)size);
 }
@@ -92,12 +90,15 @@ static Janet cfun_block_cipher_encrypt_blocks(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     JanetByteView input = janet_getbytes(argv, 1);
+    JanetBuffer *output = janet_buffer(input.len);
 
-    int ret = botan_block_cipher_encrypt_blocks(bc, input.bytes, (uint8_t *)input.bytes, 1);
+    int size = botan_block_cipher_block_size(bc);
+    JANET_BOTAN_ASSERT(size);
+
+    int blocks = input.len / size;
+    int ret = botan_block_cipher_encrypt_blocks(bc, input.bytes, output->data, blocks);
     JANET_BOTAN_ASSERT(ret);
 
-    JanetBuffer *output = janet_buffer(input.len);
-    memcpy(output->data, input.bytes, input.len);
     output->count = input.len;
     return janet_wrap_buffer(output);
 }
@@ -106,12 +107,15 @@ static Janet cfun_block_cipher_decrypt_blocks(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_block_cipher_t bc = janet_getpointer(argv, 0);
     JanetByteView input = janet_getbytes(argv, 1);
+    JanetBuffer *output = janet_buffer(input.len);
 
-    int ret = botan_block_cipher_decrypt_blocks(bc, input.bytes, (uint8_t *)input.bytes, 1);
+    int size = botan_block_cipher_block_size(bc);
+    JANET_BOTAN_ASSERT(size);
+
+    int blocks = input.len / size;
+    int ret = botan_block_cipher_decrypt_blocks(bc, input.bytes, output->data, blocks);
     JANET_BOTAN_ASSERT(ret);
 
-    JanetBuffer *output = janet_buffer(input.len);
-    memcpy(output->data, input.bytes, input.len);
     output->count = input.len;
     return janet_wrap_buffer(output);
 }
