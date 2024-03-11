@@ -1,4 +1,4 @@
-{:title "Random Number Generators"
+{:title "Symmetric Ciphers"
  :author "Seungki Kim"
  :license "MIT license"
  :template "mdzdoc/main.html"}
@@ -6,8 +6,8 @@
 
 ## Index
 
-@api-index[/build/botan][rng/]
+@api-index[/build/botan][cipher/]
 
 ## Reference
 
-@api-docs[/build/botan][rng/]
+@api-docs[/build/botan][cipher/]

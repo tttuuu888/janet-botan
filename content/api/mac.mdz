@@ -1,4 +1,4 @@
-{:title "Random Number Generators"
+{:title "Message Authentication Codes"
  :author "Seungki Kim"
  :license "MIT license"
  :template "mdzdoc/main.html"}
@@ -6,8 +6,8 @@
 
 ## Index
 
-@api-index[/build/botan][rng/]
+@api-index[/build/botan][mac/]
 
 ## Reference
 
-@api-docs[/build/botan][rng/]
+@api-docs[/build/botan][mac/]
