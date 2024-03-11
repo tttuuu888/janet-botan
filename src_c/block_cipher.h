@@ -49,10 +49,7 @@ static Janet cfun_block_cipher_name(int32_t argc, Janet *argv) {
     int ret = botan_block_cipher_name(bc, name, &len);
     JANET_BOTAN_ASSERT(ret);
 
-    int name_len = strlen(name);
-    uint8_t *out = janet_string_begin(name_len);
-    memcpy(out, name, name_len);
-    return janet_wrap_string(janet_string_end(out));
+    return janet_wrap_string(janet_string(name, strlen(name)));
 }
 
 static Janet cfun_block_cipher_get_keyspec(int32_t argc, Janet *argv) {
