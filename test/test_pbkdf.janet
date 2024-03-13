@@ -12,7 +12,7 @@
 (assert (not= (pbkdf "PBKDF2(SHA-256)" "abcd" 32)
               (pbkdf "PBKDF2(SHA-256)" "abcd" 32)))
 
-(let [[salt iter psk] (pbkdf-timed "PBKDF2(SHA-256)" "abcd" 32)]
+(let [[salt iter psk] (pbkdf-timed "PBKDF2(SHA-256)" "abcd" 32 10)]
   (assert (= [salt iter psk]
              (pbkdf "PBKDF2(SHA-256)" "abcd" 32 iter salt))))
 
