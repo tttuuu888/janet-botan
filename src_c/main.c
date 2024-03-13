@@ -17,6 +17,7 @@
 #include "hash.h"
 #include "mac.h"
 #include "cipher.h"
+#include "pbkdf.h"
 
 extern const unsigned char *src_janet___botan_lib_embed;
 extern size_t src_janet___botan_lib_embed_size;
@@ -29,6 +30,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "botan/hash", hash_cfuns);
     janet_cfuns(env, "botan/mac", mac_cfuns);
     janet_cfuns(env, "botan/cipher", cipher_cfuns);
+    janet_cfuns(env, "botan", pbkdf_cfuns);
     janet_dobytes(env,
                   src_janet___botan_lib_embed,
                   src_janet___botan_lib_embed_size,
