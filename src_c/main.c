@@ -17,6 +17,7 @@
 #include "hash.h"
 #include "mac.h"
 #include "cipher.h"
+#include "bcrypt.h"
 #include "pbkdf.h"
 #include "scrypt.h"
 #include "kdf.h"
@@ -32,6 +33,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "botan/hash", hash_cfuns);
     janet_cfuns(env, "botan/mac", mac_cfuns);
     janet_cfuns(env, "botan/cipher", cipher_cfuns);
+    janet_cfuns(env, "botan", bcrypt_cfuns);
     janet_cfuns(env, "botan", pbkdf_cfuns);
     janet_cfuns(env, "botan", scrypt_cfuns);
     janet_cfuns(env, "botan", kdf_cfuns);
