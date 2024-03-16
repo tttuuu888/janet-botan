@@ -57,4 +57,8 @@ static JanetReg utility_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
+static void submod_utility(JanetTable *env) {
+    janet_cfuns(env, "botan", utility_cfuns);
+}
+
 #endif /* BOTAN_UTILITY_H */

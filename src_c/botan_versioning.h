@@ -90,4 +90,8 @@ static JanetReg versioning_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
+static void submod_versioning(JanetTable *env) {
+    janet_cfuns(env, "botan", versioning_cfuns);
+}
+
 #endif /* BOTAN_VERSIONING_H */

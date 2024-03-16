@@ -26,8 +26,8 @@ extern const unsigned char *src_janet___botan_lib_embed;
 extern size_t src_janet___botan_lib_embed_size;
 
 JANET_MODULE_ENTRY(JanetTable *env) {
-    janet_cfuns(env, "botan", versioning_cfuns);
-    janet_cfuns(env, "botan", utility_cfuns);
+    submod_versioning(env);
+    submod_utility(env);
     submod_rng(env);
     submod_block_cipher(env);
     submod_hash(env);
