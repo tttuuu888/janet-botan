@@ -3,9 +3,9 @@
 
 (start-suite "hash")
 
-(assert-error "Error expected" (hash/init "SHA-255"))
+(assert-error "Error expected" (hash/new "SHA-255"))
 
-(let [hash (assert (hash/init "SHA-256"))]
+(let [hash (assert (hash/new "SHA-256"))]
   (assert (= (hash/name hash) "SHA-256"))
   (assert (= (hash/output-length hash) 32))
 
@@ -27,9 +27,6 @@
     (assert (= (hash/name hash2) "SHA-256"))
     (assert (not (hash/update hash2 "message digest")))
     (assert (deep= (hex-encode (hash/final hash2))
-                   "F7846F55CF23E14EEBEAB5B4E1550CAD5B509E3348FBC4EFA3A1413D393CB650"))
-    (assert (not (hash/destroy hash2))))
-
-  (assert (not (hash/destroy hash))))
+                   "F7846F55CF23E14EEBEAB5B4E1550CAD5B509E3348FBC4EFA3A1413D393CB650"))))
 
 (end-suite)

@@ -3,7 +3,6 @@
 
 (start-suite "rng")
 
-
 (let [rng-ori (assert (rng/new))
       rng-src (assert (rng/new))
       seed (range 8)]
