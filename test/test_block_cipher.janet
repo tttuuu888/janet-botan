@@ -3,11 +3,10 @@
 
 (start-suite "block-cipher")
 
-(assert-error "Error expected" (block-cipher/init "AES-129"))
+(assert-error "Error expected" (block-cipher/new "AES-129"))
 
-(let [cipher (assert (block-cipher/init "AES-128"))]
+(let [cipher (assert (block-cipher/new "AES-128"))]
   (assert (= (block-cipher/block-size cipher) 16))
-
 
   (assert (= (block-cipher/name cipher) "AES-128"))
 
@@ -30,8 +29,6 @@
   (assert (deep= (hex-encode (block-cipher/decrypt
                               cipher
                               (hex-decode "66E94BD4EF8A2C3B884CFA59CA342B2E")))
-                 "00000000000000000000000000000000"))
-
-  (assert (not (block-cipher/destroy cipher))))
+                 "00000000000000000000000000000000")))
 
 (end-suite)
