@@ -7,7 +7,64 @@
 #ifndef RNG_H
 #define RNG_H
 
-static Janet cfun_rng_init(int32_t argc, Janet *argv) {
+typedef struct botan_rng_obj {
+    botan_rng_t rng;
+} botan_rng_obj_t;
+
+/* Abstract Object functions */
+static int rng_gc_fn(void *data, size_t len);
+static int rng_get_fn(void *data, Janet key, Janet *out);
+
+/* Janet functions */
+static Janet rng_new(int32_t argc, Janet *argv);
+static Janet rng_get(int32_t argc, Janet *argv);
+static Janet rng_reseed(int32_t argc, Janet *argv);
+static Janet rng_reseed_from_rng(int32_t argc, Janet *argv);
+static Janet rng_add_entropy(int32_t argc, Janet *argv);
+
+static JanetAbstractType rng_obj_type = {
+    "botan/rng",
+    rng_gc_fn,
+    NULL,
+    rng_get_fn,
+    JANET_ATEND_GET
+};
+
+static JanetMethod rng_methods[] = {
+    {"get", rng_get},
+    {"reseed", rng_reseed},
+    {"reseed-from-rng", rng_reseed_from_rng},
+    {"add-entropy", rng_add_entropy},
+    {NULL, NULL},
+};
+
+static JanetAbstractType *botan_rng_obj_type() {
+    return &rng_obj_type;
+}
+
+/* Abstract Object functions */
+static int rng_gc_fn(void *data, size_t len) {
+    botan_rng_obj_t *rng = (botan_rng_obj_t *)data;
+
+    int ret = botan_rng_destroy(rng->rng);
+    JANET_BOTAN_ASSERT(ret);
+
+    return 0;
+}
+
+static int rng_get_fn(void *data, Janet key, Janet *out) {
+    (void)data;
+    if (!janet_checktype(key, JANET_KEYWORD)) {
+        return 0;
+    }
+
+    return janet_getmethod(janet_unwrap_keyword(key), rng_methods, out);
+}
+
+static Janet rng_new(int32_t argc, Janet *argv) {
+    botan_rng_obj_t *rng_obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+    memset(rng_obj, 0, sizeof(botan_rng_obj_t));
+
     janet_arity(argc, 0, 1);
     const char *type = (argc == 0) ? "system" : janet_getcstring(argv, 0);
     bool valid_type = false;
@@ -21,57 +78,34 @@ static Janet cfun_rng_init(int32_t argc, Janet *argv) {
     }
 
     const char *type_input = valid_type ? type : "system";
-    botan_rng_t rng;
 
-    int ret = botan_rng_init(&rng, type_input);
+    int ret = botan_rng_init(&rng_obj->rng, type_input);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_pointer(rng);
+    return janet_wrap_abstract(rng_obj);
 }
 
-static Janet cfun_rng_destroy(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_rng_t rng = janet_getpointer(argv, 0);
-
-    int ret = botan_rng_destroy(rng);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_nil();
-}
-
-static Janet cfun_rng_get(int32_t argc, Janet *argv) {
-    janet_arity(argc, 1, 2);
+static Janet rng_get(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
+    botan_rng_t rng = rng_obj->rng;
+    size_t len = janet_getsize(argv, 1);
 
     int ret;
-    botan_rng_t rng;
-    if (argc == 1)
-        ret = botan_rng_init(&rng, "system");
-    else
-        rng = janet_getpointer(argv, 1);
-    int64_t len = janet_getinteger64(argv, 0);
-    JanetArray *out = janet_array(len);
-    uint8_t *out_raw = janet_smalloc(len);
+    JanetBuffer *out = janet_buffer(len);
 
-    ret = botan_rng_get(rng, out_raw, len);
+    ret = botan_rng_get(rng, out->data, len);
     JANET_BOTAN_ASSERT(ret);
 
-
-    for(int i=0; i<len; i++)
-        out->data[i] = janet_wrap_number(out_raw[i]);
-
-    janet_sfree(out_raw);
     out->count = len;
-
-    if (argc == 1)
-        ret = botan_rng_destroy(rng);
-
-    return janet_wrap_array(out);
+    return janet_wrap_string(janet_string(out->data, out->count));
 }
 
-static Janet cfun_rng_reseed(int32_t argc, Janet *argv) {
+static Janet rng_reseed(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
-    botan_rng_t rng = janet_getpointer(argv, 0);
-    int64_t bits = janet_getinteger64(argv, 1);
+    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
+    botan_rng_t rng = rng_obj->rng;
+    size_t bits = janet_getsize(argv, 1);
 
     int ret = botan_rng_reseed(rng, bits);
     JANET_BOTAN_ASSERT(ret);
@@ -79,11 +113,13 @@ static Janet cfun_rng_reseed(int32_t argc, Janet *argv) {
     return janet_wrap_nil();
 }
 
-static Janet cfun_rng_reseed_from_rng(int32_t argc, Janet *argv) {
+static Janet rng_reseed_from_rng(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 3);
-    botan_rng_t rng = janet_getpointer(argv, 0);
-    botan_rng_t src = janet_getpointer(argv, 1);
-    int64_t bits = janet_getinteger64(argv, 2);
+    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
+    botan_rng_t rng = rng_obj->rng;
+    botan_rng_obj_t *rng_obj2 = janet_getabstract(argv, 1, botan_rng_obj_type());
+    botan_rng_t src = rng_obj2->rng;
+    size_t bits = janet_getsize(argv, 2);
 
     int ret = botan_rng_reseed_from_rng(rng, src, bits);
     JANET_BOTAN_ASSERT(ret);
@@ -91,9 +127,10 @@ static Janet cfun_rng_reseed_from_rng(int32_t argc, Janet *argv) {
     return janet_wrap_nil();
 }
 
-static Janet cfun_rng_add_entropy(int32_t argc, Janet *argv) {
+static Janet rng_add_entropy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
-    botan_rng_t rng = janet_getpointer(argv, 0);
+    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
+    botan_rng_t rng = rng_obj->rng;
     const char *seed = (const char *)janet_getstring(argv, 1);
     int len = strlen(seed);
 
@@ -104,7 +141,7 @@ static Janet cfun_rng_add_entropy(int32_t argc, Janet *argv) {
 }
 
 static JanetReg rng_cfuns[] = {
-    {"rng/init", cfun_rng_init, "(rng/init &opt type)\n\n"
+    {"rng/new", rng_new, "(rng/new &opt type)\n\n"
      "Initialize a random number generator from the given `type`:\n\n"
      "\"system\": System-RNG (defaulting to \"system\" type rng)\n\n"
      "\"user\": AutoSeeded-RNG\n\n"
@@ -112,27 +149,29 @@ static JanetReg rng_cfuns[] = {
      "\"null\": Null-RNG (always fails)\n\n"
      "\"hwrnd\" or \"rdrand\": Processor-RNG (if available)"
     },
-    {"rng/destroy", cfun_rng_destroy, "(rng/destroy rng)\n\n"
-     "Destroy the `rng` object created by `rng/init`"
-    },
-    {"rng/get", cfun_rng_get, "(rng/get len &opt rng)\n\n"
+    {"rng/get", rng_get, "(rng/get rng len)\n\n"
      "Generate random bytes of length len from a random number generator `rng`."
      "(defaulting to \"system\" type rng)"
     },
-    {"rng/reseed", cfun_rng_reseed, "(rng/reseed rng bits)\n\n"
+    {"rng/reseed", rng_reseed, "(rng/reseed rng bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` from"
      " the System-RNG."
     },
-    {"rng/reseed-from-rng", cfun_rng_reseed_from_rng,
+    {"rng/reseed-from-rng", rng_reseed_from_rng,
      "(rng/reseed-from-rng rng src bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` taken "
      "from given the source rng `src`"
     },
-    {"rng/add-entropy", cfun_rng_add_entropy,
+    {"rng/add-entropy", rng_add_entropy,
      "(rng/add-entropy rng seed)\n\n"
      "Adds the provided `seed` array or tuple to the `rng`."
     },
     {NULL, NULL, NULL}
 };
+
+static void submod_rng(JanetTable *env) {
+    janet_cfuns(env, "botan", rng_cfuns);
+    janet_register_abstract_type(botan_rng_obj_type());
+}
 
 #endif /* RNG_H */

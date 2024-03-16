@@ -28,7 +28,7 @@ extern size_t src_janet___botan_lib_embed_size;
 JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "botan", versioning_cfuns);
     janet_cfuns(env, "botan", utility_cfuns);
-    janet_cfuns(env, "botan/rng", rng_cfuns);
+    submod_rng(env);
     janet_cfuns(env, "botan/block-cipher", block_cipher_cfuns);
     janet_cfuns(env, "botan/hash", hash_cfuns);
     janet_cfuns(env, "botan/mac", mac_cfuns);

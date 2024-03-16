@@ -10,7 +10,8 @@
 static Janet cfun_bcrypt(int32_t argc, Janet *argv) {
     janet_arity(argc, 2, 3);
     JanetByteView pass = janet_getbytes(argv, 0);
-    botan_rng_t rng = janet_getpointer(argv, 1);
+    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 1, botan_rng_obj_type());
+    botan_rng_t rng = rng_obj->rng;
     size_t work_factor = 10;
     size_t out_len = 64;
     JanetBuffer *out = janet_buffer(out_len);
