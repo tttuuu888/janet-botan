@@ -33,10 +33,10 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_hash(env);
     submod_mac(env);
     submod_cipher(env);
-    janet_cfuns(env, "botan", bcrypt_cfuns);
-    janet_cfuns(env, "botan", pbkdf_cfuns);
-    janet_cfuns(env, "botan", scrypt_cfuns);
-    janet_cfuns(env, "botan", kdf_cfuns);
+    submod_bcrypt(env);
+    submod_pbkdf(env);
+    submod_scrypt(env);
+    submod_kdf(env);
     janet_dobytes(env,
                   src_janet___botan_lib_embed,
                   src_janet___botan_lib_embed_size,

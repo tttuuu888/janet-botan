@@ -7,7 +7,7 @@
 #ifndef BOTAN_PBKDF_H
 #define BOTAN_PBKDF_H
 
-static Janet cfun_pbkdf(int32_t argc, Janet *argv) {
+static Janet pbkdf(int32_t argc, Janet *argv) {
     janet_arity(argc, 3, 5);
     const char *algo = janet_getcstring(argv, 0);
     JanetByteView pw = janet_getbytes(argv, 1);
@@ -62,7 +62,7 @@ static Janet cfun_pbkdf(int32_t argc, Janet *argv) {
     return janet_wrap_tuple(janet_tuple_n(output, 3));
 }
 
-static Janet cfun_pbkdf_timed(int32_t argc, Janet *argv) {
+static Janet pbkdf_timed(int32_t argc, Janet *argv) {
     janet_arity(argc, 3, 5);
     const char *algo = janet_getcstring(argv, 0);
     JanetByteView pw = janet_getbytes(argv, 1);
@@ -121,7 +121,7 @@ static Janet cfun_pbkdf_timed(int32_t argc, Janet *argv) {
 }
 
 static JanetReg pbkdf_cfuns[] = {
-    {"pbkdf", cfun_pbkdf,
+    {"pbkdf", pbkdf,
      "(pbkdf algo passphrase out_len &opt iterations salt)\n\n"
      "Derive a key from a `passphrase` for a number of "
      "`iterations`(default 100000) using the given PBKDF algorithm, e.g., "
@@ -130,7 +130,7 @@ static JanetReg pbkdf_cfuns[] = {
      "less depending on the algorithm and the size of the request). "
      "Returns tuple of salt, iterations, and psk"
     },
-    {"pbkdf-timed", cfun_pbkdf_timed,
+    {"pbkdf-timed", pbkdf_timed,
      "(pbkdf-timed algo passphrase out_len &opt ms-to-run salt)\n\n"
      "Derive a key from a `passphrase` for a number of "
      "Runs for as many iterations as needed to consumed `ms-to-run` "
@@ -140,5 +140,9 @@ static JanetReg pbkdf_cfuns[] = {
     },
     {NULL, NULL, NULL}
 };
+
+static void submod_pbkdf(JanetTable *env) {
+    janet_cfuns(env, "botan", pbkdf_cfuns);
+}
 
 #endif /* BOTAN_PBKDF_H */

@@ -7,7 +7,7 @@
 #ifndef BOTAN_SCRYPT_H
 #define BOTAN_SCRYPT_H
 
-static Janet cfun_scrypt(int32_t argc, Janet *argv) {
+static Janet scrypt(int32_t argc, Janet *argv) {
     janet_arity(argc, 3, 6);
     size_t out_len = janet_getsize(argv, 0);
     JanetByteView pass = janet_getbytes(argv, 1);
@@ -42,7 +42,7 @@ static Janet cfun_scrypt(int32_t argc, Janet *argv) {
 }
 
 static JanetReg scrypt_cfuns[] = {
-    {"scrypt", cfun_scrypt,
+    {"scrypt", scrypt,
      "(scrypt out_len password salt &opt N r p)\n\n"
      "Runs Scrypt key derivation function over the specified password and "
      "salt using Scrypt parameters N, r, p. If omitted, the default values "
@@ -50,5 +50,9 @@ static JanetReg scrypt_cfuns[] = {
     },
     {NULL, NULL, NULL}
 };
+
+static void submod_scrypt(JanetTable *env) {
+    janet_cfuns(env, "botan", scrypt_cfuns);
+}
 
 #endif /* BOTAN_SCRYPT_H */

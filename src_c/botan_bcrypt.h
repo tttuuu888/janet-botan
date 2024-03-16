@@ -7,7 +7,7 @@
 #ifndef BOTAN_BCRYPT_H
 #define BOTAN_BCRYPT_H
 
-static Janet cfun_bcrypt(int32_t argc, Janet *argv) {
+static Janet bcrypt(int32_t argc, Janet *argv) {
     janet_arity(argc, 2, 3);
     JanetByteView pass = janet_getbytes(argv, 0);
     botan_rng_obj_t *rng_obj = janet_getabstract(argv, 1, get_rng_obj_type());
@@ -29,7 +29,7 @@ static Janet cfun_bcrypt(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(out->data, out->count));
 }
 
-static Janet cfun_bcrypt_is_valid(int32_t argc, Janet *argv) {
+static Janet bcrypt_is_valid(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     JanetByteView pass = janet_getbytes(argv, 0);
     JanetByteView hashed = janet_getbytes(argv, 1);
@@ -44,16 +44,20 @@ static Janet cfun_bcrypt_is_valid(int32_t argc, Janet *argv) {
 }
 
 static JanetReg bcrypt_cfuns[] = {
-    {"bcrypt", cfun_bcrypt,
+    {"bcrypt", bcrypt,
      "(bcrypt password rng &opt work_factor)\n\n"
      "Provided the password and an RNG object, returns a bcrypt string."
     },
-    {"bcrypt-is-valid", cfun_bcrypt_is_valid,
+    {"bcrypt-is-valid", bcrypt_is_valid,
      "(bcrypt-is-valid password bcrypt)\n\n"
      "Check a bcrypt hash against the provided password, returning true if "
      "the password matches."
     },
     {NULL, NULL, NULL}
 };
+
+static void submod_bcrypt(JanetTable *env) {
+    janet_cfuns(env, "botan", bcrypt_cfuns);
+}
 
 #endif /* BOTAN_BCRYPT_H */

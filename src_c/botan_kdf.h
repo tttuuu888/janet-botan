@@ -42,4 +42,8 @@ static JanetReg kdf_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
+static void submod_kdf(JanetTable *env) {
+    janet_cfuns(env, "botan", kdf_cfuns);
+}
+
 #endif /* BOTAN_KDF_H */
