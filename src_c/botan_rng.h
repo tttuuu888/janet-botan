@@ -38,15 +38,15 @@ static JanetMethod rng_methods[] = {
     {NULL, NULL},
 };
 
-static JanetAbstractType *botan_rng_obj_type() {
+static JanetAbstractType *get_rng_obj_type() {
     return &rng_obj_type;
 }
 
 /* Abstract Object functions */
 static int rng_gc_fn(void *data, size_t len) {
-    botan_rng_obj_t *rng = (botan_rng_obj_t *)data;
+    botan_rng_obj_t *obj = (botan_rng_obj_t *)data;
 
-    int ret = botan_rng_destroy(rng->rng);
+    int ret = botan_rng_destroy(obj->rng);
     JANET_BOTAN_ASSERT(ret);
 
     return 0;
@@ -61,9 +61,10 @@ static int rng_get_fn(void *data, Janet key, Janet *out) {
     return janet_getmethod(janet_unwrap_keyword(key), rng_methods, out);
 }
 
+/* Janet functions */
 static Janet rng_new(int32_t argc, Janet *argv) {
-    botan_rng_obj_t *rng_obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
-    memset(rng_obj, 0, sizeof(botan_rng_obj_t));
+    botan_rng_obj_t *obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+    memset(obj, 0, sizeof(botan_rng_obj_t));
 
     janet_arity(argc, 0, 1);
     const char *type = (argc == 0) ? "system" : janet_getcstring(argv, 0);
@@ -79,16 +80,16 @@ static Janet rng_new(int32_t argc, Janet *argv) {
 
     const char *type_input = valid_type ? type : "system";
 
-    int ret = botan_rng_init(&rng_obj->rng, type_input);
+    int ret = botan_rng_init(&obj->rng, type_input);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_abstract(rng_obj);
+    return janet_wrap_abstract(obj);
 }
 
 static Janet rng_get(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
-    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
-    botan_rng_t rng = rng_obj->rng;
+    botan_rng_obj_t *obj = janet_getabstract(argv, 0, get_rng_obj_type());
+    botan_rng_t rng = obj->rng;
     size_t len = janet_getsize(argv, 1);
 
     int ret;
@@ -103,8 +104,8 @@ static Janet rng_get(int32_t argc, Janet *argv) {
 
 static Janet rng_reseed(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
-    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
-    botan_rng_t rng = rng_obj->rng;
+    botan_rng_obj_t *obj = janet_getabstract(argv, 0, get_rng_obj_type());
+    botan_rng_t rng = obj->rng;
     size_t bits = janet_getsize(argv, 1);
 
     int ret = botan_rng_reseed(rng, bits);
@@ -115,10 +116,10 @@ static Janet rng_reseed(int32_t argc, Janet *argv) {
 
 static Janet rng_reseed_from_rng(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 3);
-    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
-    botan_rng_t rng = rng_obj->rng;
-    botan_rng_obj_t *rng_obj2 = janet_getabstract(argv, 1, botan_rng_obj_type());
-    botan_rng_t src = rng_obj2->rng;
+    botan_rng_obj_t *obj = janet_getabstract(argv, 0, get_rng_obj_type());
+    botan_rng_t rng = obj->rng;
+    botan_rng_obj_t *obj2 = janet_getabstract(argv, 1, get_rng_obj_type());
+    botan_rng_t src = obj2->rng;
     size_t bits = janet_getsize(argv, 2);
 
     int ret = botan_rng_reseed_from_rng(rng, src, bits);
@@ -129,8 +130,8 @@ static Janet rng_reseed_from_rng(int32_t argc, Janet *argv) {
 
 static Janet rng_add_entropy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
-    botan_rng_obj_t *rng_obj = janet_getabstract(argv, 0, botan_rng_obj_type());
-    botan_rng_t rng = rng_obj->rng;
+    botan_rng_obj_t *obj = janet_getabstract(argv, 0, get_rng_obj_type());
+    botan_rng_t rng = obj->rng;
     const char *seed = (const char *)janet_getstring(argv, 1);
     int len = strlen(seed);
 
@@ -171,7 +172,7 @@ static JanetReg rng_cfuns[] = {
 
 static void submod_rng(JanetTable *env) {
     janet_cfuns(env, "botan", rng_cfuns);
-    janet_register_abstract_type(botan_rng_obj_type());
+    janet_register_abstract_type(get_rng_obj_type());
 }
 
 #endif /* BOTAN_RNG_H */
