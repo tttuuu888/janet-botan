@@ -31,7 +31,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_rng(env);
     submod_block_cipher(env);
     submod_hash(env);
-    janet_cfuns(env, "botan/mac", mac_cfuns);
+    submod_mac(env);
     submod_cipher(env);
     janet_cfuns(env, "botan", bcrypt_cfuns);
     janet_cfuns(env, "botan", pbkdf_cfuns);
