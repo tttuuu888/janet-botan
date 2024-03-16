@@ -29,10 +29,10 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     janet_cfuns(env, "botan", versioning_cfuns);
     janet_cfuns(env, "botan", utility_cfuns);
     submod_rng(env);
-    janet_cfuns(env, "botan/block-cipher", block_cipher_cfuns);
-    janet_cfuns(env, "botan/hash", hash_cfuns);
+    submod_block_cipher(env);
+    submod_hash(env);
     janet_cfuns(env, "botan/mac", mac_cfuns);
-    janet_cfuns(env, "botan/cipher", cipher_cfuns);
+    submod_cipher(env);
     janet_cfuns(env, "botan", bcrypt_cfuns);
     janet_cfuns(env, "botan", pbkdf_cfuns);
     janet_cfuns(env, "botan", scrypt_cfuns);

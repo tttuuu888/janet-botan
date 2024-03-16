@@ -359,4 +359,9 @@ static JanetReg cipher_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
+static void submod_cipher(JanetTable *env) {
+    janet_cfuns(env, "botan", cipher_cfuns);
+    janet_register_abstract_type(get_cipher_obj_type());
+}
+
 #endif /* BOTAN_CIPHER_H */
