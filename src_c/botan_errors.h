@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef ERRORS_H
-#define ERRORS_H
+#ifndef BOTAN_ERRORS_H
+#define BOTAN_ERRORS_H
 
 #define JANET_BOTAN_ASSERT(ret_from_ffi)            \
     if (ret_from_ffi < 0) {                         \
@@ -63,4 +63,4 @@ static const char* getBotanError(int error) {
     }
 }
 
-#endif /* ERRORS_H */
+#endif /* BOTAN_ERRORS_H */

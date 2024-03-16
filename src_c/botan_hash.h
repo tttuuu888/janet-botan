@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef HASH_H
-#define HASH_H
+#ifndef BOTAN_HASH_H
+#define BOTAN_HASH_H
 
 static Janet cfun_hash_init(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
@@ -130,4 +130,4 @@ static JanetReg hash_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* HASH_H */
+#endif /* BOTAN_HASH_H */

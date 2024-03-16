@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef VERSIONING_H
-#define VERSIONING_H
+#ifndef BOTAN_VERSIONING_H
+#define BOTAN_VERSIONING_H
 
 static Janet cfun_ffi_api_version(int32_t argc, Janet *argv) {
     (void)argv;
@@ -90,4 +90,4 @@ static JanetReg versioning_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* VERSIONING_H */
+#endif /* BOTAN_VERSIONING_H */

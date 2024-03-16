@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef CIPHER_H
-#define CIPHER_H
+#ifndef BOTAN_CIPHER_H
+#define BOTAN_CIPHER_H
 
 static Janet cfun_cipher_init(int32_t argc, Janet *argv) {
     janet_arity(argc, 1, 2);
@@ -275,4 +275,4 @@ static JanetReg cipher_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* CIPHER_H */
+#endif /* BOTAN_CIPHER_H */

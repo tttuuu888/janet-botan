@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef SCRYPT_H
-#define SCRYPT_H
+#ifndef BOTAN_SCRYPT_H
+#define BOTAN_SCRYPT_H
 
 static Janet cfun_scrypt(int32_t argc, Janet *argv) {
     janet_arity(argc, 3, 6);
@@ -51,4 +51,4 @@ static JanetReg scrypt_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* SCRYPT_H */
+#endif /* BOTAN_SCRYPT_H */

@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef RNG_H
-#define RNG_H
+#ifndef BOTAN_RNG_H
+#define BOTAN_RNG_H
 
 typedef struct botan_rng_obj {
     botan_rng_t rng;
@@ -174,4 +174,4 @@ static void submod_rng(JanetTable *env) {
     janet_register_abstract_type(botan_rng_obj_type());
 }
 
-#endif /* RNG_H */
+#endif /* BOTAN_RNG_H */

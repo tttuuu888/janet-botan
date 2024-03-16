@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef UTILITY_H
-#define UTILITY_H
+#ifndef BOTAN_UTILITY_H
+#define BOTAN_UTILITY_H
 
 static Janet cfun_constant_time_compare(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
@@ -57,4 +57,4 @@ static JanetReg utility_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* UTILITY_H */
+#endif /* BOTAN_UTILITY_H */

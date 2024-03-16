@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef MAC_H
-#define MAC_H
+#ifndef BOTAN_MAC_H
+#define BOTAN_MAC_H
 
 static Janet cfun_mac_init(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
@@ -148,4 +148,4 @@ static JanetReg mac_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* MAC_H */
+#endif /* BOTAN_MAC_H */

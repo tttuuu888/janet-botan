@@ -4,8 +4,8 @@
  * Janet-botan is released under the MIT License. (see LICENSE)
  */
 
-#ifndef PBKDF_H
-#define PBKDF_H
+#ifndef BOTAN_PBKDF_H
+#define BOTAN_PBKDF_H
 
 static Janet cfun_pbkdf(int32_t argc, Janet *argv) {
     janet_arity(argc, 3, 5);
@@ -141,4 +141,4 @@ static JanetReg pbkdf_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-#endif /* PBKDF_H */
+#endif /* BOTAN_PBKDF_H */
