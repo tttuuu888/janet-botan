@@ -3,11 +3,11 @@
 
 (start-suite "symmetric cipher")
 
-(assert-error "Error expected" (cipher/init "AES-127/CBC/PKCS7"))
+(assert-error "Error expected" (cipher/new "AES-127/CBC/PKCS7" :encrypt))
 
-(let [cipher (assert (cipher/init "AES-128/CBC/PKCS7"))
-      decrypt-cipher (assert (cipher/init "AES-128/CBC" :decrypt))
-      cipher-aes-128-gcm (assert (cipher/init "AES-128/GCM"))
+(let [cipher (assert (cipher/new "AES-128/CBC/PKCS7" :encrypt))
+      decrypt-cipher (assert (cipher/new "AES-128/CBC" :decrypt))
+      cipher-aes-128-gcm (assert (cipher/new "AES-128/GCM" :encrypt))
       key (hex-decode "898BE9CC5004ED0FA6E117C9A3099D31")
       nonce (hex-decode "9DEA7621945988F96491083849B068DF")
       plain (hex-decode "0397F4F6820B1F9386F14403BE5AC16E50213BD473B4874B9BCBF5F318EE686B1D")
@@ -45,10 +45,6 @@
   (assert (= (cipher/get-default-nonce-length cipher-aes-128-gcm) 12))
   (assert (cipher/valid-nonce-length cipher-aes-128-gcm 12))
   (assert (= (cipher/get-tag-length cipher-aes-128-gcm) 16))
-  (assert (cipher/is-authenticated cipher-aes-128-gcm))
-
-  (assert (not (cipher/destroy decrypt-cipher)))
-  (assert (not (cipher/destroy cipher)))
-  (assert (not (cipher/destroy cipher-aes-128-gcm))))
+  (assert (cipher/is-authenticated cipher-aes-128-gcm)))
 
 (end-suite)
