@@ -9,18 +9,18 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "errors.h"
-#include "versioning.h"
-#include "utility.h"
-#include "rng.h"
-#include "block_cipher.h"
-#include "hash.h"
-#include "mac.h"
-#include "cipher.h"
-#include "bcrypt.h"
-#include "pbkdf.h"
-#include "scrypt.h"
-#include "kdf.h"
+#include "botan_errors.h"
+#include "botan_versioning.h"
+#include "botan_utility.h"
+#include "botan_rng.h"
+#include "botan_block_cipher.h"
+#include "botan_hash.h"
+#include "botan_mac.h"
+#include "botan_cipher.h"
+#include "botan_bcrypt.h"
+#include "botan_pbkdf.h"
+#include "botan_scrypt.h"
+#include "botan_kdf.h"
 
 extern const unsigned char *src_janet___botan_lib_embed;
 extern size_t src_janet___botan_lib_embed_size;
