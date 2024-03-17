@@ -393,17 +393,31 @@ static Janet mpi_add(int32_t argc, Janet *argv) {
     botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
     botan_mp_t mpi = obj->mpi;
 
-    botan_mpi_obj_t *obj_other = janet_getabstract(argv, 1, get_mpi_obj_type());
-    botan_mp_t mpi_other = obj_other->mpi;
-
     botan_mpi_obj_t *obj_out = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
     memset(obj_out, 0, sizeof(botan_mpi_obj_t));
 
     int ret = botan_mp_init(&obj_out->mpi);
     JANET_BOTAN_ASSERT(ret);
 
-    ret = botan_mp_add(obj_out->mpi, mpi, mpi_other);
-    JANET_BOTAN_ASSERT(ret);
+    if (janet_checktype(argv[1], JANET_NUMBER)) {
+        uint64_t input = janet_getuinteger64(argv, 1);
+        if (input > UINT32_MAX) {
+            janet_panic("The argument size exceeds the uint32_t range.");
+        }
+
+        uint32_t x = (uint32_t)input;
+
+        ret = botan_mp_add_u32(obj_out->mpi, mpi, x);
+        JANET_BOTAN_ASSERT(ret);
+    } else if (janet_checktype(argv[1], JANET_ABSTRACT)) {
+        botan_mpi_obj_t *obj_other = janet_getabstract(argv, 1, get_mpi_obj_type());
+        botan_mp_t mpi_other = obj_other->mpi;
+
+        ret = botan_mp_add(obj_out->mpi, mpi, mpi_other);
+        JANET_BOTAN_ASSERT(ret);
+    } else {
+        janet_panic("Unexpected argument");
+    }
 
     return janet_wrap_abstract(obj_out);
 }
@@ -413,17 +427,31 @@ static Janet mpi_sub(int32_t argc, Janet *argv) {
     botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
     botan_mp_t mpi = obj->mpi;
 
-    botan_mpi_obj_t *obj_other = janet_getabstract(argv, 1, get_mpi_obj_type());
-    botan_mp_t mpi_other = obj_other->mpi;
-
     botan_mpi_obj_t *obj_out = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
     memset(obj_out, 0, sizeof(botan_mpi_obj_t));
 
     int ret = botan_mp_init(&obj_out->mpi);
     JANET_BOTAN_ASSERT(ret);
 
-    ret = botan_mp_sub(obj_out->mpi, mpi, mpi_other);
-    JANET_BOTAN_ASSERT(ret);
+    if (janet_checktype(argv[1], JANET_NUMBER)) {
+        uint64_t input = janet_getuinteger64(argv, 1);
+        if (input > UINT32_MAX) {
+            janet_panic("The argument size exceeds the uint32_t range.");
+        }
+
+        uint32_t x = (uint32_t)input;
+
+        ret = botan_mp_sub_u32(obj_out->mpi, mpi, x);
+        JANET_BOTAN_ASSERT(ret);
+    } else if (janet_checktype(argv[1], JANET_ABSTRACT)) {
+        botan_mpi_obj_t *obj_other = janet_getabstract(argv, 1, get_mpi_obj_type());
+        botan_mp_t mpi_other = obj_other->mpi;
+
+        ret = botan_mp_sub(obj_out->mpi, mpi, mpi_other);
+        JANET_BOTAN_ASSERT(ret);
+    } else {
+        janet_panic("Unexpected argument");
+    }
 
     return janet_wrap_abstract(obj_out);
 }

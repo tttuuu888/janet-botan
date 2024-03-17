@@ -36,7 +36,9 @@
       mpi4 (mpi/new-from-int 4)
       mpi5 (mpi/new-from-int 5)]
   (assert (= (:add mpi1 mpi2) mpi3))
+  (assert (= (:add mpi1 2) mpi3))
   (assert (= (:sub mpi3 mpi1) mpi2))
+  (assert (= (:sub mpi3 1) mpi2))
   (assert (= (:mul mpi2 mpi2) mpi4))
   (let [[q r] (:div mpi5 mpi2)]
     (assert (= q mpi2))
