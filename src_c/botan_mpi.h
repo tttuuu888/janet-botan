@@ -626,12 +626,14 @@ static JanetReg mpi_cfuns[] = {
      "Flip the sign of `mpi` and return self."
     },
     {"mpi/add", mpi_add,
-     "(mpi/add mpi1 mpi2)\n\n"
-     "Add two MPI and return the new MPI as a result."
+     "(mpi/add mpi x)\n\n"
+     "Add x to `mpi` and return the new MPI as a result. `x` can be either "
+     "MPI or u32 number."
     },
     {"mpi/sub", mpi_sub,
-     "(mpi/sub mpi1 mpi2)\n\n"
-     "Subtract two MPI and return the new MPI as a result."
+     "(mpi/sub mpi x)\n\n"
+     "Subtract x from `mpi` and return the new MPI as a result. `x` can be "
+     "either MPI or u32 number."
     },
     {"mpi/mul", mpi_mul,
      "(mpi/sub mpi1 mpi2)\n\n"
