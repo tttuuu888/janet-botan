@@ -127,7 +127,7 @@ static Janet block_cipher_clear(int32_t argc, Janet *argv) {
     int ret = botan_block_cipher_get_keyspec(bc, NULL, NULL, &spec);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet block_cipher_set_key(int32_t argc, Janet *argv) {
@@ -139,7 +139,7 @@ static Janet block_cipher_set_key(int32_t argc, Janet *argv) {
     int ret = botan_block_cipher_set_key(bc, key.bytes, key.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet block_cipher_encrypt_blocks(int32_t argc, Janet *argv) {

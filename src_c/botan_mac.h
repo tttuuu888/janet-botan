@@ -88,7 +88,7 @@ static Janet mac_clear(int32_t argc, Janet *argv) {
     int ret = botan_mac_clear(mac);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet mac_output_length(int32_t argc, Janet *argv) {
@@ -127,7 +127,7 @@ static Janet mac_set_key(int32_t argc, Janet *argv) {
     int ret = botan_mac_set_key(mac, key.bytes, key.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet mac_set_nonce(int32_t argc, Janet *argv) {
@@ -139,7 +139,7 @@ static Janet mac_set_nonce(int32_t argc, Janet *argv) {
     int ret = botan_mac_set_nonce(mac, key.bytes, key.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet mac_update(int32_t argc, Janet *argv) {
@@ -151,7 +151,7 @@ static Janet mac_update(int32_t argc, Janet *argv) {
     int ret = botan_mac_update(mac, input.bytes, input.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet mac_final(int32_t argc, Janet *argv) {
@@ -176,7 +176,7 @@ static JanetReg mac_cfuns[] = {
     },
     {"mac/clear", mac_clear, "(mac/clear mac)\n\n"
      "Reset the state of `mac` back to clean, "
-     "as if no key and input has been supplied."
+     "as if no key and input has been supplied, return self."
     },
     {"mac/output-length", mac_output_length,
      "(mac/output-length mac)\n\n"
@@ -188,15 +188,15 @@ static JanetReg mac_cfuns[] = {
      "[max-key-length min-key-length mod-key-length]."
     },
     {"mac/set-key", mac_set_key, "(mac/set-key mac key)\n\n"
-     "Set the `key` for the MAC calculation."
+     "Set the `key` for the MAC calculation, return self."
     },
     {"mac/set-nonce", mac_set_nonce, "(mac/set-nonce mac key)\n\n"
-     "Set the `nonce` for the MAC calculation."
+     "Set the `nonce` for the MAC calculation, return self."
      "Note that not all MAC algorithms require a nonce. If a nonce is required,"
      " the function has to be called before the data is processed. "
     },
     {"mac/update", mac_update, "(mac/update mac input)\n\n"
-     "Add input to the MAC computation."
+     "Add input to the MAC computation, return self."
     },
     {"mac/final", mac_final, "(mac/final mac)\n\n"
      "Finalize the MAC and return the output"

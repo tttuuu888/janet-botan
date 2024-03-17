@@ -20,7 +20,7 @@
     (assert (= max-key 16))
     (assert (= mod-key 1)))
 
-  (assert (not (cipher/set-key cipher key)))
+  (assert (cipher/set-key cipher key))
 
   (assert-error "Error expected" (cipher/set-associated-data cipher nonce))
 
@@ -31,15 +31,15 @@
   (assert (cipher/valid-nonce-length cipher 16))
   (assert (not (cipher/valid-nonce-length cipher 1)))
 
-  (assert (not (cipher/clear cipher)))
-  (assert (not (cipher/set-key cipher key)))
-  (assert (not (cipher/start cipher nonce)))
+  (assert (cipher/clear cipher))
+  (assert (cipher/set-key cipher key))
+  (assert (cipher/start cipher nonce))
   (assert (= (cipher/finish cipher plain) encrypted))
 
   (assert (not (cipher/is-authenticated cipher)))
 
-  (assert (not (cipher/set-key decrypt-cipher key)))
-  (assert (not (cipher/start decrypt-cipher nonce)))
+  (assert (cipher/set-key decrypt-cipher key))
+  (assert (cipher/start decrypt-cipher nonce))
   (assert (= (cipher/finish decrypt-cipher encrypted) plain))
 
   (assert (= (cipher/get-default-nonce-length cipher-aes-128-gcm) 12))

@@ -25,7 +25,7 @@
   (assert (:is-negative (:flip-sign mpi1)))
   (assert (:is-positive (:flip-sign mpi1)))
   (assert (< mpi2 mpi7))
-  (assert (not (:swap mpi2 mpi7)))
+  (assert (:swap mpi2 mpi7))
   (assert (> mpi2 mpi7))
   (assert (= mpi9 (mpi/new-from-int (blshift 1 1)))))
 

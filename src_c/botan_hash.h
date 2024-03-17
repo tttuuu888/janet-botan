@@ -114,7 +114,7 @@ static Janet hash_clear(int32_t argc, Janet *argv) {
     int ret = botan_hash_clear(hash);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet hash_output_length(int32_t argc, Janet *argv) {
@@ -138,7 +138,7 @@ static Janet hash_update(int32_t argc, Janet *argv) {
     int ret = botan_hash_update(hash, input.bytes, input.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet hash_final(int32_t argc, Janet *argv) {
@@ -169,14 +169,14 @@ static JanetReg hash_cfuns[] = {
     },
     {"hash/clear", hash_clear, "(hash/clear hash)\n\n"
      "Reset the state of `hash` back to clean, "
-     "as if no input has been supplied."
+     "as if no input has been supplied, return self."
     },
     {"hash/output-length", hash_output_length,
      "(hash/output-length hash)\n\n"
      "Return the output length of the `hash`"
     },
     {"hash/update", hash_update, "(hash/update hash input)\n\n"
-     "Add input to the hash computation."
+     "Add input to the hash computation, return self."
     },
     {"hash/final", hash_final, "(hash/final hash)\n\n"
      "Finalize the hash and return the output"

@@ -15,11 +15,11 @@
     (assert (= max-key 16))
     (assert (= mod-key 1)))
 
-  (assert (not (block-cipher/clear cipher)))
+  (assert (block-cipher/clear cipher))
 
-  (assert (not (block-cipher/set-key
-                cipher
-                (hex-decode "00000000000000000000000000000000"))))
+  (assert (block-cipher/set-key
+           cipher
+           (hex-decode "00000000000000000000000000000000")))
 
   (assert (deep= (hex-encode (block-cipher/encrypt
                               cipher

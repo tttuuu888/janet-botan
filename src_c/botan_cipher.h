@@ -124,7 +124,7 @@ static Janet cipher_clear(int32_t argc, Janet *argv) {
     int ret = botan_cipher_clear(cipher);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet cipher_get_keyspec(int32_t argc, Janet *argv) {
@@ -151,7 +151,7 @@ static Janet cipher_set_key(int32_t argc, Janet *argv) {
     int ret = botan_cipher_set_key(cipher, key.bytes, key.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet cipher_is_authenticated(int32_t argc, Janet *argv) {
@@ -222,7 +222,7 @@ static Janet cipher_set_associated_data(int32_t argc, Janet *argv) {
     int ret = botan_cipher_set_associated_data(cipher, ad.bytes, ad.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet cipher_start(int32_t argc, Janet *argv) {
@@ -234,7 +234,7 @@ static Janet cipher_start(int32_t argc, Janet *argv) {
     int ret = botan_cipher_start(cipher, nonce.bytes, nonce.len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet cipher_update(int32_t argc, Janet *argv) {
@@ -304,7 +304,7 @@ static JanetReg cipher_cfuns[] = {
     },
     {"cipher/clear", cipher_clear, "(cipher/clear cipher)\n\n"
      "Reset the state of `cipher` back to clean, "
-     "as if no key and input has been supplied."
+     "as if no key and input has been supplied, return self"
     },
     {"cipher/get-keyspec", cipher_get_keyspec,
      "(cipher/get-keyspec cipher)\n\n"
@@ -312,7 +312,7 @@ static JanetReg cipher_cfuns[] = {
      "`[max-key-length min-key-length mod-key-length]`."
     },
     {"cipher/set-key", cipher_set_key, "(cipher/set-key cipher key)\n\n"
-     "Set the symmetric key to be used."
+     "Set the symmetric key to be used, return self."
     },
     {"cipher/is-authenticated", cipher_is_authenticated,
      "(cipher/is-authenticated cipher)\n\n"
@@ -337,11 +337,11 @@ static JanetReg cipher_cfuns[] = {
     },
     {"cipher/set-associated-data", cipher_set_associated_data,
      "(cipher/set-associated-data cipher ad)\n\n"
-     "Sets the associated data. Fails if this is not an AEAD mode."
+     "Sets the associated data, return self. Fails if this is not an AEAD mode."
     },
     {"cipher/start", cipher_start,
      "(cipher/start cipher nonce)\n\n"
-     "Start processing a message using `nonce`."
+     "Start processing a message using `nonce`, return self"
     },
     {"cipher/update", cipher_update,
      "(cipher/update cipher input)\n\n"

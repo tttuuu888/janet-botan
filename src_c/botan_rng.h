@@ -111,7 +111,7 @@ static Janet rng_reseed(int32_t argc, Janet *argv) {
     int ret = botan_rng_reseed(rng, bits);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet rng_reseed_from_rng(int32_t argc, Janet *argv) {
@@ -125,7 +125,7 @@ static Janet rng_reseed_from_rng(int32_t argc, Janet *argv) {
     int ret = botan_rng_reseed_from_rng(rng, src, bits);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet rng_add_entropy(int32_t argc, Janet *argv) {
@@ -138,7 +138,7 @@ static Janet rng_add_entropy(int32_t argc, Janet *argv) {
     int ret = botan_rng_add_entropy(rng, (const uint8_t *)seed, len);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static JanetReg rng_cfuns[] = {
@@ -156,16 +156,16 @@ static JanetReg rng_cfuns[] = {
     },
     {"rng/reseed", rng_reseed, "(rng/reseed rng bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` from"
-     " the System-RNG."
+     " the System-RNG, return self."
     },
     {"rng/reseed-from-rng", rng_reseed_from_rng,
      "(rng/reseed-from-rng rng src bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` taken "
-     "from given the source rng `src`"
+     "from given the source rng `src`, return self."
     },
     {"rng/add-entropy", rng_add_entropy,
      "(rng/add-entropy rng seed)\n\n"
-     "Adds the provided `seed` array or tuple to the `rng`."
+     "Adds the provided `seed` array or tuple to the `rng`, return self."
     },
     {NULL, NULL, NULL}
 };

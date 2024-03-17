@@ -317,7 +317,7 @@ static Janet mpi_set_bit(int32_t argc, Janet *argv) {
     int ret = botan_mp_set_bit(mpi, bit);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet mpi_clear_bit(int32_t argc, Janet *argv) {
@@ -329,7 +329,7 @@ static Janet mpi_clear_bit(int32_t argc, Janet *argv) {
     int ret = botan_mp_clear_bit(mpi, bit);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj);
 }
 
 static Janet mpi_is_zero(int32_t argc, Janet *argv) {
@@ -473,7 +473,7 @@ static Janet mpi_swap(int32_t argc, Janet *argv) {
     int ret = botan_mp_swap(mpi1, mpi2);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj1);
 }
 
 static Janet mpi_lshift(int32_t argc, Janet *argv) {
@@ -559,11 +559,11 @@ static JanetReg mpi_cfuns[] = {
     },
     {"mpi/set-bit", mpi_set_bit,
      "(mpi/set-bit mpi bit)\n\n"
-     "Set the specified bit of `n`."
+     "Set the specified bit of `n`, return self."
     },
     {"mpi/clear-bit", mpi_clear_bit,
      "(mpi/clear-bit mpi bit)\n\n"
-     "Clears the specified bit of `n`."
+     "Clears the specified bit of `n`, return self."
     },
     {"mpi/is-zero", mpi_is_zero,
      "(mpi/is-zero mpi)\n\n"
@@ -599,7 +599,7 @@ static JanetReg mpi_cfuns[] = {
     },
     {"mpi/swap", mpi_swap,
      "(mpi/swap mpi1 mpi2)\n\n"
-     "Swap two `mpi` values."
+     "Swap `mpi1` and `mpi2` values, return `mpi1`."
     },
     {"mpi/lshift", mpi_lshift,
      "(mpi/lshift mpi shift)\n\n"
