@@ -17,6 +17,7 @@ static int mpi_get_fn(void *data, Janet key, Janet *out);
 static int mpi_compare_fn(void *p1, void *p2);
 
 /* Janet functions */
+static Janet mpi_new(int32_t argc, Janet *argv);
 static Janet mpi_new_int(int32_t argc, Janet *argv);
 static Janet mpi_new_str(int32_t argc, Janet *argv);
 static Janet mpi_new_hex_str(int32_t argc, Janet *argv);
@@ -113,6 +114,17 @@ static int mpi_compare_fn(void *p1, void *p2) {
 }
 
 /* Janet functions */
+static Janet mpi_new(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 0);
+    botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
+    memset(obj, 0, sizeof(botan_mpi_obj_t));
+
+    int ret = botan_mp_init(&obj->mpi);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet mpi_new_int(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
@@ -513,6 +525,10 @@ static Janet mpi_rshift(int32_t argc, Janet *argv) {
 }
 
 static JanetReg mpi_cfuns[] = {
+    {"mpi/new", mpi_new,
+     "(mpi/new)\n\n"
+     "Create a new zero-valued MPI."
+    },
     {"mpi/new-from-int", mpi_new_int,
      "(mpi/new-from-int value)\n\n"
      "Create an MPI object with an integer `value`."

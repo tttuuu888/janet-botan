@@ -15,6 +15,7 @@
 
       mpi9  (assert (:lshift mpi1 1))
       mpi10 (assert (:rshift mpi9 1))]
+  (assert (= (mpi/new) (mpi/new-from-int 0)))
   (assert (= mpi1 mpi2 mpi3 mpi4 mpi5))
   (assert (not (= mpi6 mpi7 mpi8)))
   (assert (< mpi1 mpi6))
