@@ -42,6 +42,8 @@ static Janet mpi_div(int32_t argc, Janet *argv);
 static Janet mpi_swap(int32_t argc, Janet *argv);
 static Janet mpi_lshift(int32_t argc, Janet *argv);
 static Janet mpi_rshift(int32_t argc, Janet *argv);
+static Janet mpi_num_bytes(int32_t argc, Janet *argv);
+static Janet mpi_to_u32(int32_t argc, Janet *argv);
 
 static JanetAbstractType mpi_obj_type = {
     "botan/mpi",
@@ -76,6 +78,8 @@ static JanetMethod mpi_methods[] = {
     {"swap", mpi_swap},
     {"lshift", mpi_lshift},
     {"rshift", mpi_rshift},
+    {"num-bytes", mpi_num_bytes},
+    {"to-u32", mpi_to_u32},
     {NULL, NULL},
 };
 
@@ -552,6 +556,30 @@ static Janet mpi_rshift(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj_out);
 }
 
+static Janet mpi_num_bytes(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi = obj->mpi;
+    size_t val;
+
+    int ret = botan_mp_num_bytes(mpi, &val);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)val);
+}
+
+static Janet mpi_to_u32(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi = obj->mpi;
+    uint32_t val;
+
+    int ret = botan_mp_to_uint32(mpi, &val);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)val);
+}
+
 static JanetReg mpi_cfuns[] = {
     {"mpi/new", mpi_new,
      "(mpi/new)\n\n"
@@ -654,6 +682,15 @@ static JanetReg mpi_cfuns[] = {
     {"mpi/rshift", mpi_rshift,
      "(mpi/rshift mpi shift)\n\n"
      "Right shift by specified bit count, return the result MPI."
+    },
+    {"mpi/num-bytes", mpi_num_bytes,
+     "(mpi/num-bytes mpi)\n\n"
+     "Return the number of significant bytes in the MPI."
+    },
+    {"mpi/to-u32", mpi_to_u32,
+     "(mpi/to-u32 mpi)\n\n"
+     "Convert the MPI to a uint32_t, if possible. Fails if MPI is negative "
+     "or too large"
     },
 
     {NULL, NULL, NULL}

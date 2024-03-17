@@ -40,6 +40,8 @@
   (assert (= (:sub mpi3 mpi1) mpi2))
   (assert (= (:sub mpi3 1) mpi2))
   (assert (= (:mul mpi2 mpi2) mpi4))
+  (assert (= (:to-u32 mpi1) 1))
+  (assert (= (:num-bytes mpi1) 1))
   (let [[q r] (:div mpi5 mpi2)]
     (assert (= q mpi2))
     (assert (= r mpi1))))
