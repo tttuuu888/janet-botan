@@ -22,6 +22,7 @@
 #include "botan_scrypt.h"
 #include "botan_kdf.h"
 #include "botan_mpi.h"
+#include "botan_private_key.h"
 
 extern const unsigned char *src_janet___botan_lib_embed;
 extern size_t src_janet___botan_lib_embed_size;
@@ -39,6 +40,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_scrypt(env);
     submod_kdf(env);
     submod_mpi(env);
+    submod_private_key(env);
     janet_dobytes(env,
                   src_janet___botan_lib_embed,
                   src_janet___botan_lib_embed_size,
