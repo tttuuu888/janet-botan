@@ -717,6 +717,7 @@ static JanetReg mpi_cfuns[] = {
 
 static void submod_mpi(JanetTable *env) {
     janet_cfuns(env, "botan", mpi_cfuns);
+    janet_register_abstract_type(get_mpi_obj_type());
 }
 
 #endif /* BOTAN_MPI_H */
