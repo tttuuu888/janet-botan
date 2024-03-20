@@ -5,4 +5,8 @@
 
 (pp (privkey/new "RSA" "1024"))
 
+(let [prikey (privkey/new "RSA" "1024")]
+  (pp (hex-decode (:to-pem prikey))))
+
+
 (end-suite)
