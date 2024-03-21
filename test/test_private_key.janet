@@ -10,6 +10,7 @@
       prikey2-load-from-der (privkey/load prikey1-der)]
   (assert (= (:check-key prikey1 (rng/new)) true))
   (assert (= (:check-key prikey1 (rng/new) :weak) true))
+  (assert (= (:algo-name prikey1) "RSA"))
   )
 
 

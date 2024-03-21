@@ -21,6 +21,7 @@ static Janet private_key_get_public_key(int32_t argc, Janet *argv);
 static Janet private_key_to_pem(int32_t argc, Janet *argv);
 static Janet private_key_to_der(int32_t argc, Janet *argv);
 static Janet private_key_check_key(int32_t argc, Janet *argv);
+static Janet private_key_algo_name(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -35,6 +36,7 @@ static JanetMethod private_key_methods[] = {
     {"to-pem", private_key_to_pem},
     {"to-der", private_key_to_der},
     {"check-key", private_key_check_key},
+    {"algo-name", private_key_algo_name},
 
     {NULL, NULL},
 };
@@ -182,6 +184,29 @@ static Janet private_key_check_key(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
+static Janet private_key_algo_name(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    size_t algo_len = 0;
+    int ret = botan_privkey_algo_name(key, NULL, &algo_len);
+    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
+        janet_panic(getBotanError(ret));
+    }
+
+    JanetBuffer *output = janet_buffer(algo_len);
+    ret = botan_privkey_algo_name(key, output->data, &algo_len);
+    JANET_BOTAN_ASSERT(ret);
+
+    if (output->data[algo_len - 1] == 0) {
+        algo_len -= 1;
+    }
+
+    return janet_wrap_string(janet_string(output->data, algo_len));
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo param &opt rng)\n\n"
@@ -213,6 +238,10 @@ static JanetReg private_key_cfuns[] = {
      "(privkey/check-key privkey rng &opt weak)\n\n"
      "Test the key for consistency. If weak is provided then less expensive "
      "tests are performed."
+    },
+    {"privkey/algo-name", private_key_check_key,
+     "(privkey/algo-name privkey)\n\n"
+     "Returns the algorithm name."
     },
 
     {NULL, NULL, NULL}
