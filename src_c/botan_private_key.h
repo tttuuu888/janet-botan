@@ -17,6 +17,9 @@ static int private_key_get_fn(void *data, Janet key, Janet *out);
 
 /* Janet functions */
 static Janet private_key_new(int32_t argc, Janet *argv);
+static Janet private_key_get_public_key(int32_t argc, Janet *argv);
+static Janet private_key_to_pem(int32_t argc, Janet *argv);
+static Janet private_key_to_der(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -27,6 +30,10 @@ static JanetAbstractType private_key_obj_type = {
 };
 
 static JanetMethod private_key_methods[] = {
+    {"get-pubkey", private_key_get_public_key},
+    {"to-pem", private_key_to_pem},
+    {"to-der", private_key_to_der},
+
     {NULL, NULL},
 };
 
@@ -91,7 +98,7 @@ static Janet private_key_load(int32_t argc, Janet *argv) {
     memset(obj, 0, sizeof(botan_private_key_obj_t));
 
     JanetByteView blob = janet_getbytes(argv, 0);
-    char *pass = "";
+    char *pass = NULL;
 
     if (argc == 2) {
         pass = (char *)janet_getcstring(argv, 1);
@@ -117,6 +124,45 @@ static Janet private_key_get_public_key(int32_t argc, Janet *argv) {
     return janet_wrap_nil();
 }
 
+static Janet private_key_to_pem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+    view_data_t data;
+
+    size_t key_len = 0;
+    int ret = botan_privkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
+    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
+        janet_panic(getBotanError(ret));
+    }
+
+    JanetBuffer *output = janet_buffer(key_len);
+    ret = botan_privkey_export(key, output->data, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(output->data, key_len));
+}
+
+static Janet private_key_to_der(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    size_t key_len = 0;
+    int ret = botan_privkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_DER);
+    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
+        janet_panic(getBotanError(ret));
+    }
+
+    JanetBuffer *output = janet_buffer(key_len);
+    ret = botan_privkey_export(key, output->data, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_DER);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(output->data, key_len));
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo param &opt rng)\n\n"
@@ -135,6 +181,14 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"
      "Return a `pubkey` object."
+    },
+    {"privkey/to-pem", private_key_to_pem,
+     "(privkey/to-pem privkey)\n\n"
+     "Return the PEM encoded private key (unencrypted)."
+    },
+    {"privkey/to-der", private_key_to_der,
+     "(privkey/to-pem privkey)\n\n"
+     "Return the DER encoded private key (unencrypted)."
     },
     {NULL, NULL, NULL}
 };
