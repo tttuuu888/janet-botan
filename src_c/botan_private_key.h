@@ -22,6 +22,7 @@ static Janet private_key_to_pem(int32_t argc, Janet *argv);
 static Janet private_key_to_der(int32_t argc, Janet *argv);
 static Janet private_key_check_key(int32_t argc, Janet *argv);
 static Janet private_key_algo_name(int32_t argc, Janet *argv);
+static Janet private_key_export(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -37,6 +38,7 @@ static JanetMethod private_key_methods[] = {
     {"to-der", private_key_to_der},
     {"check-key", private_key_check_key},
     {"algo-name", private_key_algo_name},
+    {"export", private_key_export},
 
     {NULL, NULL},
 };
@@ -144,6 +146,9 @@ static Janet private_key_to_pem(int32_t argc, Janet *argv) {
     JanetBuffer *output = janet_buffer(key_len);
     ret = botan_privkey_export(key, output->data, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
     JANET_BOTAN_ASSERT(ret);
+    if (output->data[key_len - 1] == 0) {
+        key_len -= 1;
+    }
 
     return janet_wrap_string(janet_string(output->data, key_len));
 }
@@ -207,6 +212,16 @@ static Janet private_key_algo_name(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(output->data, algo_len));
 }
 
+static Janet private_key_export(int32_t argc, Janet *argv) {
+    janet_arity(argc, 1, 2);
+
+    if (argc == 2) {
+        return private_key_to_pem(1, argv);
+    } else {
+        return private_key_to_der(1, argv);
+    }
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo param &opt rng)\n\n"
@@ -242,6 +257,12 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/algo-name", private_key_check_key,
      "(privkey/algo-name privkey)\n\n"
      "Returns the algorithm name."
+    },
+    {"privkey/export", private_key_export,
+     "(privkey/export &opt pem)\n\n"
+     "Exports the private key in PKCS8 format. If `pem` is provided, the "
+     "result is a PEM encoded string. Otherwise it is a binary DER value. "
+     "The key will not be encrypted."
     },
 
     {NULL, NULL, NULL}
