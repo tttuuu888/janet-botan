@@ -21,7 +21,7 @@ static Janet bcrypt(int32_t argc, Janet *argv) {
         work_factor = janet_getsize(argv, 2);
     }
 
-    ret = botan_bcrypt_generate(out->data, &out_len, pass.bytes,
+    ret = botan_bcrypt_generate(out->data, &out_len, (const char *)pass.bytes,
                                 rng, work_factor, 0);
     JANET_BOTAN_ASSERT(ret);
 
@@ -35,7 +35,7 @@ static Janet bcrypt_is_valid(int32_t argc, Janet *argv) {
     JanetByteView hashed = janet_getbytes(argv, 1);
     int ret;
 
-    ret = botan_bcrypt_is_valid(pass.bytes, hashed.bytes);
+    ret = botan_bcrypt_is_valid((const char *)pass.bytes, (const char *)hashed.bytes);
     if (ret != 0 && ret != 1) {
         janet_panic(getBotanError(ret));
     }

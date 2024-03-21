@@ -155,7 +155,7 @@ static Janet mpi_new_str(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     JanetByteView val = janet_getbytes(argv, 0);
-    ret = botan_mp_set_from_str(obj->mpi, val.bytes);
+    ret = botan_mp_set_from_str(obj->mpi, (const char *)val.bytes);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -170,7 +170,7 @@ static Janet mpi_new_hex_str(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
     JanetByteView val = janet_getbytes(argv, 0);
 
-    ret = botan_mp_set_from_radix_str(obj->mpi, val.bytes, 16);
+    ret = botan_mp_set_from_radix_str(obj->mpi, (const char *)val.bytes, 16);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -212,11 +212,7 @@ static Janet mpi_new_rng(int32_t argc, Janet *argv) {
 static Janet mpi_inverse_mod(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
-    botan_mp_t mpi = obj->mpi;
-
     botan_mpi_obj_t *obj_mod = janet_getabstract(argv, 1, get_mpi_obj_type());
-    botan_mp_t mpi2 = obj_mod->mpi;
-
     botan_mpi_obj_t *obj_out = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
     memset(obj_out, 0, sizeof(botan_mpi_obj_t));
 

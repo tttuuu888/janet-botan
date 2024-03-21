@@ -17,8 +17,6 @@ static Janet scrypt(int32_t argc, Janet *argv) {
     size_t N=1024;
     size_t r=8;
     size_t p=8;
-
-    size_t iter = 100000;
     int ret;
 
     if (argc >= 4) {
@@ -33,7 +31,7 @@ static Janet scrypt(int32_t argc, Janet *argv) {
 
     ret = botan_pwdhash("Scrypt", N, r, p,
                         out->data, out_len,
-                        pass.bytes, pass.len,
+                        (const char *)pass.bytes, pass.len,
                         salt.bytes, salt.len);
     JANET_BOTAN_ASSERT(ret);
 
