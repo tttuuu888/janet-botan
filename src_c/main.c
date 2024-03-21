@@ -10,6 +10,8 @@
 #include <string.h>
 
 #include "botan_errors.h"
+#include "botan_view_functions.h"
+
 #include "botan_versioning.h"
 #include "botan_utility.h"
 #include "botan_rng.h"
