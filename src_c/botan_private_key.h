@@ -20,6 +20,7 @@ static Janet private_key_new(int32_t argc, Janet *argv);
 static Janet private_key_get_public_key(int32_t argc, Janet *argv);
 static Janet private_key_to_pem(int32_t argc, Janet *argv);
 static Janet private_key_to_der(int32_t argc, Janet *argv);
+static Janet private_key_check_key(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -33,6 +34,7 @@ static JanetMethod private_key_methods[] = {
     {"get-pubkey", private_key_get_public_key},
     {"to-pem", private_key_to_pem},
     {"to-der", private_key_to_der},
+    {"check-key", private_key_check_key},
 
     {NULL, NULL},
 };
@@ -163,6 +165,23 @@ static Janet private_key_to_der(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(output->data, key_len));
 }
 
+static Janet private_key_check_key(int32_t argc, Janet *argv) {
+    janet_arity(argc, 2, 3);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+    botan_rng_obj_t *obj_rng = janet_getabstract(argv, 1, get_rng_obj_type());
+    botan_rng_t rng = obj_rng->rng;
+    uint32_t flag = 1;
+
+    if (argc == 3) {
+        flag = 0;
+    }
+
+    int ret = botan_privkey_check_key(key, rng, flag);
+    return janet_wrap_boolean(ret == 0);
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo param &opt rng)\n\n"
@@ -190,6 +209,12 @@ static JanetReg private_key_cfuns[] = {
      "(privkey/to-pem privkey)\n\n"
      "Return the DER encoded private key (unencrypted)."
     },
+    {"privkey/check-key", private_key_check_key,
+     "(privkey/check-key privkey rng &opt weak)\n\n"
+     "Test the key for consistency. If weak is provided then less expensive "
+     "tests are performed."
+    },
+
     {NULL, NULL, NULL}
 };
 
