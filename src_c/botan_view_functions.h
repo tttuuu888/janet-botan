@@ -33,7 +33,10 @@ static int view_str_func(botan_view_ctx view_ctx, const char *str, size_t len) {
     view_data_t *data = (view_data_t *)view_ctx;
     data->data = janet_smalloc(len);
     memcpy(data->data, str, len);
-    data->len = len - 1;
+    data->len = len;
+    if (data->data[len - 1] == 0) {
+        data->len -= 1;
+    }
 
     return 0;
 }
