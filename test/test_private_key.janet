@@ -43,5 +43,13 @@
   (assert (= (:get-field dh-priv-key "g") g))
   (assert (= (:get-field dh-priv-key "x") x)))
 
+(let [p (mpi/new-from-str "1898479519619165222561514020362438903700593475271")
+      g (mpi/new-from-str "2")
+      x (mpi/new-from-str "123456789")
+      elgamal-priv-key (privkey/load-elgamal p g x)]
+  (assert (= (:get-field elgamal-priv-key "p") p))
+  (assert (= (:get-field elgamal-priv-key "g") g))
+  (assert (= (:get-field elgamal-priv-key "x") x)))
+
 
 (end-suite)
