@@ -23,6 +23,7 @@ static Janet private_key_to_der(int32_t argc, Janet *argv);
 static Janet private_key_check_key(int32_t argc, Janet *argv);
 static Janet private_key_algo_name(int32_t argc, Janet *argv);
 static Janet private_key_export(int32_t argc, Janet *argv);
+static Janet private_key_get_field(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -39,6 +40,7 @@ static JanetMethod private_key_methods[] = {
     {"check-key", private_key_check_key},
     {"algo-name", private_key_algo_name},
     {"export", private_key_export},
+    {"get-field", private_key_get_field},
 
     {NULL, NULL},
 };
@@ -111,6 +113,28 @@ static Janet private_key_load(int32_t argc, Janet *argv) {
     }
 
     ret = botan_privkey_load(&obj->private_key, (botan_rng_t)NULL, blob.bytes, blob.len, (const char*)pass);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_rsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    botan_mpi_obj_t *obj_p = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi_p = obj_p->mpi;
+
+    botan_mpi_obj_t *obj_q = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_q = obj_q->mpi;
+
+    botan_mpi_obj_t *obj_e = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_e = obj_e->mpi;
+
+    ret = botan_privkey_load_rsa(&obj->private_key, mpi_p, mpi_q, mpi_e);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -222,6 +246,25 @@ static Janet private_key_export(int32_t argc, Janet *argv) {
     }
 }
 
+static Janet private_key_get_field(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+    const char *field = (const char *)janet_getstring(argv, 1);
+
+    botan_mpi_obj_t *obj_mpi = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
+    memset(obj_mpi, 0, sizeof(botan_mpi_obj_t));
+
+    int ret = botan_mp_init(&obj_mpi->mpi);
+    JANET_BOTAN_ASSERT(ret);
+
+    ret = botan_privkey_get_field(obj_mpi->mpi, key, field);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj_mpi);
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo param &opt rng)\n\n"
@@ -236,6 +279,10 @@ static JanetReg private_key_cfuns[] = {
      "(privkey/load blob &opt password)\n\n"
      "Return a private key (DER or PEM formats accepted). No `password` "
      "indicate no encryption expected."
+    },
+    {"privkey/load-rsa", private_key_load_rsa,
+     "(privkey/load-rsa p q e)\n\n"
+     "Return a private RSA key."
     },
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"
@@ -263,6 +310,13 @@ static JanetReg private_key_cfuns[] = {
      "Exports the private key in PKCS8 format. If `pem` is provided, the "
      "result is a PEM encoded string. Otherwise it is a binary DER value. "
      "The key will not be encrypted."
+    },
+    {"privkey/get-field", private_key_get_field,
+     "(privkey/get-field filed-name)\n\n"
+     "Return an integer field related to the private key. The valid field "
+     "names vary depending on the algorithm. For example first RSA secret "
+     "prime can be extracted with `(privkey/get-field key \"p\")`. This "
+     "function can also be used to extract the public parameters."
     },
 
     {NULL, NULL, NULL}

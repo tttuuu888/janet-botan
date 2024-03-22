@@ -17,4 +17,13 @@
   (assert (= (:to-der prikey1) (:export prikey1))))
 
 
+(let [p (mpi/new-from-str "1090660992520643446103273789680343")
+      q (mpi/new-from-str "1162435056374824133712043309728653")
+      e (mpi/new-from-str "65537")
+      rsa-priv-key1 (privkey/load-rsa p q e)]
+  (assert (= (:get-field rsa-priv-key1 "p") p))
+  (assert (= (:get-field rsa-priv-key1 "q") q))
+  (assert (= (:get-field rsa-priv-key1 "e") e)))
+
+
 (end-suite)
