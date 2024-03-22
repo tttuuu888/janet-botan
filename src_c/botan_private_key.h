@@ -140,6 +140,31 @@ static Janet private_key_load_rsa(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet private_key_load_dsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 4);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    botan_mpi_obj_t *obj_p = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi_p = obj_p->mpi;
+
+    botan_mpi_obj_t *obj_q = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_q = obj_q->mpi;
+
+    botan_mpi_obj_t *obj_g = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_g = obj_g->mpi;
+
+    botan_mpi_obj_t *obj_x = janet_getabstract(argv, 3, get_mpi_obj_type());
+    botan_mp_t mpi_x = obj_x->mpi;
+
+    ret = botan_privkey_load_dsa(&obj->private_key, mpi_p, mpi_q, mpi_g, mpi_x);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet private_key_get_public_key(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 0);
 
@@ -283,6 +308,10 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/load-rsa", private_key_load_rsa,
      "(privkey/load-rsa p q e)\n\n"
      "Return a private RSA key."
+    },
+    {"privkey/load-dsa", private_key_load_dsa,
+     "(privkey/load-dsa p q g x)\n\n"
+     "Return a private DSA key."
     },
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"
