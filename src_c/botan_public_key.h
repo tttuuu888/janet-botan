@@ -372,7 +372,7 @@ static JanetReg public_key_cfuns[] = {
      "Return a public SM2 key."
     },
     {"pubkey/export", public_key_export,
-     "(pubkey/export &opt pem)\n\n"
+     "(pubkey/export pubkey &opt pem)\n\n"
      "Exports the public key using the usual X.509 SPKI representation. "
      "If `pem` is provided, the result is a PEM encoded string. Otherwise "
      "it is a binary DER value."
@@ -391,7 +391,7 @@ static JanetReg public_key_cfuns[] = {
      "tests are performed."
     },
     {"pubkey/get-field", public_key_get_field,
-     "(pubkey/get-field filed-name)\n\n"
+     "(pubkey/get-field pubkey filed-name)\n\n"
      "Return an integer field related to the public key. The valid field "
      "names vary depending on the algorithm. For example RSA public modulus "
      "can be extracted with (pubkey/get-field \"n\")."
