@@ -600,24 +600,24 @@ static JanetReg mpi_cfuns[] = {
      "(mpi/new)\n\n"
      "Create a new zero-valued MPI."
     },
-    {"mpi/new-from-int", mpi_new_int,
-     "(mpi/new-from-int value)\n\n"
+    {"mpi/from-int", mpi_new_int,
+     "(mpi/from-int value)\n\n"
      "Create an MPI object with an integer `value`."
     },
-    {"mpi/new-from-str", mpi_new_str,
-     "(mpi/new-from-str value)\n\n"
+    {"mpi/from-str", mpi_new_str,
+     "(mpi/from-str value)\n\n"
      "Create an MPI object with an integer string `value`."
     },
-    {"mpi/new-from-hex-str", mpi_new_hex_str,
-     "(mpi/new-from-hex-str value)\n\n"
+    {"mpi/from-hex-str", mpi_new_hex_str,
+     "(mpi/from-hex-str value)\n\n"
      "Create an MPI object with a hex string `value`."
     },
-    {"mpi/new-from-mpi", mpi_new_mpi,
-     "(mpi/new-from-mpi mpi)\n\n"
+    {"mpi/from-mpi", mpi_new_mpi,
+     "(mpi/from-mpi mpi)\n\n"
      "Create an MPI object with an MPI object `mpi`."
     },
-    {"mpi/new-from-rng", mpi_new_rng,
-     "(mpi/new-from-rng rng bits)\n\n"
+    {"mpi/from-rng", mpi_new_rng,
+     "(mpi/from-rng rng bits)\n\n"
      "Create a `bits` size random MPI object with `rng`."
     },
     {"mpi/inverse-mod", mpi_inverse_mod,
