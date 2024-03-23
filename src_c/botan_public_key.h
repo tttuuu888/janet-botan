@@ -98,6 +98,134 @@ static Janet public_key_load_rsa(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet public_key_load_dsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 4);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    botan_mpi_obj_t *obj_p = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi_p = obj_p->mpi;
+
+    botan_mpi_obj_t *obj_q = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_q = obj_q->mpi;
+
+    botan_mpi_obj_t *obj_g = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_g = obj_g->mpi;
+
+    botan_mpi_obj_t *obj_y = janet_getabstract(argv, 3, get_mpi_obj_type());
+    botan_mp_t mpi_y = obj_y->mpi;
+
+    ret = botan_pubkey_load_dsa(&obj->public_key, mpi_p, mpi_q, mpi_g, mpi_y);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_dh(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    botan_mpi_obj_t *obj_p = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi_p = obj_p->mpi;
+
+    botan_mpi_obj_t *obj_g = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_g = obj_g->mpi;
+
+    botan_mpi_obj_t *obj_y = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_y = obj_y->mpi;
+
+    ret = botan_pubkey_load_dh(&obj->public_key, mpi_p, mpi_g, mpi_y);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_elgamal(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    botan_mpi_obj_t *obj_p = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi_p = obj_p->mpi;
+
+    botan_mpi_obj_t *obj_g = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_g = obj_g->mpi;
+
+    botan_mpi_obj_t *obj_y = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_y = obj_y->mpi;
+
+    ret = botan_pubkey_load_elgamal(&obj->public_key, mpi_p, mpi_g, mpi_y);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_ecdsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    botan_mpi_obj_t *obj_x = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_x = obj_x->mpi;
+
+    botan_mpi_obj_t *obj_y = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_y = obj_y->mpi;
+
+    ret = botan_pubkey_load_ecdsa(&obj->public_key, mpi_x, mpi_y, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_ecdh(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    botan_mpi_obj_t *obj_x = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_x = obj_x->mpi;
+
+    botan_mpi_obj_t *obj_y = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_y = obj_y->mpi;
+
+    ret = botan_pubkey_load_ecdh(&obj->public_key, mpi_x, mpi_y, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_sm2(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    botan_mpi_obj_t *obj_x = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_x = obj_x->mpi;
+    botan_mpi_obj_t *obj_y = janet_getabstract(argv, 2, get_mpi_obj_type());
+    botan_mp_t mpi_y = obj_y->mpi;
+
+    ret = botan_pubkey_load_sm2(&obj->public_key, mpi_x, mpi_y, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet public_key_to_pem(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -218,6 +346,30 @@ static JanetReg public_key_cfuns[] = {
      "(pubkey/load-rsa n e)\n\n"
      "Load an RSA public key giving the modulus and public exponent as "
      "integers."
+    },
+    {"pubkey/load-dsa", public_key_load_dsa,
+     "(pubkey/load-dsa p q g y)\n\n"
+     "Return a public DSA key."
+    },
+    {"pubkey/load-dh", public_key_load_dh,
+     "(pubkey/load-dh p g y)\n\n"
+     "Return a public DH key."
+    },
+    {"pubkey/load-elgamal", public_key_load_elgamal,
+     "(pubkey/load-elgamal p g y)\n\n"
+     "Return a public ElGamal key."
+    },
+    {"pubkey/load-ecdsa", public_key_load_ecdsa,
+     "(pubkey/load-ecdsa curve x y)\n\n"
+     "Return a public ECDSA key."
+    },
+    {"pubkey/load-ecdh", public_key_load_ecdh,
+     "(pubkey/load-ecdh curve x y)\n\n"
+     "Return a public ECDH key."
+    },
+    {"pubkey/load-sm2", public_key_load_sm2,
+     "(pubkey/load-sm2 curve x y)\n\n"
+     "Return a public SM2 key."
     },
     {"pubkey/export", public_key_export,
      "(pubkey/export &opt pem)\n\n"
