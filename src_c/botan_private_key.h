@@ -280,7 +280,6 @@ static Janet private_key_to_pem(int32_t argc, Janet *argv) {
 
     botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
     botan_privkey_t key = obj->private_key;
-    view_data_t data;
 
     size_t key_len = 0;
     int ret = botan_privkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
