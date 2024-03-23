@@ -261,17 +261,18 @@ static Janet private_key_load_sm2(int32_t argc, Janet *argv) {
 }
 
 static Janet private_key_get_public_key(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 0);
+    janet_fixarity(argc, 1);
 
-    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
-    botan_privkey_t key = obj->private_key;
+    botan_public_key_obj_t *obj_pub = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj_pub, 0, sizeof(botan_public_key_obj_t));
 
-#if 0
-    int ret = botan_privkey_export_pubkey(key, (botan_rng_t)NULL, blob.bytes, blob.len, (const char*)pass);
+    botan_private_key_obj_t *obj_pri = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t pri_key = obj_pri->private_key;
+
+    int ret = botan_privkey_export_pubkey(&obj_pub->public_key, pri_key);
     JANET_BOTAN_ASSERT(ret);
-#endif
 
-    return janet_wrap_nil();
+    return janet_wrap_abstract(obj_pub);
 }
 
 static Janet private_key_to_pem(int32_t argc, Janet *argv) {
