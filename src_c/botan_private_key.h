@@ -209,6 +209,57 @@ static Janet private_key_load_elgamal(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet private_key_load_ecdsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    botan_mpi_obj_t *obj_x = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_x = obj_x->mpi;
+
+    ret = botan_privkey_load_ecdsa(&obj->private_key, mpi_x, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_ecdh(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    botan_mpi_obj_t *obj_x = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_x = obj_x->mpi;
+
+    ret = botan_privkey_load_ecdh(&obj->private_key, mpi_x, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_sm2(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    botan_mpi_obj_t *obj_x = janet_getabstract(argv, 1, get_mpi_obj_type());
+    botan_mp_t mpi_x = obj_x->mpi;
+
+    ret = botan_privkey_load_sm2(&obj->private_key, mpi_x, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet private_key_get_public_key(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 0);
 
@@ -364,6 +415,18 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/load-elgamal", private_key_load_elgamal,
      "(privkey/load-elgamal p g x)\n\n"
      "Return a private ElGamal key."
+    },
+    {"privkey/load-ecdsa", private_key_load_ecdsa,
+     "(privkey/load-ecdsa curve x)\n\n"
+     "Return a private ECDSA key."
+    },
+    {"privkey/load-ecdh", private_key_load_ecdh,
+     "(privkey/load-ecdh curve x)\n\n"
+     "Return a private ECDH key."
+    },
+    {"privkey/load-sm2", private_key_load_sm2,
+     "(privkey/load-sm2 curve x)\n\n"
+     "Return a private SM2 key."
     },
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"

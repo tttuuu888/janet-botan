@@ -51,5 +51,25 @@
   (assert (= (:get-field elgamal-priv-key "g") g))
   (assert (= (:get-field elgamal-priv-key "x") x)))
 
+(let [curve "secp256r1"
+      ecdsa-priv-key1 (privkey/new "ECDSA" curve)
+      x (:get-field ecdsa-priv-key1 "x")
+      ecdsa-priv-key2 (privkey/load-ecdsa curve x)]
+  (assert (= (:get-field ecdsa-priv-key1 "x")
+             (:get-field ecdsa-priv-key2 "x"))))
+
+(let [curve "secp256r1"
+      ecdh-priv-key1 (privkey/new "ECDH" curve)
+      x (:get-field ecdh-priv-key1 "x")
+      ecdh-priv-key2 (privkey/load-ecdh curve x)]
+  (assert (= (:get-field ecdh-priv-key1 "x")
+             (:get-field ecdh-priv-key2 "x"))))
+
+(let [curve "sm2p256v1"
+      sm2-priv-key1 (privkey/new "SM2_Enc" curve)
+      x (:get-field sm2-priv-key1 "x")
+      sm2-priv-key2 (privkey/load-sm2 curve x)]
+  (assert (= (:get-field sm2-priv-key1 "x")
+             (:get-field sm2-priv-key2 "x"))))
 
 (end-suite)
