@@ -24,6 +24,7 @@ static Janet public_key_check_key(int32_t argc, Janet *argv);
 static Janet public_key_get_field(int32_t argc, Janet *argv);
 static Janet public_key_algo_name(int32_t argc, Janet *argv);
 static Janet public_key_get_public_point(int32_t argc, Janet *argv);
+static Janet public_key_fingerprint(int32_t argc, Janet *argv);
 
 static JanetAbstractType public_key_obj_type = {
     "botan/public-key",
@@ -41,6 +42,7 @@ static JanetMethod public_key_methods[] = {
     {"export", public_key_export},
     {"get-field", public_key_get_field},
     {"get-public-point", public_key_get_public_point},
+    {"fingerprint", public_key_fingerprint},
 
     {NULL, NULL},
 };
@@ -352,6 +354,34 @@ static Janet public_key_get_public_point(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(data.data, data.len));
 }
 
+static Janet public_key_fingerprint(int32_t argc, Janet *argv) {
+    janet_arity(argc, 1, 2);
+
+    botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
+    botan_pubkey_t key = obj->public_key;
+
+    const char *hash_name = "SHA-256";
+    if (argc == 2) {
+        hash_name = janet_getcstring(argv, 1);
+    }
+
+    botan_hash_obj_t *obj_hash = janet_abstract(&hash_obj_type, sizeof(botan_hash_obj_t));
+    memset(obj_hash, 0, sizeof(botan_hash_obj_t));
+
+    int ret = botan_hash_init(&obj_hash->hash, hash_name, 0);
+    JANET_BOTAN_ASSERT(ret);
+
+    size_t out_len;
+    ret = botan_hash_output_length(obj_hash->hash, &out_len);
+    JANET_BOTAN_ASSERT(ret);
+
+    JanetBuffer *out = janet_buffer(out_len);
+    ret = botan_pubkey_fingerprint(key, hash_name, out->data, &out_len);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(out->data, out_len));
+}
+
 static JanetReg public_key_cfuns[] = {
     {"pubkey/load", public_key_load,
      "(pubkey/load value)\n\n"
@@ -418,6 +448,11 @@ static JanetReg public_key_cfuns[] = {
     {"pubkey/get-public-point", public_key_get_public_point,
      "(pubkey/get-public-point pubkey)\n\n"
      "Return a public point of the key."
+    },
+    {"pubkey/fingerprint", public_key_fingerprint,
+     "(pubkey/fingerprint pubkey &opt hash)\n\n"
+     "Returns a hash of the public key. \"SHA-256\" is used as a default "
+     "hash, if `hash` is not provided."
     },
     {NULL, NULL, NULL}
 };

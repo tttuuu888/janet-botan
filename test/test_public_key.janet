@@ -14,8 +14,11 @@
       pubkey (:get-pubkey prikey)
       pub-point (hex-encode (:get-public-point pubkey))
       pub-x (hex-encode (:to-bin (:get-field pubkey "public_x")))
-      pub-y (hex-encode (:to-bin (:get-field pubkey "public_y")))]
-  (assert (= pub-point (string "04" pub-x pub-y))))
+      pub-y (hex-encode (:to-bin (:get-field pubkey "public_y")))
+      fingerprint (:fingerprint pubkey)
+      sha256-hash-of-pubkey (:final (:update (hash/new "SHA-256") (hex-decode pub-point)))]
+  (assert (= pub-point (string "04" pub-x pub-y)))
+  (assert (= fingerprint sha256-hash-of-pubkey)))
 
 
 (end-suite)
