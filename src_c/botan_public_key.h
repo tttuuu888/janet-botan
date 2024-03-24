@@ -25,6 +25,7 @@ static Janet public_key_get_field(int32_t argc, Janet *argv);
 static Janet public_key_algo_name(int32_t argc, Janet *argv);
 static Janet public_key_get_public_point(int32_t argc, Janet *argv);
 static Janet public_key_fingerprint(int32_t argc, Janet *argv);
+static Janet public_key_estimated_strength(int32_t argc, Janet *argv);
 
 static JanetAbstractType public_key_obj_type = {
     "botan/public-key",
@@ -43,6 +44,7 @@ static JanetMethod public_key_methods[] = {
     {"get-field", public_key_get_field},
     {"get-public-point", public_key_get_public_point},
     {"fingerprint", public_key_fingerprint},
+    {"estimated-strength", public_key_estimated_strength},
 
     {NULL, NULL},
 };
@@ -382,6 +384,19 @@ static Janet public_key_fingerprint(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(out->data, out_len));
 }
 
+static Janet public_key_estimated_strength(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
+    botan_pubkey_t key = obj->public_key;
+
+    size_t estimate;
+    int ret = botan_pubkey_estimated_strength(key, &estimate);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)estimate);
+}
+
 static JanetReg public_key_cfuns[] = {
     {"pubkey/load", public_key_load,
      "(pubkey/load value)\n\n"
@@ -453,6 +468,11 @@ static JanetReg public_key_cfuns[] = {
      "(pubkey/fingerprint pubkey &opt hash)\n\n"
      "Returns a hash of the public key. \"SHA-256\" is used as a default "
      "hash, if `hash` is not provided."
+    },
+    {"pubkey/estimated_strength", public_key_estimated_strength,
+     "(pubkey/estimated_strength pubkey)\n\n"
+     "Returns the estimated strength of this key against known attacks "
+     "(NFS, Pollard’s rho, etc)"
     },
     {NULL, NULL, NULL}
 };
