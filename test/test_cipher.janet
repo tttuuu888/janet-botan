@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "symmetric cipher")
+(start-suite "Symmetric Ciphers")
 
 (assert-error "Error expected" (cipher/new "AES-127/CBC/PKCS7" :encrypt))
 

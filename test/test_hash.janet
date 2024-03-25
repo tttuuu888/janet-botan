@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "hash")
+(start-suite "Hash Functions")
 
 (assert-error "Error expected" (hash/new "SHA-255"))
 

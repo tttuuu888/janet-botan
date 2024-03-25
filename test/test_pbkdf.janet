@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "pbkdf")
+(start-suite "PBKDF")
 
 (let [salt (hex-decode "102030405060708090A0B0C0D0E0F000")
       expected-output (hex-decode "DECF9EF197B87ABBDB6CBA9E81A7BCB8AC36BB2BFA3B93746C8042227A27CFEA")]

@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "utility")
+(start-suite "Utility")
 
 (assert (constant-time-compare "abc" "abc"))
 (assert (not (constant-time-compare "abc" "bcd")))

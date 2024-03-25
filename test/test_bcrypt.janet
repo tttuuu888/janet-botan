@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "bcrypt")
+(start-suite "Bcrypt")
 
 (let [rng (rng/new)]
 

@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "mpi")
+(start-suite "Multiple Precision Integers (MPI)")
 
 (let [mpi1 (assert (mpi/from-int 1))
       mpi2 (assert (mpi/from-int 1))

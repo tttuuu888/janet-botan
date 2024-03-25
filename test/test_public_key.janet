@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "public key")
+(start-suite "Public Key")
 
 (let [n (mpi/from-str "1090660992520643446103273789680343")
       e (mpi/from-str "65537")

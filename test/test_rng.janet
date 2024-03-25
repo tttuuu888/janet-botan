@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "rng")
+(start-suite "Random Number Generators")
 
 (let [rng-ori (assert (rng/new))
       rng-src (assert (rng/new))

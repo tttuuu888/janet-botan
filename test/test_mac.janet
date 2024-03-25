@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "mac")
+(start-suite "Message Authentication Codes")
 
 (assert-error "Error expected" (mac/new "HMAC(SHA-255)"))
 

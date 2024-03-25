@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "private key")
+(start-suite "Private Key")
 
 (let [prikey1 (privkey/new "RSA" "1024")
       prikey1-pem (:to-pem prikey1)

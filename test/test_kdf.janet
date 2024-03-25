@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "kdf")
+(start-suite "KDF")
 
 (assert (= (hex-encode (kdf "HKDF(HMAC(SHA-256))"
                             42

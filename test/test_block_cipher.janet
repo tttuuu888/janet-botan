@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "block-cipher")
+(start-suite "Block Ciphers")
 
 (assert-error "Error expected" (block-cipher/new "AES-129"))
 

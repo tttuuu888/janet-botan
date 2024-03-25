@@ -1,7 +1,7 @@
 (use ../build/botan)
 (use spork/test)
 
-(start-suite "scrypt")
+(start-suite "Scrypt")
 
 (assert (= (hex-encode (scrypt 64 "" "" 16 1 1))
            "77D6576238657B203B19CA42C18A0497F16B4844E3074AE8DFDFFA3FEDE21442FCD0069DED0948F8326A753A0FC81F17E8D3E0FB2E0D3628CF35E20C38D18906"))
