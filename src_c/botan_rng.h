@@ -132,10 +132,9 @@ static Janet rng_add_entropy(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_rng_obj_t *obj = janet_getabstract(argv, 0, get_rng_obj_type());
     botan_rng_t rng = obj->rng;
-    const char *seed = (const char *)janet_getstring(argv, 1);
-    int len = strlen(seed);
+    JanetByteView seed = janet_getbytes(argv, 1);
 
-    int ret = botan_rng_add_entropy(rng, (const uint8_t *)seed, len);
+    int ret = botan_rng_add_entropy(rng, (const uint8_t *)seed.bytes, seed.len);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);

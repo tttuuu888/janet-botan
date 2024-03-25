@@ -81,9 +81,8 @@ static Janet pk_sign_update(int32_t argc, Janet *argv) {
     botan_pk_sign_obj_t *obj = janet_getabstract(argv, 0, get_pk_sign_obj_type());
     botan_pk_op_sign_t op = obj->pk_sign;
 
-    const char *msg = (const char *)janet_getstring(argv, 1);
-    size_t msg_len = strlen(msg);
-    ret = botan_pk_op_sign_update(op, msg, msg_len);
+    JanetByteView msg = janet_getbytes(argv, 1);
+    ret = botan_pk_op_sign_update(op, msg.bytes, msg.len);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);

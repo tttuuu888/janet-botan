@@ -79,8 +79,7 @@ static Janet pk_encrypt_encrypt(int32_t argc, Janet *argv) {
     botan_pk_encrypt_obj_t *obj = janet_getabstract(argv, 0, get_pk_encrypt_obj_type());
     botan_pk_op_encrypt_t op = obj->pk_encrypt;
 
-    const char *msg = (const char *)janet_getstring(argv, 1);
-    size_t msg_len = strlen(msg);
+    JanetByteView msg = janet_getbytes(argv, 1);
     size_t out_len = 0;
     botan_rng_t rng;
 
@@ -96,11 +95,11 @@ static Janet pk_encrypt_encrypt(int32_t argc, Janet *argv) {
         rng = obj2->rng;
     }
 
-    ret = botan_pk_op_encrypt_output_length(op, msg_len, &out_len);
+    ret = botan_pk_op_encrypt_output_length(op, msg.len, &out_len);
     JANET_BOTAN_ASSERT(ret);
 
     JanetBuffer *out = janet_buffer(out_len);
-    ret = botan_pk_op_encrypt(op, rng, out->data, &out_len, msg, msg_len);
+    ret = botan_pk_op_encrypt(op, rng, out->data, &out_len, msg.bytes, msg.len);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_string(janet_string(out->data, out_len));
