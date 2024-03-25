@@ -115,7 +115,7 @@ static JanetReg pk_encrypt_cfuns[] = {
     },
     {"pk-encrypt/encrypt", pk_encrypt_encrypt,
      "(pk-encrypt/encrypt op message &opt rng)\n\n"
-     "Encrypt the provided data using the `pubkey`. New rng is used by "
+     "Encrypt the provided data using the key`. New rng is used by "
      "default, if `rng` is not provided."
     },
 
