@@ -1,0 +1,13 @@
+{:title "Scrypt"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][scrypt/]
+
+## Reference
+
+@api-docs[/build/botan][scrypt/]

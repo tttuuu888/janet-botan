@@ -1,0 +1,13 @@
+{:title "Public Key"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][pubkey/]
+
+## Reference
+
+@api-docs[/build/botan][pubkey/]

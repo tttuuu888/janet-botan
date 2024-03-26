@@ -1,0 +1,15 @@
+{:title "Versioning"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][ffi-]
+@api-index[/build/botan][version-]
+
+## Reference
+
+@api-docs[/build/botan][ffi-]
+@api-docs[/build/botan][version-]

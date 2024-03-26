@@ -1,0 +1,15 @@
+{:title "Utility"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][constant-time-compare]
+@api-index[/build/botan][hex-]
+
+## Reference
+
+@api-docs[/build/botan][constant-time-compare]
+@api-docs[/build/botan][hex-]
