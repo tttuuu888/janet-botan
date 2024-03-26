@@ -36,9 +36,7 @@ static Janet bcrypt_is_valid(int32_t argc, Janet *argv) {
     int ret;
 
     ret = botan_bcrypt_is_valid((const char *)pass.bytes, (const char *)hashed.bytes);
-    if (ret != 0 && ret != 1) {
-        janet_panic(getBotanError(ret));
-    }
+    JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_boolean(ret == 0);
 }
