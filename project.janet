@@ -10,7 +10,7 @@
  :cflags ["-I." "-Ibotan/build/include/public/botan" ;default-cflags]
  :lflags ["-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
  :embedded ["src_janet/botan_lib.janet"]
- :source ["src_c/main.c"])
+ :source ["src/main.c"])
 
 (def project-path (os/cwd))
 

@@ -53,9 +53,4 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_pk_decrypt(env);
     submod_pk_sign(env);
     submod_pk_verify(env);
-    janet_dobytes(env,
-                  src_janet___botan_lib_embed,
-                  src_janet___botan_lib_embed_size,
-                  "botan_lib.janet",
-                  NULL);
 }
