@@ -5,7 +5,7 @@
  :order 0}
 ---
 
-Janet-botan is a Janet bindings to Botan.
+Janet-botan is a @link[https://janet-lang.org]{Janet} bindings to @link[https://botan.randombit.net/]{Botan}.
 
 ## Source code
 
