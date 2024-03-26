@@ -67,7 +67,8 @@ static JanetReg versioning_cfuns[] = {
     {"ffi-api-version", cfun_ffi_api_version, "(ffi-api-version)\n\n"
       "Return the version of the currently supported FFI API."
     },
-    {"ffi-supports-api", cfun_ffi_supports_api, "(ffi-supports-api)\n\n"
+    {"ffi-supports-api", cfun_ffi_supports_api,
+     "(ffi-supports-api version)\n\n"
      "Check if the FFI version specified is supported by this library. "
      "Returns a boolean."
     },
