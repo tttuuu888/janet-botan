@@ -41,7 +41,7 @@ static Janet scrypt(int32_t argc, Janet *argv) {
 
 static JanetReg scrypt_cfuns[] = {
     {"scrypt", scrypt,
-     "(scrypt out_len password salt &opt N r p)\n\n"
+     "(scrypt out-len password salt &opt N r p)\n\n"
      "Runs Scrypt key derivation function over the specified password and "
      "salt using Scrypt parameters N, r, p. If omitted, the default values "
      "of N=1024, r=8, p=8 are used."

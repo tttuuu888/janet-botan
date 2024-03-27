@@ -6,8 +6,8 @@
 
 ## Index
 
-@api-index[/build/botan][scrypt/]
+@api-index[/build/botan][scrypt]
 
 ## Reference
 
-@api-docs[/build/botan][scrypt/]
+@api-docs[/build/botan][scrypt]
