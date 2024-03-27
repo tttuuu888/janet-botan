@@ -324,7 +324,7 @@ static JanetReg cipher_cfuns[] = {
     },
     {"cipher/valid-nonce-length", cipher_valid_nonce_length,
      "(cipher/valid-nonce-length cipher nonce-len)\n\n"
-     "Returns true if `nonce_len` is a valid nonce len for this mode."
+     "Returns true if `nonce-len` is a valid nonce len for this mode."
     },
     {"cipher/get-default-nonce-length", cipher_get_default_nonce_length,
      "(cipher/get-default-nonce-length cipher)\n\n"
@@ -354,7 +354,7 @@ static JanetReg cipher_cfuns[] = {
      "Finish processing (with an optional final `input`). May throw if "
      "message authentication checks fail, in which case all plaintext "
      "previously processed must be discarded. You may call `cipher/finish` "
-     "with the entire message"
+     "with the entire message."
     },
     {NULL, NULL, NULL}
 };

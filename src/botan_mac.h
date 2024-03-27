@@ -192,8 +192,8 @@ static JanetReg mac_cfuns[] = {
     },
     {"mac/set-nonce", mac_set_nonce, "(mac/set-nonce mac key)\n\n"
      "Set the `nonce` for the MAC calculation, return self."
-     "Note that not all MAC algorithms require a nonce. If a nonce is required,"
-     " the function has to be called before the data is processed. "
+     "Note that not all MAC algorithms require a nonce. If a nonce is "
+     "required, the function has to be called before the data is processed."
     },
     {"mac/update", mac_update, "(mac/update mac input)\n\n"
      "Add input to the MAC computation, return self."

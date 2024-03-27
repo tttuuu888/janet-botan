@@ -630,7 +630,8 @@ static JanetReg mpi_cfuns[] = {
     },
     {"mpi/mod-mul", mpi_mod_mul,
      "(mpi/mod-mul mpi other modulus)\n\n"
-     "Return new MPI of the multiplication product of `mpi` and `other` modulo `modulus`."
+     "Return new MPI of the multiplication product of `mpi` and `other` "
+     "modulo `modulus`."
     },
     {"mpi/gcd", mpi_gcd,
      "(mpi/gcd mpi other)\n\n"
@@ -684,7 +685,8 @@ static JanetReg mpi_cfuns[] = {
     },
     {"mpi/div", mpi_div,
      "(mpi/div mpi1 mpi2)\n\n"
-     "Divide `mpi1` by `mpi2` and return quotient MPI and remainder MPI in tuple."
+     "Divide `mpi1` by `mpi2` and return quotient MPI and remainder MPI in "
+     "tuple."
     },
     {"mpi/swap", mpi_swap,
      "(mpi/swap mpi1 mpi2)\n\n"

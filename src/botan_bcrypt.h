@@ -43,7 +43,7 @@ static Janet bcrypt_is_valid(int32_t argc, Janet *argv) {
 
 static JanetReg bcrypt_cfuns[] = {
     {"bcrypt", bcrypt,
-     "(bcrypt password rng &opt work_factor)\n\n"
+     "(bcrypt password rng &opt work-factor)\n\n"
      "Provided the password and an RNG object, returns a bcrypt string."
     },
     {"bcrypt-is-valid", bcrypt_is_valid,

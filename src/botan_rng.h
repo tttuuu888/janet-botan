@@ -151,16 +151,15 @@ static JanetReg rng_cfuns[] = {
     },
     {"rng/get", rng_get, "(rng/get rng len)\n\n"
      "Generate random bytes of length len from a random number generator `rng`."
-     "(defaulting to \"system\" type rng)"
     },
     {"rng/reseed", rng_reseed, "(rng/reseed rng bits)\n\n"
-     "Reseeds the random number generator `rng` with bits number of `bits` from"
-     " the System-RNG, return self."
+     "Reseeds the random number generator `rng` with bits number of `bits` "
+     "from the System-RNG, return self."
     },
     {"rng/reseed-from-rng", rng_reseed_from_rng,
      "(rng/reseed-from-rng rng src bits)\n\n"
-     "Reseeds the random number generator `rng` with bits number of `bits` taken "
-     "from given the source rng `src`, return self."
+     "Reseeds the random number generator `rng` with bits number of `bits` "
+     "taken from given the source rng `src`, return self."
     },
     {"rng/add-entropy", rng_add_entropy,
      "(rng/add-entropy rng seed)\n\n"

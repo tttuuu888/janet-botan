@@ -6,8 +6,8 @@
 
 ## Index
 
-@api-index[/build/botan][kdf/]
+@api-index[/build/botan][kdf]
 
 ## Reference
 
-@api-docs[/build/botan][kdf/]
+@api-docs[/build/botan][kdf]

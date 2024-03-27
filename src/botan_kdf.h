@@ -34,7 +34,7 @@ static Janet cfun_kdf(int32_t argc, Janet *argv) {
 
 static JanetReg kdf_cfuns[] = {
     {"kdf", cfun_kdf,
-     "(kdf algo out_len secret salt &opt label)\n\n"
+     "(kdf algo out-len secret salt &opt label)\n\n"
      "Performs a key derviation function (such as “HKDF(SHA-384)”) over the "
      "provided secret, salt and label values. Returns a value of the "
      "specified length."

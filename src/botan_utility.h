@@ -49,10 +49,10 @@ static JanetReg utility_cfuns[] = {
      "Check if buffer `x` equals buffer `y`. Returns a boolean."
     },
     {"hex-encode", cfun_hex_encode, "(hex-encode bin)\n\n"
-     "Performs hex encoding of binary data in `bin`. Returns the buffer."
+     "Performs hex encoding of binary data in `bin`. Returns the string."
     },
     {"hex-decode", cfun_hex_decode, "(hex-decode str)\n\n"
-     "Performs hex decoding of string data in `str`. Returns the buffer."
+     "Performs hex decoding of string data in `str`. Returns the string."
     },
     {NULL, NULL, NULL}
 };

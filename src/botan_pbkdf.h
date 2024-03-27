@@ -122,20 +122,20 @@ static Janet pbkdf_timed(int32_t argc, Janet *argv) {
 
 static JanetReg pbkdf_cfuns[] = {
     {"pbkdf", pbkdf,
-     "(pbkdf algo passphrase out_len &opt iterations salt)\n\n"
+     "(pbkdf algo passphrase out-len &opt iterations salt)\n\n"
      "Derive a key from a `passphrase` for a number of "
      "`iterations`(default 100000) using the given PBKDF algorithm, e.g., "
      "\"PBKDF2(SHA-512)\". The `salt` can be provided or otherwise is "
-     "randomly chosen. Returns `out_len` bytes of output (or potentially "
+     "randomly chosen. Returns `out-len` bytes of output (or potentially "
      "less depending on the algorithm and the size of the request). "
      "Returns tuple of salt, iterations, and psk"
     },
     {"pbkdf-timed", pbkdf_timed,
-     "(pbkdf-timed algo passphrase out_len &opt ms-to-run salt)\n\n"
+     "(pbkdf-timed algo passphrase out-len &opt ms-to-run salt)\n\n"
      "Derive a key from a `passphrase` for a number of "
      "Runs for as many iterations as needed to consumed `ms-to-run` "
      "milliseconds on whatever we’re running on. Returns tuple of salt, "
-     "iterations, and psk. Default value of `ms_to_run` is 300 and `salt` "
+     "iterations, and psk. Default value of `ms-to-run` is 300 and `salt` "
      "is 12 bytes of random values."
     },
     {NULL, NULL, NULL}
