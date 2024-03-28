@@ -97,16 +97,26 @@ static Janet pk_key_agreement_public_value(int32_t argc, Janet *argv) {
 }
 
 static Janet pk_key_agreement_agree(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 4);
+    janet_arity(argc, 3, 4);
 
     int ret;
     botan_pk_key_agreement_obj_t *obj = janet_getabstract(argv, 0, get_pk_key_agreement_obj_type());
     botan_pk_op_ka_t op = obj->pk_key_agreement;
+    JanetByteView other_key = janet_getbytes(argv, 1);
+    JanetByteView salt = janet_getbytes(argv, 2);
+    size_t out_len = 0;
+    if (argc == 4) {
+        out_len = janet_getsize(argv, 3);
+    } else {
+        ret = botan_pk_op_key_agreement_size(op, &out_len);
+        JANET_BOTAN_ASSERT(ret);
+    }
 
-    botan_rng_t rng;
+    JanetBuffer *out = janet_buffer(out_len);
+    ret = botan_pk_op_key_agreement(op, out->data, &out_len, other_key.bytes, other_key.len, salt.bytes, salt.len);
+    JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_nil();
-    /* return janet_wrap_string(janet_string(out->data, out_len)); */
+    return janet_wrap_string(janet_string(out->data, out_len));
 }
 
 static JanetReg pk_key_agreement_cfuns[] = {
@@ -120,8 +130,9 @@ static JanetReg pk_key_agreement_cfuns[] = {
      "Returns the public value to be passed to the other party"
     },
     {"pk-key-agreement/agree", pk_key_agreement_agree,
-     "(pk-key_agreement/agree op other-key key-len salt)\n\n"
-     "Returns a key derived by the KDF."
+     "(pk-key_agreement/agree op other-key salt &opt key-len)\n\n"
+     "Returns a key derived by the KDF. If `key-len` is omitted, default "
+     "agreement size will be used."
     },
 
     {NULL, NULL, NULL}
