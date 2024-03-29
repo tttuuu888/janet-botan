@@ -31,4 +31,16 @@
   (assert (= (:agree pk-ka1 (:get-public-point pubkey2) salt 128)
              (:agree pk-ka2 (:get-public-point pubkey1) salt 128))))
 
+(let [kyber-priv (privkey/new "Kyber""Kyber-1024-r3")
+      kyber-pub (:get-pubkey kyber-priv)
+      kem-enc (pk-kem-encrypt/new kyber-pub "KDF2(SHA-256)")
+      kem-dec (pk-kem-decrypt/new kyber-priv "KDF2(SHA-256)")
+      shared-key-len 32
+      salt (:get (rng/new) 12)
+      [shared-key encap-key] (:create-shared-key kem-enc salt shared-key-len)
+      shared-key-d (:decrypt-shared-key kem-dec salt shared-key-len encap-key)]
+  (assert (= (length shared-key) shared-key-len))
+  (assert (= (length encap-key) 1568))
+  (assert (= shared-key shared-key-d)))
+
 (end-suite)

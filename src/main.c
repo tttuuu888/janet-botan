@@ -31,6 +31,8 @@
 #include "botan_pk_sign.h"
 #include "botan_pk_verify.h"
 #include "botan_pk_key_agreement.h"
+#include "botan_pk_kem_encrypt.h"
+#include "botan_pk_kem_decrypt.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     submod_versioning(env);
@@ -52,4 +54,6 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_pk_sign(env);
     submod_pk_verify(env);
     submod_pk_key_agreement(env);
+    submod_pk_kem_encrypt(env);
+    submod_pk_kem_decrypt(env);
 }
