@@ -8,6 +8,7 @@
 #include <ffi.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #include "botan_errors.h"
 #include "botan_view_functions.h"
@@ -35,6 +36,7 @@
 #include "botan_pk_kem_decrypt.h"
 #include "botan_fpe.h"
 #include "botan_hotp.h"
+#include "botan_totp.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     submod_versioning(env);
@@ -60,4 +62,5 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_pk_kem_decrypt(env);
     submod_fpe(env);
     submod_hotp(env);
+    submod_totp(env);
 }
