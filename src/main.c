@@ -37,6 +37,7 @@
 #include "botan_fpe.h"
 #include "botan_hotp.h"
 #include "botan_totp.h"
+#include "botan_nist_key_wrap.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     submod_versioning(env);
@@ -63,4 +64,5 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_fpe(env);
     submod_hotp(env);
     submod_totp(env);
+    submod_nist_key_wrap(env);
 }

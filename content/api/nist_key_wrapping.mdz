@@ -1,0 +1,13 @@
+{:title "NIST Key Wrapping"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][nist-key]
+
+## Reference
+
+@api-docs[/build/botan][nist-key]
