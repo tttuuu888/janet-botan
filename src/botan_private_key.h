@@ -361,7 +361,7 @@ static Janet private_key_algo_name(int32_t argc, Janet *argv) {
     }
 
     JanetBuffer *output = janet_buffer(algo_len);
-    ret = botan_privkey_algo_name(key, output->data, &algo_len);
+    ret = botan_privkey_algo_name(key, (char *)output->data, &algo_len);
     JANET_BOTAN_ASSERT(ret);
 
     if (output->data[algo_len - 1] == 0) {

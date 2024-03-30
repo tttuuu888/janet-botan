@@ -16,7 +16,6 @@ static int public_key_gc_fn(void *data, size_t len);
 static int public_key_get_fn(void *data, Janet key, Janet *out);
 
 /* Janet functions */
-static Janet public_key_new(int32_t argc, Janet *argv);
 static Janet public_key_to_pem(int32_t argc, Janet *argv);
 static Janet public_key_to_der(int32_t argc, Janet *argv);
 static Janet public_key_export(int32_t argc, Janet *argv);
@@ -252,7 +251,6 @@ static Janet public_key_to_pem(int32_t argc, Janet *argv) {
 
     botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
     botan_pubkey_t key = obj->public_key;
-    view_data_t data;
 
     size_t key_len = 0;
     int ret = botan_pubkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
@@ -348,7 +346,7 @@ static Janet public_key_algo_name(int32_t argc, Janet *argv) {
     }
 
     JanetBuffer *output = janet_buffer(algo_len);
-    ret = botan_pubkey_algo_name(key, output->data, &algo_len);
+    ret = botan_pubkey_algo_name(key, (char *)output->data, &algo_len);
     JANET_BOTAN_ASSERT(ret);
 
     if (output->data[algo_len - 1] == 0) {

@@ -87,8 +87,6 @@ static Janet pk_key_agreement_public_value(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
     botan_pk_key_agreement_obj_t *obj = janet_getabstract(argv, 0, get_pk_key_agreement_obj_type());
-    botan_pk_op_ka_t op = obj->pk_key_agreement;
-
     if (!obj->public_value) {
         janet_panic("No public value found.");
     }

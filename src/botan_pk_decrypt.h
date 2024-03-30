@@ -86,7 +86,7 @@ static Janet pk_decrypt_decrypt(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     JanetBuffer *out = janet_buffer(out_len);
-    ret = botan_pk_op_decrypt(op, out->data, &out_len, (const char *)msg.bytes, msg.len);
+    ret = botan_pk_op_decrypt(op, out->data, &out_len, (const uint8_t *)msg.bytes, msg.len);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_string(janet_string(out->data, out_len));
