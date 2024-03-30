@@ -1,0 +1,13 @@
+{:title "Format Preserving Encryption (FE1)"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][fpe/]
+
+## Reference
+
+@api-docs[/build/botan][fpe/]

@@ -125,8 +125,8 @@ static JanetReg fpe_cfuns[] = {
     {"fpe/new", fpe_new,
      "(fpe/new modulus key &opt round compat-mode)\n\n"
      "Create a new FPE instance, FE1 scheme Rounds should be 16 or higher "
-     "for best security. If omitted, default value for round is 5, "
-     "compact-mode is false."
+     "for best security. If omitted, default value for `round` is 5, "
+     "`compact-mode` is false."
     },
     {"fpe/encrypt", fpe_encrypt,
      "(fpe/encrypt x tweak)\n\n"
@@ -135,7 +135,7 @@ static JanetReg fpe_cfuns[] = {
     },
     {"fpe/decrypt", fpe_decrypt,
      "(fpe/decrypt x tweak)\n\n"
-     "Decrypt value under the FPE scheme using provided tweak. Return an"
+     "Decrypt value under the FPE scheme using provided tweak. Return an "
      "MPI object."
     },
 
