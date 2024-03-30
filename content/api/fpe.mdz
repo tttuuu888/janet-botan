@@ -1,4 +1,4 @@
-{:title "Format Preserving Encryption (FE1)"
+{:title "Format Preserving Encryption"
  :author "Seungki Kim"
  :license "MIT license"
  :template "mdzdoc/main.html"}

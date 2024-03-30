@@ -1,4 +1,4 @@
-{:title "Multiple Precision Integers (MPI)"
+{:title "Multiple Precision Integers"
  :author "Seungki Kim"
  :license "MIT license"
  :template "mdzdoc/main.html"}
