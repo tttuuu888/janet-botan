@@ -34,6 +34,7 @@
 #include "botan_pk_kem_encrypt.h"
 #include "botan_pk_kem_decrypt.h"
 #include "botan_fpe.h"
+#include "botan_hotp.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     submod_versioning(env);
@@ -58,4 +59,5 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_pk_kem_encrypt(env);
     submod_pk_kem_decrypt(env);
     submod_fpe(env);
+    submod_hotp(env);
 }

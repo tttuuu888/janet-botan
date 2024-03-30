@@ -1,0 +1,13 @@
+{:title "HOTP"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][hotp/]
+
+## Reference
+
+@api-docs[/build/botan][hotp/]
