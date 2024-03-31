@@ -38,6 +38,7 @@
 #include "botan_hotp.h"
 #include "botan_totp.h"
 #include "botan_nist_key_wrap.h"
+#include "botan_x509_cert.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     submod_versioning(env);
@@ -65,4 +66,5 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_hotp(env);
     submod_totp(env);
     submod_nist_key_wrap(env);
+    submod_x509_cert(env);
 }
