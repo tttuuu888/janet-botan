@@ -112,7 +112,10 @@ static Janet cipher_name(int32_t argc, Janet *argv) {
     int ret = botan_cipher_name(cipher, name_buf, &name_len);
     JANET_BOTAN_ASSERT(ret);
 
-    name_len -= 1;              /* A length except the last null character */
+    if (name_buf[name_len - 1] == 0) {
+        name_len -= 1;
+    }
+
     return janet_wrap_string(janet_string((const uint8_t *)name_buf, name_len));
 }
 
