@@ -29,7 +29,7 @@ static Janet x509_cert_subject_public_key(int32_t argc, Janet *argv);
 static Janet x509_cert_subject_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_hostname_match(int32_t argc, Janet *argv);
-static Janet x509_cert_allow_usage(int32_t argc, Janet *argv);
+static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv);
 
 static JanetAbstractType x509_cert_obj_type = {
     "botan/x509_cert",
@@ -53,7 +53,7 @@ static JanetMethod x509_cert_methods[] = {
     {"subject-dn", x509_cert_subject_dn},
     {"issuer-dn", x509_cert_issuer_dn},
     {"hostname-match", x509_cert_hostname_match},
-    {"allow-usage", x509_cert_allow_usage},
+    {"allowed-usage", x509_cert_allowed_usage},
     {NULL, NULL},
 };
 
@@ -361,7 +361,7 @@ static Janet x509_cert_hostname_match(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
-static Janet x509_cert_allow_usage(int32_t argc, Janet *argv) {
+static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
@@ -464,6 +464,20 @@ static JanetReg x509_cert_cfuns[] = {
      "(x509-cert/issuer-dn cert-obj key index)\n\n"
      "Get a value from the issuer DN field. `key` specifies a value to get, "
      "for instance \"Name\" or \"Country\"."
+    },
+    {"x509-cert/hostname-match", x509_cert_hostname_match,
+     "(x509-cert/hostname-match cert-obj hostname)\n\n"
+     "Return true if the Common Name (CN) field of the certificate matches "
+     "a given `hostname`."
+    },
+    {"x509-cert/hostname-match", x509_cert_hostname_match,
+     "(x509-cert/hostname-match cert-obj hostname)\n\n"
+     "Return true if the Common Name (CN) field of the certificate matches "
+     "a given `hostname`."
+    },
+    {"x509-cert/allowed-usage", x509_cert_allowed_usage,
+     "(x509-cert/allowed-usage cert-obj cert-usage)\n\n"
+     "Test if the certificate is allowed for a particular usage."
     },
 
     {NULL, NULL, NULL}
