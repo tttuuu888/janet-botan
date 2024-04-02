@@ -65,16 +65,8 @@ static Janet hotp_new(int32_t argc, Janet *argv) {
     memset(obj, 0, sizeof(botan_hotp_obj_t));
 
     JanetByteView key = janet_getbytes(argv, 0);
-
-    const char *hash = "SHA-1";
-    if (argc >= 2) {
-        hash = janet_getcstring(argv, 1);
-    }
-
-    size_t digits = 6;
-    if (argc == 3) {
-        digits = janet_getsize(argv, 2);
-    }
+    const char *hash = janet_optcstring(argv, argc, 1, "SHA-1");
+    size_t digits = janet_optsize(argv, argc, 2, 6);
 
     int ret = botan_hotp_init(&obj->hotp, key.bytes, key.len, hash, digits);
     JANET_BOTAN_ASSERT(ret);
@@ -103,11 +95,7 @@ static Janet hotp_check(int32_t argc, Janet *argv) {
     botan_hotp_t hotp = obj->hotp;
     uint32_t code = (uint32_t)janet_getsize(argv, 1);
     uint64_t counter = janet_getuinteger64(argv, 2);
-
-    size_t resync_range = 0;
-    if (argc == 4) {
-        resync_range = janet_getsize(argv, 3);
-    }
+    size_t resync_range = janet_optsize(argv, argc, 3, 0);
 
     uint64_t next_ctr = 0;
     int ret = botan_hotp_check(hotp, &next_ctr, code, counter, resync_range);

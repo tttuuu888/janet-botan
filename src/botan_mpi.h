@@ -303,7 +303,7 @@ static Janet mpi_is_prime(int32_t argc, Janet *argv) {
     botan_rng_obj_t *obj2 = janet_getabstract(argv, 1, get_rng_obj_type());
     botan_rng_t rng = obj2->rng;
 
-    size_t prob = (argc == 3) ? janet_getsize(argv, 2) : 128;
+    size_t prob = janet_optsize(argv, argc, 2, 128);
     int ret = botan_mp_is_prime(mpi, rng, prob);
     JANET_BOTAN_ASSERT(ret);
 

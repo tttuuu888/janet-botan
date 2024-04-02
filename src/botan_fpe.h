@@ -68,12 +68,7 @@ static Janet fpe_new(int32_t argc, Janet *argv) {
     botan_mp_t mpi = obj2->mpi;
 
     JanetByteView key = janet_getbytes(argv, 1);
-
-    size_t rounds = 5;
-    if (argc >= 3) {
-        rounds = janet_getsize(argv, 2);
-    }
-
+    size_t rounds = janet_optsize(argv, argc, 2, 5);
     uint32_t flags = 0;
     if (argc >= 4) {
         flags = 1;

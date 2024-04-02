@@ -12,14 +12,10 @@ static Janet bcrypt(int32_t argc, Janet *argv) {
     JanetByteView pass = janet_getbytes(argv, 0);
     botan_rng_obj_t *rng_obj = janet_getabstract(argv, 1, get_rng_obj_type());
     botan_rng_t rng = rng_obj->rng;
-    size_t work_factor = 10;
+    size_t work_factor = janet_optsize(argv, argc, 2, 10);
     size_t out_len = 64;
     JanetBuffer *out = janet_buffer(out_len);
     int ret;
-
-    if (argc == 3) {
-        work_factor = janet_getsize(argv, 2);
-    }
 
     ret = botan_bcrypt_generate(out->data, &out_len, (const char *)pass.bytes,
                                 rng, work_factor, 0);

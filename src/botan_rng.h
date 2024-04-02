@@ -67,7 +67,7 @@ static Janet rng_new(int32_t argc, Janet *argv) {
     memset(obj, 0, sizeof(botan_rng_obj_t));
 
     janet_arity(argc, 0, 1);
-    const char *type = (argc == 0) ? "system" : janet_getcstring(argv, 0);
+    const char *type = janet_optcstring(argv, argc, 0, "system");
     bool valid_type = false;
     if (strcmp(type, "system") == 0 ||
         strcmp(type, "user") == 0 ||

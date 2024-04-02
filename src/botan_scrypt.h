@@ -14,20 +14,10 @@ static Janet scrypt(int32_t argc, Janet *argv) {
     JanetByteView salt = janet_getbytes(argv, 2);
     JanetBuffer *out = janet_buffer(out_len);
 
-    size_t N=1024;
-    size_t r=8;
-    size_t p=8;
+    size_t N = janet_optsize(argv, argc, 3, 1024);
+    size_t r = janet_optsize(argv, argc, 4, 8);
+    size_t p = janet_optsize(argv, argc, 5, 8);
     int ret;
-
-    if (argc >= 4) {
-        N = janet_getsize(argv, 3);
-    }
-    if (argc >= 5) {
-        r = janet_getsize(argv, 4);
-    }
-    if (argc == 6) {
-        p = janet_getsize(argv, 5);
-    }
 
     ret = botan_pwdhash("Scrypt", N, r, p,
                         out->data, out_len,

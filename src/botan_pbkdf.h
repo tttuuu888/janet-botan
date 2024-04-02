@@ -14,14 +14,10 @@ static Janet pbkdf(int32_t argc, Janet *argv) {
     size_t out_len = janet_getsize(argv, 2);
     JanetBuffer *out = janet_buffer(out_len);
 
-    size_t iter = 100000;
+    size_t iter = janet_optsize(argv, argc, 3, 100000);
     uint8_t *salt;
     size_t salt_len;
     int ret;
-
-    if (argc >= 4) {
-        iter = janet_getsize(argv, 3);
-    }
 
     if (argc == 5) {
         JanetByteView salt_data = janet_getbytes(argv, 4);

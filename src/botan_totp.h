@@ -66,20 +66,9 @@ static Janet totp_new(int32_t argc, Janet *argv) {
 
     JanetByteView key = janet_getbytes(argv, 0);
 
-    const char *hash = "SHA-1";
-    if (argc >= 2) {
-        hash = janet_getcstring(argv, 1);
-    }
-
-    size_t digits = 6;
-    if (argc >= 3) {
-        digits = janet_getsize(argv, 2);
-    }
-
-    size_t timestep = 30;
-    if (argc == 4) {
-        timestep = janet_getsize(argv, 3);
-    }
+    const char *hash = janet_optcstring(argv, argc, 1, "SHA-1");
+    size_t digits = janet_optsize(argv, argc, 2, 6);
+    size_t timestep = janet_optsize(argv, argc, 3, 30);
 
     int ret = botan_totp_init(&obj->totp, key.bytes, key.len, hash, digits, timestep);
     JANET_BOTAN_ASSERT(ret);
@@ -117,10 +106,7 @@ static Janet totp_check(int32_t argc, Janet *argv) {
         timestamp = janet_getuinteger64(argv, 2);
     }
 
-    size_t acceptable_drift = 0;
-    if (argc == 4) {
-        acceptable_drift = janet_getsize(argv, 3);
-    }
+    size_t acceptable_drift = janet_optsize(argv, argc, 3, 0);
 
     int ret = botan_totp_check(totp, code, timestamp, acceptable_drift);
     JANET_BOTAN_ASSERT(ret);

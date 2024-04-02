@@ -169,11 +169,7 @@ static Janet x509_cert_fingerprint(int32_t argc, Janet *argv) {
     int ret;
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     botan_x509_cert_t cert = obj->x509_cert;
-
-    const char *hash = "SHA-256";
-    if (argc == 2) {
-        hash = janet_getcstring(argv, 1);
-    }
+    const char *hash = janet_optcstring(argv, argc, 1, "SHA-256");
 
     size_t out_len = 128;
     JanetBuffer *out = janet_buffer(out_len);
