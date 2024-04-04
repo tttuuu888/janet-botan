@@ -47,6 +47,9 @@ GfhWL0+0pcmP2g==
   (assert (:allowed-usage cert1 "KEY-CERT-SIGN"))
   (assert (:allowed-usage cert1 "CRL-SIGN"))
   (assert (:allowed-usage cert1 "ENCIPHER-ONLY"))
-  (assert (:allowed-usage cert1 "DECIPHER-ONLY")))
+  (assert (:allowed-usage cert1 "DECIPHER-ONLY"))
+  (assert (= (x509-cert/verify cert1) 3001))
+  (assert (= (x509-cert/validation-status 3001) "Cannot establish trust"))
+  (assert (= (x509-cert/validation-status 0) "Verified")))
 
 (end-suite)

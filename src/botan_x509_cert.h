@@ -30,6 +30,9 @@ static Janet x509_cert_subject_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_hostname_match(int32_t argc, Janet *argv);
 static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv);
+static Janet x509_cert_verify(int32_t argc, Janet *argv);
+static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
+
 
 static JanetAbstractType x509_cert_obj_type = {
     "botan/x509_cert",
@@ -54,6 +57,8 @@ static JanetMethod x509_cert_methods[] = {
     {"issuer-dn", x509_cert_issuer_dn},
     {"hostname-match", x509_cert_hostname_match},
     {"allowed-usage", x509_cert_allowed_usage},
+    {"verify", x509_cert_verify},
+    {"validation-status", x509_cert_validation_status},
     {NULL, NULL},
 };
 
@@ -399,6 +404,101 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
+static Janet x509_cert_verify(int32_t argc, Janet *argv) {
+    janet_arity(argc, 1, 14);
+    if ((argc & 1) == 0) {
+        janet_panic("Invalid arguments number");
+    }
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    const char *trusted_path = NULL;
+    size_t required_strength = 0;
+    const char *hostname = NULL;
+    uint64_t reference_time = 0;
+    botan_x509_cert_t *intermediates = NULL;
+    size_t intermediates_len = 0;
+    botan_x509_cert_t *trusted = NULL;
+    size_t trusted_len = 0;
+
+    for (int i=1; i<argc; i+=2) {
+        if (!janet_checktype(argv[i], JANET_KEYWORD)) {
+            janet_panicf("Argument #%d is not a keyword\n", i);
+        }
+
+        JanetKeyword keyword = janet_getkeyword(argv, i);
+        if (!janet_cstrcmp(keyword, "intermediates")) {
+            if (!janet_checktype(argv[i+1], JANET_TUPLE)) {
+                janet_panic(":intermediates value is not a tuple");
+            }
+
+            JanetTuple tup = janet_gettuple(argv, i+1);
+            int32_t tup_len = janet_tuple_length(tup);
+            intermediates = janet_smalloc(sizeof(botan_x509_cert_obj_t) * tup_len);
+            intermediates_len = tup_len;
+            for (int j=0; j<tup_len; j++) {
+                botan_x509_cert_obj_t *p = janet_getabstract(tup, j, get_x509_cert_obj_type());
+                intermediates[j] = p->x509_cert;
+            }
+
+        } else if (!janet_cstrcmp(keyword, "trusted")) {
+            if (!janet_checktype(argv[i+1], JANET_TUPLE)) {
+                janet_panic(":trusted value is not a tuple");
+            }
+
+            JanetTuple tup = janet_gettuple(argv, i+1);
+            int32_t tup_len = janet_tuple_length(tup);
+
+            trusted = janet_smalloc(sizeof(botan_x509_cert_obj_t) * tup_len);
+            trusted_len = tup_len;
+            for (int j=0; j<tup_len; j++) {
+                botan_x509_cert_obj_t *p = janet_getabstract(tup, j, get_x509_cert_obj_type());
+                trusted[j] = p->x509_cert;
+            }
+
+        } else if (!janet_cstrcmp(keyword, "trusted-path")) {
+            trusted_path = janet_getcstring(argv, i+1);
+
+        } else if (!janet_cstrcmp(keyword, "required-strength")) {
+            required_strength = janet_getsize(argv, i+1);
+
+        } else if (!janet_cstrcmp(keyword, "hostname")) {
+            hostname = janet_getcstring(argv, i+1);
+
+        } else if (!janet_cstrcmp(keyword, "reference-time")) {
+            reference_time = (uint64_t)janet_getnumber(argv, i+1);
+
+        } else if (!janet_cstrcmp(keyword, "crls")) {
+
+        } else {
+            janet_panicf("Argument #%d is not a valid keyword\n", i);
+        }
+    }
+
+    int err_code = 0;
+    int ret = botan_x509_cert_verify(&err_code, cert,
+                                     intermediates, intermediates_len,
+                                     trusted, trusted_len,
+                                     trusted_path,
+                                     required_strength,
+                                     hostname,
+                                     reference_time);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)err_code);
+}
+
+static Janet x509_cert_validation_status(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int code = janet_getinteger(argv, 0);
+
+    const char *ret = botan_x509_cert_validation_status(code);
+
+    return janet_wrap_string(janet_string((const uint8_t *)ret, strlen(ret)));
+}
+
 static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/load", x509_cert_load,
      "(x509-cert/load cert)\n\n"
@@ -474,6 +574,30 @@ static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/allowed-usage", x509_cert_allowed_usage,
      "(x509-cert/allowed-usage cert-obj cert-usage)\n\n"
      "Test if the certificate is allowed for a particular usage."
+    },
+    {"x509-cert/verify", x509_cert_verify,
+     "(x509-cert/verify cert-obj &keys {:intermediates intermediates :trusted "
+     "trusted :truste trusted-path :required-strength required-strength "
+     ":hostname hostname :reference-time reference-time :crl crls})\n\n"
+     "Verify a certificate. Returns 0 if validation was successful, returns a "
+     " positive error code if the validation was unsuccesful.\n"
+     "* `:intermediates` - A tuple of untrusted subauthorities.\n\n"
+     "* `:trusted` - A tuple of trusted root CAs.\n\n"
+     "* `:trusted-path` - A path refers to a directory where one or more "
+     "trusted CA certificates are stored.\n\n"
+     "* `:required-strength` - Indicates the minimum key and hash strength "
+     "that is allowed. For instance setting to 80 allows 1024-bit RSA and "
+     "SHA-1. Setting to 110 requires 2048-bit RSA and SHA-256 or higher. Set "
+     "to zero to accept a default. Default value is 0, if omitted.\n\n"
+     "* `:hostname` - Check against the certificates CN field.\n\n"
+     "* `:reference-time` - Time value which the certificate chain is "
+     "validated against. Use zero(default) to use the current system clock.\n\n"
+     "* `crls` - A tuple of CRLs issued by either trusted or untrusted "
+     "authorities."
+    },
+    {"x509-cert/validation-status", x509_cert_validation_status,
+     "(x509-cert/validation-status error-code)\n\n"
+     "Return an informative string explaining the verification return code."
     },
 
     {NULL, NULL, NULL}
