@@ -39,7 +39,6 @@
 #include "botan_totp.h"
 #include "botan_nist_key_wrap.h"
 #include "botan_x509_cert.h"
-#include "botan_x509_crl.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
     submod_versioning(env);
