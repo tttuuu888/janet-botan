@@ -7,7 +7,7 @@
 
 (declare-native
  :name "botan"
- :cflags ["-I." "-Ibotan/build/include/public/botan" ;default-cflags]
+ :cflags ["-I." "-Ibotan/build/include/public/botan" "-Wall" ;default-cflags]
  :lflags ["-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
  :source ["src/main.c"])
 
