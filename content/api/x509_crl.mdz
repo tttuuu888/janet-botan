@@ -1,0 +1,13 @@
+{:title "X509 CRL"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][x509-crl/]
+
+## Reference
+
+@api-docs[/build/botan][x509-crl/]
