@@ -32,3 +32,4 @@
 (task "build-botan" ["botan-header"])
 
 (add-dep "build" "build-botan")
+(add-dep "build/src___main.o" "build-botan")
