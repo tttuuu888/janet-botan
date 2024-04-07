@@ -1,0 +1,71 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="mdzdoc-css/main.css" type="text/css" charset="utf-8">
+    <title>Janet-botan</title>
+    <meta name="description" content="">
+  </head>
+  <body>
+    <!-- Toggles Navigation -->
+    <div id="toc-toggle" class="">
+      <div class="bar topbar"></div>
+      <div class="bar"></div>
+      <div class="bar botbar"></div>
+    </div>
+    <div class="twocol">
+      <div class="toc toc-hidden">
+        <ul>
+          <li><span class="selected"><a href="index.html">Janet-botan</a></span></li><li class="caret"><span><a href="api/index.html">API</a></span><ul><li><span><a href="api/bcrypt.html">Bcrypt</a></span></li><li><span><a href="api/block_cipher.html">Block Ciphers</a></span></li><li><span><a href="api/fpe.html">Format Preserving Encryption</a></span></li><li><span><a href="api/hotp.html">HOTP</a></span></li><li><span><a href="api/hash.html">Hash Functions</a></span></li><li><span><a href="api/kdf.html">KDF</a></span></li><li><span><a href="api/mac.html">Message Authentication Codes</a></span></li><li><span><a href="api/mpi.html">Multiple Precision Integers</a></span></li><li><span><a href="api/nist_key_wrapping.html">NIST Key Wrapping</a></span></li><li><span><a href="api/pbkdf.html">PBKDF</a></span></li><li><span><a href="api/private_key.html">Private Key</a></span></li><li><span><a href="api/public_key.html">Public Key</a></span></li><li><span><a href="api/pk_operations.html">Public Key Operations</a></span></li><li><span><a href="api/rng.html">Random Number Generators</a></span></li><li><span><a href="api/srp6.html">SRP6 Server Session</a></span></li><li><span><a href="api/script.html">Scrypt</a></span></li><li><span><a href="api/cipher.html">Symmetric Ciphers</a></span></li><li><span><a href="api/totp.html">TOTP</a></span></li><li><span><a href="api/utiltity.html">Utility</a></span></li><li><span><a href="api/versioning.html">Versioning</a></span></li><li><span><a href="api/x509_crl.html">X509 CRL</a></span></li><li><span><a href="api/x509_cert.html">X509 Certificate</a></span></li></ul></li>
+        </ul>
+      </div>
+      <div class="content-wrapper">
+        <h1>Janet-botan</h1>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="api/x509_cert.html"><span class="prevnext-text">X509 Certificate</span></a></span>
+          <span class="next"><a href="api/index.html"><span class="prevnext-text">API</span></a></span>
+        </div>
+        
+
+<p>Janet-botan is a <a href="https://janet-lang.org">Janet</a> bindings to <a href="https://botan.randombit.net/">Botan</a>.
+</p>
+<h2 id="Source-code">Source code
+</h2>
+<p><a href="https://github.com/tttuuu888/janet-botan">https://github.com/tttuuu888/janet-botan</a></p><h2 id="Install">Install
+</h2>
+<pre class="mendoza-codeblock"><code>[sudo] jpm install https://github.com/tttuuu888/janet-botan.git</code></pre>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="api/x509_cert.html"><span class="prevnext-text">X509 Certificate</span></a></span>
+          <span class="next"><a href="api/index.html"><span class="prevnext-text">API</span></a></span>
+        </div>
+      </div>
+    </div>
+    <script charset="utf-8">
+      function toggleToc() {
+        var toggler = document.getElementById('toc-toggle');
+        var wrapper = document.querySelector('.toc');
+        wrapper.classList.toggle('toc-hidden');
+        toggler.classList.toggle('open');
+        window.localStorage.setItem('show-toc', toggler.classList.contains('open'));
+      }
+      function addTocToggle() {
+        var el = document.getElementById('toc-toggle');
+        el.addEventListener('click', toggleToc);
+      }
+      window.addEventListener('DOMContentLoaded', addTocToggle);
+      if (window.localStorage.getItem('show-toc') === 'true') {
+        toggleToc()
+      }
+    </script>
+    <footer>
+      <div class="content-wrapper">
+        Copyright &copy; Seungki Kim 2024
+      </div>
+    </footer>
+  </body>
+</html>

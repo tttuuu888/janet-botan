@@ -1,0 +1,69 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="../mdzdoc-css/main.css" type="text/css" charset="utf-8">
+    <title>Hash Functions</title>
+    <meta name="description" content="">
+  </head>
+  <body>
+    <!-- Toggles Navigation -->
+    <div id="toc-toggle" class="">
+      <div class="bar topbar"></div>
+      <div class="bar"></div>
+      <div class="bar botbar"></div>
+    </div>
+    <div class="twocol">
+      <div class="toc toc-hidden">
+        <ul>
+          <li><span><a href="../index.html">Janet-botan</a></span></li><li class="caret"><span><a href="index.html">API</a></span><ul><li><span><a href="bcrypt.html">Bcrypt</a></span></li><li><span><a href="block_cipher.html">Block Ciphers</a></span></li><li><span><a href="fpe.html">Format Preserving Encryption</a></span></li><li><span><a href="hotp.html">HOTP</a></span></li><li><span class="selected"><a href="hash.html">Hash Functions</a></span></li><li><span><a href="kdf.html">KDF</a></span></li><li><span><a href="mac.html">Message Authentication Codes</a></span></li><li><span><a href="mpi.html">Multiple Precision Integers</a></span></li><li><span><a href="nist_key_wrapping.html">NIST Key Wrapping</a></span></li><li><span><a href="pbkdf.html">PBKDF</a></span></li><li><span><a href="private_key.html">Private Key</a></span></li><li><span><a href="public_key.html">Public Key</a></span></li><li><span><a href="pk_operations.html">Public Key Operations</a></span></li><li><span><a href="rng.html">Random Number Generators</a></span></li><li><span><a href="srp6.html">SRP6 Server Session</a></span></li><li><span><a href="script.html">Scrypt</a></span></li><li><span><a href="cipher.html">Symmetric Ciphers</a></span></li><li><span><a href="totp.html">TOTP</a></span></li><li><span><a href="utiltity.html">Utility</a></span></li><li><span><a href="versioning.html">Versioning</a></span></li><li><span><a href="x509_crl.html">X509 CRL</a></span></li><li><span><a href="x509_cert.html">X509 Certificate</a></span></li></ul></li>
+        </ul>
+      </div>
+      <div class="content-wrapper">
+        <h1>Hash Functions</h1>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="hotp.html"><span class="prevnext-text">HOTP</span></a></span>
+          <span class="next"><a href="kdf.html"><span class="prevnext-text">KDF</span></a></span>
+        </div>
+        
+
+<h2 id="Index-3">Index
+</h2>
+<p><a href="#hash/clear">hash/clear</a><span class="divider"> </span><a href="#hash/copy">hash/copy</a><span class="divider"> </span><a href="#hash/final">hash/final</a><span class="divider"> </span><a href="#hash/name">hash/name</a><span class="divider"> </span><a href="#hash/new">hash/new</a><span class="divider"> </span><a href="#hash/output-length">hash/output-length</a><span class="divider"> </span><a href="#hash/update">hash/update</a></p><h2 id="Reference-3">Reference
+</h2>
+<div class="docstring"><div class="binding-wrap"><span class="binding"><a id="hash/clear">hash/clear</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">hash/clear</span> <span class="mdzsyn-coresym">hash</span>)</code></pre><p>Reset the state of `hash` back to clean, as if no input has been supplied, return self.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="hash/copy">hash/copy</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">hash/copy</span> <span class="mdzsyn-coresym">hash</span>)</code></pre><p>Return a new hash object copied from `hash`.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="hash/final">hash/final</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">hash/final</span> <span class="mdzsyn-coresym">hash</span>)</code></pre><p>Finalize the hash and return the output</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="hash/name">hash/name</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">hash/name</span> <span class="mdzsyn-coresym">hash</span>)</code></pre><p>Return the name of the hash function.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="hash/new">hash/new</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">hash/new</span> <span class="mdzsyn-symbol">name</span>)</code></pre><p>Creates a hash of the given name, e.g., "SHA-384".</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="hash/output-length">hash/output-length</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">hash/output-length</span> <span class="mdzsyn-coresym">hash</span>)</code></pre><p>Return the output length of the `hash`</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="hash/update">hash/update</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">hash/update</span> <span class="mdzsyn-coresym">hash</span> <span class="mdzsyn-symbol">input</span>)</code></pre><p>Add input to the hash computation, return self.</p></div>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="hotp.html"><span class="prevnext-text">HOTP</span></a></span>
+          <span class="next"><a href="kdf.html"><span class="prevnext-text">KDF</span></a></span>
+        </div>
+      </div>
+    </div>
+    <script charset="utf-8">
+      function toggleToc() {
+        var toggler = document.getElementById('toc-toggle');
+        var wrapper = document.querySelector('.toc');
+        wrapper.classList.toggle('toc-hidden');
+        toggler.classList.toggle('open');
+        window.localStorage.setItem('show-toc', toggler.classList.contains('open'));
+      }
+      function addTocToggle() {
+        var el = document.getElementById('toc-toggle');
+        el.addEventListener('click', toggleToc);
+      }
+      window.addEventListener('DOMContentLoaded', addTocToggle);
+      if (window.localStorage.getItem('show-toc') === 'true') {
+        toggleToc()
+      }
+    </script>
+    <footer>
+      <div class="content-wrapper">
+        Copyright &copy; Seungki Kim 2024
+      </div>
+    </footer>
+  </body>
+</html>

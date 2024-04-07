@@ -1,0 +1,69 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="../mdzdoc-css/main.css" type="text/css" charset="utf-8">
+    <title>Symmetric Ciphers</title>
+    <meta name="description" content="">
+  </head>
+  <body>
+    <!-- Toggles Navigation -->
+    <div id="toc-toggle" class="">
+      <div class="bar topbar"></div>
+      <div class="bar"></div>
+      <div class="bar botbar"></div>
+    </div>
+    <div class="twocol">
+      <div class="toc toc-hidden">
+        <ul>
+          <li><span><a href="../index.html">Janet-botan</a></span></li><li class="caret"><span><a href="index.html">API</a></span><ul><li><span><a href="bcrypt.html">Bcrypt</a></span></li><li><span><a href="block_cipher.html">Block Ciphers</a></span></li><li><span><a href="fpe.html">Format Preserving Encryption</a></span></li><li><span><a href="hotp.html">HOTP</a></span></li><li><span><a href="hash.html">Hash Functions</a></span></li><li><span><a href="kdf.html">KDF</a></span></li><li><span><a href="mac.html">Message Authentication Codes</a></span></li><li><span><a href="mpi.html">Multiple Precision Integers</a></span></li><li><span><a href="nist_key_wrapping.html">NIST Key Wrapping</a></span></li><li><span><a href="pbkdf.html">PBKDF</a></span></li><li><span><a href="private_key.html">Private Key</a></span></li><li><span><a href="public_key.html">Public Key</a></span></li><li><span><a href="pk_operations.html">Public Key Operations</a></span></li><li><span><a href="rng.html">Random Number Generators</a></span></li><li><span><a href="srp6.html">SRP6 Server Session</a></span></li><li><span><a href="script.html">Scrypt</a></span></li><li><span class="selected"><a href="cipher.html">Symmetric Ciphers</a></span></li><li><span><a href="totp.html">TOTP</a></span></li><li><span><a href="utiltity.html">Utility</a></span></li><li><span><a href="versioning.html">Versioning</a></span></li><li><span><a href="x509_crl.html">X509 CRL</a></span></li><li><span><a href="x509_cert.html">X509 Certificate</a></span></li></ul></li>
+        </ul>
+      </div>
+      <div class="content-wrapper">
+        <h1>Symmetric Ciphers</h1>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="script.html"><span class="prevnext-text">Scrypt</span></a></span>
+          <span class="next"><a href="totp.html"><span class="prevnext-text">TOTP</span></a></span>
+        </div>
+        
+
+<h2 id="Index-1">Index
+</h2>
+<p><a href="#cipher/clear">cipher/clear</a><span class="divider"> </span><a href="#cipher/finish">cipher/finish</a><span class="divider"> </span><a href="#cipher/get-default-nonce-length">cipher/get-default-nonce-length</a><span class="divider"> </span><a href="#cipher/get-keyspec">cipher/get-keyspec</a><span class="divider"> </span><a href="#cipher/get-tag-length">cipher/get-tag-length</a><span class="divider"> </span><a href="#cipher/get-update-granularity">cipher/get-update-granularity</a><span class="divider"> </span><a href="#cipher/is-authenticated">cipher/is-authenticated</a><span class="divider"> </span><a href="#cipher/name">cipher/name</a><span class="divider"> </span><a href="#cipher/new">cipher/new</a><span class="divider"> </span><a href="#cipher/set-associated-data">cipher/set-associated-data</a><span class="divider"> </span><a href="#cipher/set-key">cipher/set-key</a><span class="divider"> </span><a href="#cipher/start">cipher/start</a><span class="divider"> </span><a href="#cipher/update">cipher/update</a><span class="divider"> </span><a href="#cipher/valid-nonce-length">cipher/valid-nonce-length</a></p><h2 id="Reference-1">Reference
+</h2>
+<div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/clear">cipher/clear</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/clear</span> <span class="mdzsyn-symbol">cipher</span>)</code></pre><p>Reset the state of `cipher` back to clean, as if no key and input has been supplied, return self</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/finish">cipher/finish</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/finish</span> <span class="mdzsyn-symbol">cipher</span> <span class="mdzsyn-symbol">input</span>)</code></pre><p>Finish processing (with an optional final `input`). May throw if message authentication checks fail, in which case all plaintext previously processed must be discarded. You may call `cipher/finish` with the entire message.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/get-default-nonce-length">cipher/get-default-nonce-length</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/get-default-nonce-length</span> <span class="mdzsyn-symbol">cipher</span>)</code></pre><p>Returns default nonce length.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/get-keyspec">cipher/get-keyspec</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/get-keyspec</span> <span class="mdzsyn-symbol">cipher</span>)</code></pre><p>Return the key spec of this `cipher` in format of `[max-key-length min-key-length mod-key-length]`.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/get-tag-length">cipher/get-tag-length</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/get-tag-length</span> <span class="mdzsyn-symbol">cipher</span>)</code></pre><p>Returns the tag length (0 for unauthenticated modes).</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/get-update-granularity">cipher/get-update-granularity</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/get-update-granularity</span> <span class="mdzsyn-symbol">cipher</span>)</code></pre><p>Return the update granularity of the cipher. `cipher/update` must be called with blocks of this size, except for the final.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/is-authenticated">cipher/is-authenticated</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/is-authenticated</span> <span class="mdzsyn-symbol">cipher</span>)</code></pre><p>Returns true if this is an AEAD mode.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/name">cipher/name</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/name</span> <span class="mdzsyn-symbol">cipher</span>)</code></pre><p>Returns the name of this algorithm.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/new">cipher/new</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/new</span> <span class="mdzsyn-symbol">name</span> <span class="mdzsyn-coresym">type</span>)</code></pre><p>Creates an cipher object of the given name, e.g., "AES-256/GCM".Create an encryption cipher if `:encrypt` type is given, create decryption cipher if `:decrypt` type is supplied.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/set-associated-data">cipher/set-associated-data</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/set-associated-data</span> <span class="mdzsyn-symbol">cipher</span> <span class="mdzsyn-symbol">ad</span>)</code></pre><p>Sets the associated data, return self. Fails if this is not an AEAD mode.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/set-key">cipher/set-key</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/set-key</span> <span class="mdzsyn-symbol">cipher</span> <span class="mdzsyn-symbol">key</span>)</code></pre><p>Set the symmetric key to be used, return self.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/start">cipher/start</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/start</span> <span class="mdzsyn-symbol">cipher</span> <span class="mdzsyn-symbol">nonce</span>)</code></pre><p>Start processing a message using `nonce`, return self</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/update">cipher/update</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/update</span> <span class="mdzsyn-symbol">cipher</span> <span class="mdzsyn-symbol">input</span>)</code></pre><p>Consumes `input` text and returns output. Input text must be of `cipher/get-update-granularity` length. Alternately, always call finish with the entire message, avoiding calls to update entirely.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="cipher/valid-nonce-length">cipher/valid-nonce-length</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">cipher/valid-nonce-length</span> <span class="mdzsyn-symbol">cipher</span> <span class="mdzsyn-symbol">nonce-len</span>)</code></pre><p>Returns true if `nonce-len` is a valid nonce len for this mode.</p></div>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="script.html"><span class="prevnext-text">Scrypt</span></a></span>
+          <span class="next"><a href="totp.html"><span class="prevnext-text">TOTP</span></a></span>
+        </div>
+      </div>
+    </div>
+    <script charset="utf-8">
+      function toggleToc() {
+        var toggler = document.getElementById('toc-toggle');
+        var wrapper = document.querySelector('.toc');
+        wrapper.classList.toggle('toc-hidden');
+        toggler.classList.toggle('open');
+        window.localStorage.setItem('show-toc', toggler.classList.contains('open'));
+      }
+      function addTocToggle() {
+        var el = document.getElementById('toc-toggle');
+        el.addEventListener('click', toggleToc);
+      }
+      window.addEventListener('DOMContentLoaded', addTocToggle);
+      if (window.localStorage.getItem('show-toc') === 'true') {
+        toggleToc()
+      }
+    </script>
+    <footer>
+      <div class="content-wrapper">
+        Copyright &copy; Seungki Kim 2024
+      </div>
+    </footer>
+  </body>
+</html>
