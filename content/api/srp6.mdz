@@ -1,0 +1,17 @@
+{:title "SRP6 Server Session"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"}
+---
+
+## Index
+
+@api-index[/build/botan][srp6-server-session/]
+@api-index[/build/botan][srp6-generate-verifier]
+@api-index[/build/botan][srp6-client-agree]
+
+## Reference
+
+@api-docs[/build/botan][srp6-server-session/]
+@api-docs[/build/botan][srp6-generate-verifier]
+@api-docs[/build/botan][srp6-client-agree]
