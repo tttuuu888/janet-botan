@@ -709,6 +709,10 @@ static JanetReg mpi_cfuns[] = {
      "Convert the MPI to a uint32_t, if possible. Fails if MPI is negative "
      "or too large"
     },
+    {"mpi/to-bin", mpi_to_bin,
+     "(mpi/to-bin mpi)\n\n"
+     "Convert the MPI to a binary and return as a string."
+    },
 
     {NULL, NULL, NULL}
 };
