@@ -204,7 +204,7 @@ static JanetReg block_cipher_cfuns[] = {
      "but do not deallocate it."
     },
     {"block-cipher/set-key", block_cipher_set_key,
-     "(block-cipher/clear bc key)\n\n"
+     "(block-cipher/set-key bc key)\n\n"
      "Set the cipher key, which is required before encrypting or decrypting."
     },
     {"block-cipher/encrypt", block_cipher_encrypt_blocks,
