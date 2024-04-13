@@ -180,7 +180,7 @@ static Janet block_cipher_decrypt_blocks(int32_t argc, Janet *argv) {
 
 static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/new", block_cipher_new,
-     "(block-cipher/init name)\n\n"
+     "(block-cipher/new name)\n\n"
      "Create a new cipher mode object, `name` should be for example "
      "\"AES-128\" or \"Threefish-512\""
     },
