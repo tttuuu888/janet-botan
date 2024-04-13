@@ -9,6 +9,7 @@
 
 typedef struct botan_cipher_obj {
     botan_cipher_t cipher;
+    bool is_encrypt;
 } botan_cipher_obj_t;
 
 /* Abstract Object functions */
@@ -89,8 +90,10 @@ static Janet cipher_new(int32_t argc, Janet *argv) {
     JanetKeyword keyword = janet_getkeyword(argv, 1);
     uint32_t flag;
     if (janet_cstrcmp(keyword, "encrypt") == 0) {
+        obj->is_encrypt = true;
         flag = 0;
     } else if (janet_cstrcmp(keyword, "decrypt") == 0) {
+        obj->is_encrypt = false;
         flag = 1;
     } else {
         janet_panic("Unexpected argument");
@@ -245,23 +248,18 @@ static Janet cipher_update(int32_t argc, Janet *argv) {
     botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
     botan_cipher_t cipher = obj->cipher;
     JanetByteView input = janet_getbytes(argv, 1);
-    size_t tag_len = 0;
-
-    int ret = botan_cipher_get_tag_length(cipher, &tag_len);
-    JANET_BOTAN_ASSERT(ret);
-
-    size_t output_len = input.len + tag_len + 64;
+    size_t output_len = input.len;
     JanetBuffer *output = janet_buffer(output_len);
     size_t output_written = 0;
     size_t input_consumed = 0;
-    ret = botan_cipher_update(cipher,
-                              0,
-                              output->data,
-                              output_len,
-                              &output_written,
-                              input.bytes,
-                              input.len,
-                              &input_consumed);
+    int ret = botan_cipher_update(cipher,
+                                  0,
+                                  output->data,
+                                  output_len,
+                                  &output_written,
+                                  input.bytes,
+                                  input.len,
+                                  &input_consumed);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_string(janet_string(output->data, output_written));
@@ -269,15 +267,25 @@ static Janet cipher_update(int32_t argc, Janet *argv) {
 
 static Janet cipher_finish(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
+
+    int ret;
     botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
     botan_cipher_t cipher = obj->cipher;
     JanetByteView input = janet_getbytes(argv, 1);
-    size_t tag_len = 0;
+    size_t extra_bytes = 0;
 
-    int ret = botan_cipher_get_tag_length(cipher, &tag_len);
-    JANET_BOTAN_ASSERT(ret);
+    if (obj->is_encrypt) {
+        size_t tag_len = 0;
+        ret = botan_cipher_get_tag_length(cipher, &tag_len);
+        JANET_BOTAN_ASSERT(ret);
+        if (tag_len > 0) {
+            extra_bytes = tag_len;
+        } else {
+            extra_bytes = 64;   /* Available largest block size */
+        }
+    }
 
-    size_t output_len = input.len + tag_len + 64;
+    size_t output_len = input.len + extra_bytes;
     JanetBuffer *output = janet_buffer(output_len);
     size_t output_written = 0;
     size_t input_consumed = 0;
