@@ -1,8 +1,10 @@
 (declare-project
  :name "botan"
  :description "Janet bindings to Botan."
- :url "https://github.com/tttuuu888/janet-botan"
  :author "Seungki Kim <tttuuu888@gmail.com>"
+ :license "MIT"
+ :url "https://github.com/tttuuu888/janet-botan"
+ :repo "git+https://github.com/tttuuu888/janet-botan"
  :dependencies ["spork"])
 
 (declare-native
@@ -32,3 +34,4 @@
 (task "build-botan" ["botan-header"])
 
 (add-dep "build" "build-botan")
+(add-dep "build/src___main.o" "build-botan")
