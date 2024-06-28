@@ -1,6 +1,6 @@
 {:title "Janet-botan"
  :author "Seungki Kim"
- :license "BSD-2-Clause license"
+ :license "MIT license"
  :template "mdzdoc/main.html"
  :order 0}
 ---
