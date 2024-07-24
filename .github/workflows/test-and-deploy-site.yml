@@ -23,7 +23,7 @@ jobs:
         git config user.email github-actions@github.com
         git fetch origin gh-pages
         git checkout -b gh-pages origin/gh-pages
-        git merge master --commit --no-edit
+        git merge master --commit --no-edit --allow-unrelated-histories
     - name: "Generate site"
       run: |
         mdz clean
