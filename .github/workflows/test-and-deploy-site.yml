@@ -1,0 +1,34 @@
+name: Test and deploy site
+
+on:
+  push:
+    branches: [ master ]
+  pull_request_target:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "Test project"
+      uses: pyrmont/action-janet-test@v2
+    - name: "Install mendoza"
+      run: |
+        $PREFIX/bin/jpm install mendoza
+    - name: "Merge master into gh-pages"
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git checkout gh-pages
+        git merge origin/master
+    - name: "Generate site"
+      run: |
+        mdz clean
+        mdz build
+    - name: "Commit and push changes"
+      run: |
+        git add ./site
+        git commit -m "Auto-generate site" || echo "No changes to commit"
+        git push origin gh-pages
