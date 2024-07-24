@@ -29,7 +29,9 @@ jobs:
         mdz clean
         mdz build docs
     - name: "Commit and push changes"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git add ./docs
-        git commit -m "Auto-generate site" || echo "No changes to commit"
-        git push origin gh-pages
+        git commit -am "Auto-generate site"
+        git push https://tttuuu888:${GH_TOKEN}@github.com/tttuuu888/janet-botan.git gh-pages
