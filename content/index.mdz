@@ -16,3 +16,43 @@ Janet-botan is a @link[https://janet-lang.org]{Janet} bindings to @link[https://
 @codeblock```
 [sudo] jpm install https://github.com/tttuuu888/janet-botan.git
 ```
+
+## Example
+
+Janet-botan provides flexible ways to perform cryptographic operations.
+Below are examples demonstrating three different styles of using Janet-botan for SHA-256 hashing.
+
+### Method 1: Function calls
+
+This method uses direct function calls to perform hashing operations.
+
+@codeblock[janet]```
+(let [hash (hash/new "SHA-256")]
+  (hash/update hash "1234")
+  (hash/update hash "5678")
+  (print (hash/final hash)))
+```
+
+### Method 2: Method syntax
+
+This approach uses Janet's method syntax to call functions on the hash object.
+
+@codeblock[janet]```
+(let [hash (hash/new "SHA-256")]
+  (:update hash "1234")
+  (:update hash "5678")
+  (print (:final hash)))
+```
+
+### Method 3: Threading macro
+
+This example demonstrates the use of Janet's threading macro (`->`) for a more functional style.
+
+@codeblock[janet]```
+(let [hash (hash/new "SHA-256")]
+  (-> hash
+      (:update "1234")
+      (:update "5678")
+      (:final)
+      (print)))
+```
