@@ -31,7 +31,9 @@
         (print "Copy botan header...")
         (copyfile "botan/build/build.h" "botan/build.h")))
 
-(task "build-botan" ["botan-header"])
+(rule "pre-install" ["build"]
+      (os/execute ["./pre_install.sh"] :p))
 
-(add-dep "build" "build-botan")
-(add-dep "build/src___main.o" "build-botan")
+(add-dep "build" "botan-header")
+(add-dep "build/src___main.o" "botan-header")
+(add-dep "install" "pre-install")
