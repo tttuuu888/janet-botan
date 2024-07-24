@@ -12,10 +12,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: "Test project"
-      uses: pyrmont/action-janet-test@v5
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - name: "Test project"
+      uses: pyrmont/action-janet-test@v5
     - name: "Install mendoza"
       run: |
         $PREFIX/bin/jpm install mendoza
