@@ -12,12 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: "Checkout repository"
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: "Test project"
       uses: pyrmont/action-janet-test@v5
+    - name: "Fetch all history"
+      run: |
+        git fetch --all
     - name: "Install mendoza"
       run: |
         $PREFIX/bin/jpm install mendoza
@@ -27,7 +30,7 @@ jobs:
         git config user.email github-actions@github.com
         git fetch origin gh-pages
         git checkout -b gh-pages origin/gh-pages
-        git merge master --commit --no-edit --allow-unrelated-histories
+        git merge origin/master --commit --no-edit --allow-unrelated-histories
     - name: "Generate site"
       run: |
         mdz clean
