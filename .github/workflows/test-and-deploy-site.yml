@@ -27,9 +27,9 @@ jobs:
     - name: "Generate site"
       run: |
         mdz clean
-        mdz build
+        mdz build docs
     - name: "Commit and push changes"
       run: |
-        git add ./site
+        git add ./docs
         git commit -m "Auto-generate site" || echo "No changes to commit"
         git push origin gh-pages
