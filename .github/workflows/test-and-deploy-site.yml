@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: "Test project"
-      uses: pyrmont/action-janet-test@v2
+      uses: pyrmont/action-janet-test@v5
       with:
         fetch-depth: 0
     - name: "Install mendoza"
