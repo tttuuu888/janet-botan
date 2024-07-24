@@ -14,6 +14,8 @@ jobs:
     steps:
     - name: "Test project"
       uses: pyrmont/action-janet-test@v2
+      with:
+        fetch-depth: 0
     - name: "Install mendoza"
       run: |
         $PREFIX/bin/jpm install mendoza
@@ -31,8 +33,6 @@ jobs:
     - name: "Commit and push changes"
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        fetch-depth: 0
       run: |
         git add ./docs && git commit -am "Auto-generate site" || echo "git add and commit."
         git push https://${GITHUB_ACTOR}:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git gh-pages || echo "git push to origin gh-pages"
