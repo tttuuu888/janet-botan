@@ -38,7 +38,35 @@
 </h2>
 <p><a href="https://github.com/tttuuu888/janet-botan">https://github.com/tttuuu888/janet-botan</a></p><h2 id="Install">Install
 </h2>
-<pre class="mendoza-codeblock"><code>[sudo] jpm install https://github.com/tttuuu888/janet-botan.git</code></pre>
+<pre class="mendoza-codeblock"><code>[sudo] jpm install https://github.com/tttuuu888/janet-botan.git</code></pre><h2 id="Example">Example
+</h2>
+<p>Janet-botan provides flexible ways to perform cryptographic operations.
+Below are examples demonstrating three different styles of using Janet-botan for SHA-256 hashing.
+</p>
+<h3 id="1.-Function-calls">1. Function calls
+</h3>
+<p>This method uses direct function calls to perform hashing operations.
+</p>
+<pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-coresym">let</span> [<span class="mdzsyn-coresym">hash</span> (<span class="mdzsyn-symbol">hash/new</span> <span class="mdzsyn-string">"SHA-256"</span>)]
+  (<span class="mdzsyn-symbol">hash/update</span> <span class="mdzsyn-coresym">hash</span> <span class="mdzsyn-string">"1234"</span>)
+  (<span class="mdzsyn-symbol">hash/update</span> <span class="mdzsyn-coresym">hash</span> <span class="mdzsyn-string">"5678"</span>)
+  (<span class="mdzsyn-coresym">print</span> (<span class="mdzsyn-symbol">hash/final</span> <span class="mdzsyn-coresym">hash</span>)))</code></pre><h3 id="2.-Method-syntax">2. Method syntax
+</h3>
+<p>This approach uses Janet's method syntax to call functions on the hash object.
+</p>
+<pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-coresym">let</span> [<span class="mdzsyn-coresym">hash</span> (<span class="mdzsyn-symbol">hash/new</span> <span class="mdzsyn-string">"SHA-256"</span>)]
+  (<span class="mdzsyn-keyword">:update</span> <span class="mdzsyn-coresym">hash</span> <span class="mdzsyn-string">"1234"</span>)
+  (<span class="mdzsyn-keyword">:update</span> <span class="mdzsyn-coresym">hash</span> <span class="mdzsyn-string">"5678"</span>)
+  (<span class="mdzsyn-coresym">print</span> (<span class="mdzsyn-keyword">:final</span> <span class="mdzsyn-coresym">hash</span>)))</code></pre><h3 id="3.-Threading-macro">3. Threading macro
+</h3>
+<p>This example demonstrates the use of Janet's threading macro (`-&gt;`) for a more functional style.
+</p>
+<pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-coresym">let</span> [<span class="mdzsyn-coresym">hash</span> (<span class="mdzsyn-symbol">hash/new</span> <span class="mdzsyn-string">"SHA-256"</span>)]
+  (<span class="mdzsyn-coresym">-&gt;</span> <span class="mdzsyn-coresym">hash</span>
+      (<span class="mdzsyn-keyword">:update</span> <span class="mdzsyn-string">"1234"</span>)
+      (<span class="mdzsyn-keyword">:update</span> <span class="mdzsyn-string">"5678"</span>)
+      (<span class="mdzsyn-keyword">:final</span>)
+      (<span class="mdzsyn-coresym">print</span>)))</code></pre>
         <div class="prevnext-bar">
           <span class="prev"><a href="api/x509_cert.html"><span class="prevnext-text">X509 Certificate</span></a></span>
           <span class="next"><a href="api/index.html"><span class="prevnext-text">API</span></a></span>
