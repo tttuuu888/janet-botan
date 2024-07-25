@@ -10,12 +10,23 @@ jobs:
   test-and-deploy-site:
     name: Test and deploy site
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
     steps:
     - name: "Checkout repository"
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - name: "Merge master to gh-pages"
+      uses: devmasx/merge-branch@1.4.0
+      with:
+        type: now
+        from_branch: master
+        target_branch: gh-pages
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
     - name: "Test project"
       uses: pyrmont/action-janet-test@v5
     - name: "Fetch all history"
@@ -24,13 +35,12 @@ jobs:
     - name: "Install mendoza"
       run: |
         $PREFIX/bin/jpm install mendoza
-    - name: "Merge master into gh-pages"
+    - name: "Change branch to gh-pages"
       run: |
         git config user.name github-actions
         git config user.email github-actions@github.com
         git fetch origin gh-pages
         git checkout -b gh-pages origin/gh-pages
-        git merge origin/master --commit --no-edit --allow-unrelated-histories
     - name: "Generate site"
       run: |
         mdz clean
