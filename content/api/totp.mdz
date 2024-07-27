@@ -1,7 +1,8 @@
 {:title "TOTP"
  :author "Seungki Kim"
  :license "MIT license"
- :template "mdzdoc/main.html"}
+ :template "mdzdoc/main.html"
+ :order 20}
 ---
 
 ## Index

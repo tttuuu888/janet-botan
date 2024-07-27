@@ -1,7 +1,8 @@
 {:title "Hash Functions"
  :author "Seungki Kim"
  :license "MIT license"
- :template "mdzdoc/main.html"}
+ :template "mdzdoc/main.html"
+ :order 5}
 ---
 
 ## Index
