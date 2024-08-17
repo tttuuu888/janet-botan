@@ -1,0 +1,14 @@
+{:title "ZFEC Forward Error Correction"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "mdzdoc/main.html"
+ :order 23}
+---
+
+## Index
+
+@api-index[/build/botan][zfec]
+
+## Reference
+
+@api-docs[/build/botan][zfec]
