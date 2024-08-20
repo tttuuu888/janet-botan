@@ -28,7 +28,7 @@ static Janet cfun_version_string(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 0);
 
     const char *version = botan_version_string();
-    return janet_wrap_string((const uint8_t *)version);
+    return janet_wrap_string(janet_string((const uint8_t *)version, strlen(version)));
 }
 
 static Janet cfun_version_major(int32_t argc, Janet *argv) {
