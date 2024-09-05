@@ -182,14 +182,14 @@ static JanetReg block_cipher_cfuns[] = {
     {"block-cipher/new", block_cipher_new,
      "(block-cipher/new name)\n\n"
      "Create a new cipher mode object, `name` should be for example "
-     "\"AES-128\" or \"Threefish-512\""
+     "\"AES-128\" or \"Threefish-512\". Returns `bc-obj`."
     },
     {"block-cipher/block-size", block_cipher_block_size,
-     "(block-cipher/block-size bc)\n\n"
+     "(block-cipher/block-size bc-obj)\n\n"
      "Return the block size of this cipher."
     },
     {"block-cipher/name", block_cipher_name,
-     "(block-cipher/name bc)\n\n"
+     "(block-cipher/name bc-obj)\n\n"
      "Return the name of this block cipher algorithm, which may nor may not "
      " exactly match what was passed to `block-cipher/init`."
     },
@@ -199,21 +199,24 @@ static JanetReg block_cipher_cfuns[] = {
      "[max-key-length min-key-length mod-key-length]."
     },
     {"block-cipher/clear", block_cipher_clear,
-     "(block-cipher/clear bc)\n\n"
+     "(block-cipher/clear bc-obj)\n\n"
      "Clear the internal state (such as keys) of this cipher object, "
-     "but do not deallocate it."
+     "but do not deallocate it. Returns `bc-obj`."
     },
     {"block-cipher/set-key", block_cipher_set_key,
-     "(block-cipher/set-key bc key)\n\n"
-     "Set the cipher key, which is required before encrypting or decrypting."
+     "(block-cipher/set-key bc-obj key)\n\n"
+     "Set the cipher key, which is required before encrypting or decrypting. "
+     "Returns `bc-obj`."
     },
     {"block-cipher/encrypt", block_cipher_encrypt_blocks,
-     "(block-cipher/encrypt bc input)\n\n"
-     "Encrypt `input` data. The key must have been set beforehand."
+     "(block-cipher/encrypt bc-obj input)\n\n"
+     "Encrypt `input` data. The key must have been set beforehand. "
+     "Returns encrypted data in buffer format."
     },
     {"block-cipher/decrypt", block_cipher_decrypt_blocks,
-     "(block-cipher/decrypt bc input)\n\n"
-     "Decrypt `input` data. The key must have been set beforehand."
+     "(block-cipher/decrypt bc-obj input)\n\n"
+     "Decrypt `input` data. The key must have been set beforehand. "
+     "Returns decrypted data in buffer format."
     },
     {NULL, NULL, NULL}
 };

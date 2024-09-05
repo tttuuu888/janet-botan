@@ -147,23 +147,24 @@ static JanetReg rng_cfuns[] = {
      "\"user\": AutoSeeded-RNG\n\n"
      "\"user-threadsafe\": serialized AutoSeeded-RNG\n\n"
      "\"null\": Null-RNG (always fails)\n\n"
-     "\"hwrnd\" or \"rdrand\": Processor-RNG (if available)"
+     "\"hwrnd\" or \"rdrand\": Processor-RNG (if available)\n\n"
+     "Returns `rng-obj`"
     },
-    {"rng/get", rng_get, "(rng/get rng len)\n\n"
-     "Generate random bytes of length len from a random number generator `rng`."
+    {"rng/get", rng_get, "(rng/get rng-obj len)\n\n"
+     "Returns random bytes of length `len` from a random number generator `rng-obj`."
     },
-    {"rng/reseed", rng_reseed, "(rng/reseed rng bits)\n\n"
+    {"rng/reseed", rng_reseed, "(rng/reseed rng-obj bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` "
-     "from the System-RNG, return self."
+     "from the System-RNG. Returns `rng-obj`."
     },
     {"rng/reseed-from-rng", rng_reseed_from_rng,
-     "(rng/reseed-from-rng rng src bits)\n\n"
+     "(rng/reseed-from-rng rng-obj src bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` "
-     "taken from given the source rng `src`, return self."
+     "taken from given the source rng `src`. Returns `rng-obj`."
     },
     {"rng/add-entropy", rng_add_entropy,
-     "(rng/add-entropy rng seed)\n\n"
-     "Adds the provided `seed` array or tuple to the `rng`, return self."
+     "(rng/add-entropy rng-obj seed)\n\n"
+     "Adds the provided `seed` array or tuple to the `rng`. Returns `rng-obj`."
     },
     {NULL, NULL, NULL}
 };
