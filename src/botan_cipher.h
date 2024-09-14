@@ -310,58 +310,59 @@ static JanetReg cipher_cfuns[] = {
      "Create an encryption cipher if `:encrypt` type is given, create "
      "decryption cipher if `:decrypt` type is supplied."
     },
-    {"cipher/name", cipher_name, "(cipher/name cipher)\n\n"
+    {"cipher/name", cipher_name, "(cipher/name cipher-obj)\n\n"
      "Returns the name of this algorithm."
     },
-    {"cipher/clear", cipher_clear, "(cipher/clear cipher)\n\n"
+    {"cipher/clear", cipher_clear, "(cipher/clear cipher-obj)\n\n"
      "Reset the state of `cipher` back to clean, "
-     "as if no key and input has been supplied, return self"
+     "as if no key and input has been supplied. Returns `cipher-obj`."
     },
     {"cipher/get-keyspec", cipher_get_keyspec,
-     "(cipher/get-keyspec cipher)\n\n"
+     "(cipher/get-keyspec cipher-obj)\n\n"
      "Return the key spec of this `cipher` in format of "
      "`[max-key-length min-key-length mod-key-length]`."
     },
-    {"cipher/set-key", cipher_set_key, "(cipher/set-key cipher key)\n\n"
-     "Set the symmetric key to be used, return self."
+    {"cipher/set-key", cipher_set_key, "(cipher/set-key cipher-obj key)\n\n"
+     "Set the symmetric key to be used. Returns `cipher-obj`."
     },
     {"cipher/is-authenticated", cipher_is_authenticated,
-     "(cipher/is-authenticated cipher)\n\n"
+     "(cipher/is-authenticated cipher-obj)\n\n"
      "Returns true if this is an AEAD mode."
     },
     {"cipher/get-tag-length", cipher_get_tag_length,
-     "(cipher/get-tag-length cipher)\n\n"
+     "(cipher/get-tag-length cipher-obj)\n\n"
      "Returns the tag length (0 for unauthenticated modes)."
     },
     {"cipher/valid-nonce-length", cipher_valid_nonce_length,
-     "(cipher/valid-nonce-length cipher nonce-len)\n\n"
+     "(cipher/valid-nonce-length cipher-obj nonce-len)\n\n"
      "Returns true if `nonce-len` is a valid nonce len for this mode."
     },
     {"cipher/get-default-nonce-length", cipher_get_default_nonce_length,
-     "(cipher/get-default-nonce-length cipher)\n\n"
+     "(cipher/get-default-nonce-length cipher-obj)\n\n"
      "Returns default nonce length."
     },
     {"cipher/get-update-granularity", cipher_get_update_granularity,
-     "(cipher/get-update-granularity cipher)\n\n"
+     "(cipher/get-update-granularity cipher-obj)\n\n"
      "Return the update granularity of the cipher. `cipher/update` must "
      "be called with blocks of this size, except for the final."
     },
     {"cipher/set-associated-data", cipher_set_associated_data,
-     "(cipher/set-associated-data cipher ad)\n\n"
-     "Sets the associated data, return self. Fails if this is not an AEAD mode."
+     "(cipher/set-associated-data cipher-obj ad)\n\n"
+     "Sets the associated data and returns `cipher-obj`. "
+     "Fails if this is not an AEAD mode."
     },
     {"cipher/start", cipher_start,
-     "(cipher/start cipher nonce)\n\n"
-     "Start processing a message using `nonce`, return self"
+     "(cipher/start cipher-obj nonce)\n\n"
+     "Start processing a message using `nonce`. Returns `cipher-obj`."
     },
     {"cipher/update", cipher_update,
-     "(cipher/update cipher input)\n\n"
+     "(cipher/update cipher-obj input)\n\n"
      "Consumes `input` text and returns output. Input text must be of "
      "`cipher/get-update-granularity` length. Alternately, always call "
      "finish with the entire message, avoiding calls to update entirely."
     },
     {"cipher/finish", cipher_finish,
-     "(cipher/finish cipher input)\n\n"
+     "(cipher/finish cipher-obj input)\n\n"
      "Finish processing (with an optional final `input`). May throw if "
      "message authentication checks fail, in which case all plaintext "
      "previously processed must be discarded. You may call `cipher/finish` "
