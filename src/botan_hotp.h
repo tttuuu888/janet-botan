@@ -118,14 +118,14 @@ static JanetReg hotp_cfuns[] = {
      "(hotp/new key &opt hash digits)\n\n"
      "Instantiate a new HOTP instance with the given parameters. If omitted, "
      "the default value for `hash` is \"SHA-1\" and the default value for "
-     "`digits` is 6."
+     "`digits` is 6. Returns `htop-obj`."
     },
     {"hotp/generate", hotp_generate,
-     "(hotp/generate hotp counter)\n\n"
+     "(hotp/generate hotp-obj counter)\n\n"
      "Generate an HOTP code for the provided `counter`."
     },
     {"hotp/check", hotp_check,
-     "(hotp/check hotp code counter &opt resync-range)\n\n"
+     "(hotp/check hotp-obj code counter &opt resync-range)\n\n"
      "Check if provided `code` is the correct code for `counter`. If omitted, "
      "the default value for `resync-range` is 0. If `resync-range` is greater "
      "than zero, HOTP also checks up to `resync-range` following `counter` "

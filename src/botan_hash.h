@@ -162,27 +162,27 @@ static Janet hash_final(int32_t argc, Janet *argv) {
 
 static JanetReg hash_cfuns[] = {
     {"hash/new", hash_new, "(hash/new name)\n\n"
-     "Creates a hash of the given name, e.g., \"SHA-384\"."
+     "Creates a hash of the given name, e.g., \"SHA-384\". Returns `hash-obj`."
     },
     {"hash/name", hash_name, "(hash/name hash)\n\n"
      "Return the name of the hash function."
     },
-    {"hash/copy", hash_copy_state, "(hash/copy hash)\n\n"
-     "Return a new hash object copied from `hash`."
+    {"hash/copy", hash_copy_state, "(hash/copy hash-obj)\n\n"
+     "Return a new hash object copied from `hash`. Returns new `hash-obj`."
     },
-    {"hash/clear", hash_clear, "(hash/clear hash)\n\n"
+    {"hash/clear", hash_clear, "(hash/clear hash-obj)\n\n"
      "Reset the state of `hash` back to clean, "
-     "as if no input has been supplied, return self."
+     "as if no input has been supplied. Returns `hash-obj`."
     },
     {"hash/output-length", hash_output_length,
-     "(hash/output-length hash)\n\n"
-     "Return the output length of the `hash`"
+     "(hash/output-length hash-obj)\n\n"
+     "Return the output length of the `hash-obj`."
     },
-    {"hash/update", hash_update, "(hash/update hash input)\n\n"
-     "Add input to the hash computation, return self."
+    {"hash/update", hash_update, "(hash/update hash-boj input)\n\n"
+     "Add input to the hash computation. Returns `hash-obj`."
     },
-    {"hash/final", hash_final, "(hash/final hash)\n\n"
-     "Finalize the hash and return the output"
+    {"hash/final", hash_final, "(hash/final hash-obj)\n\n"
+     "Finalize the hash and return the output."
     },
     {NULL, NULL, NULL}
 };
