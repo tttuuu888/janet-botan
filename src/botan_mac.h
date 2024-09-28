@@ -173,33 +173,34 @@ static Janet mac_final(int32_t argc, Janet *argv) {
 static JanetReg mac_cfuns[] = {
     {"mac/new", mac_new, "(mac/new name)\n\n"
      "Creates a MAC of the given name, e.g., \"HMAC(SHA-384)\"."
+     "Returns `mac-obj`."
     },
-    {"mac/clear", mac_clear, "(mac/clear mac)\n\n"
+    {"mac/clear", mac_clear, "(mac/clear mac-obj)\n\n"
      "Reset the state of `mac` back to clean, "
-     "as if no key and input has been supplied, return self."
+     "as if no key and input has been supplied. Returns `mac-obj`."
     },
     {"mac/output-length", mac_output_length,
-     "(mac/output-length mac)\n\n"
+     "(mac/output-length mac-obj)\n\n"
      "Return the output length of the `mac`"
     },
     {"mac/get-keyspec", mac_get_keyspec,
-     "(mac/get-keyspec mac)\n\n"
+     "(mac/get-keyspec mac-obj)\n\n"
      "Return the key spec of the `mac` in format of "
      "[max-key-length min-key-length mod-key-length]."
     },
-    {"mac/set-key", mac_set_key, "(mac/set-key mac key)\n\n"
-     "Set the `key` for the MAC calculation, return self."
+    {"mac/set-key", mac_set_key, "(mac/set-key mac-obj key)\n\n"
+     "Set the `key` for the MAC calculation. Returns `mac-obj`."
     },
-    {"mac/set-nonce", mac_set_nonce, "(mac/set-nonce mac key)\n\n"
-     "Set the `nonce` for the MAC calculation, return self."
+    {"mac/set-nonce", mac_set_nonce, "(mac/set-nonce mac-obj key)\n\n"
+     "Set the `nonce` for the MAC calculation. Returns `mac-obj`."
      "Note that not all MAC algorithms require a nonce. If a nonce is "
      "required, the function has to be called before the data is processed."
     },
-    {"mac/update", mac_update, "(mac/update mac input)\n\n"
-     "Add input to the MAC computation, return self."
+    {"mac/update", mac_update, "(mac/update mac-obj input)\n\n"
+     "Add input to the MAC computation. Returns `mac-obj`."
     },
-    {"mac/final", mac_final, "(mac/final mac)\n\n"
-     "Finalize the MAC and return the output"
+    {"mac/final", mac_final, "(mac/final mac-obj)\n\n"
+     "Finalize the MAC and return the output."
     },
     {NULL, NULL, NULL}
 };
