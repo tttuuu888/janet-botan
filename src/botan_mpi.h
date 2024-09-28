@@ -598,120 +598,123 @@ static Janet mpi_to_bin(int32_t argc, Janet *argv) {
 static JanetReg mpi_cfuns[] = {
     {"mpi/new", mpi_new,
      "(mpi/new)\n\n"
-     "Create a new zero-valued MPI."
+     "Create a new zero-valued MPI. Returns `mpi-obj`."
     },
     {"mpi/from-int", mpi_new_int,
      "(mpi/from-int value)\n\n"
-     "Create an MPI object with an integer `value`."
+     "Create an MPI object with an integer `value`. Returns `mpi-obj`."
     },
     {"mpi/from-str", mpi_new_str,
      "(mpi/from-str value)\n\n"
-     "Create an MPI object with an integer string `value`."
+     "Create an MPI object with an integer string `value`. Returns `mpi-obj`."
     },
     {"mpi/from-hex-str", mpi_new_hex_str,
      "(mpi/from-hex-str value)\n\n"
-     "Create an MPI object with a hex string `value`."
+     "Create an MPI object with a hex string `value`. Returns `mpi-obj`."
     },
     {"mpi/from-mpi", mpi_new_mpi,
-     "(mpi/from-mpi mpi)\n\n"
-     "Create an MPI object with an MPI object `mpi`."
+     "(mpi/from-mpi mpi-obj)\n\n"
+     "Create an MPI object with an MPI object `mpi`. Returns new `mpi-obj`."
     },
     {"mpi/from-rng", mpi_new_rng,
      "(mpi/from-rng rng bits)\n\n"
-     "Create a `bits` size random MPI object with `rng`."
+     "Create a `bits` size random MPI object with `rng`. Returns `mpi-obj`."
     },
     {"mpi/inverse-mod", mpi_inverse_mod,
-     "(mpi/inverse-mod mpi modulus)\n\n"
-     "Return the inverse of MPI modulo `modulus`, or nil if no inverse exists."
+     "(mpi/inverse-mod mpi-obj modulus)\n\n"
+     "Create the inverse of `mpi-obj` modulo `modulus`, or nil if no inverse exists."
+     "Returns new `mpi-obj`."
     },
     {"mpi/pow-mod", mpi_pow_mod,
-     "(mpi/pow-mod mpi exponent modulus)\n\n"
-     "Return new MPI to the `exponent` MPI power modulo `modulus` MPI."
+     "(mpi/pow-mod mpi-obj exponent modulus)\n\n"
+     "Create new `mpi-obj` to the `exponent` `mpi-obj` power modulo `modulus` `mpi-obj`."
+     "Returns new `mpi-obj`."
     },
     {"mpi/mod-mul", mpi_mod_mul,
-     "(mpi/mod-mul mpi other modulus)\n\n"
-     "Return new MPI of the multiplication product of `mpi` and `other` "
-     "modulo `modulus`."
+     "(mpi/mod-mul mpi-obj other-mpi-obj modulus)\n\n"
+     "Create new `mpi-obj` of the multiplication product of `mpi-obj` and "
+     "`other-mpi-obj` modulo `modulus`. Returns new `mpi-obj`."
     },
     {"mpi/gcd", mpi_gcd,
-     "(mpi/gcd mpi other)\n\n"
-     "Return new MPI of the greatest common divisor of `mpi` and `other`."
+     "(mpi/gcd mpi-obj other-mpi-obj)\n\n"
+     "Create new `mpi-obj` of the greatest common divisor of `mpi-obj` and `other-mpi-obj`."
     },
     {"mpi/is-prime", mpi_is_prime,
-     "(mpi/is-prime mpi rng &opt prob)\n\n"
-     "Test if MPI is prime and return boolean. Default value of prob is 128."
+     "(mpi/is-prime mpi-obj rng &opt prob)\n\n"
+     "Return true if `mpi-obj` is prime, otherwise returns false. "
+     "Default value of prob is 128."
     },
     {"mpi/get-bit", mpi_get_bit,
-     "(mpi/get-bit mpi bit)\n\n"
-     "Returns 0 if the specified bit of n is not set, 1 if it is set."
+     "(mpi/get-bit mpi-obj bit)\n\n"
+     "Returns 0 if the specified `bit` of `mpi-obj` is not set, 1 if it is set."
     },
     {"mpi/set-bit", mpi_set_bit,
-     "(mpi/set-bit mpi bit)\n\n"
-     "Set the specified bit of `n`, return self."
+     "(mpi/set-bit mpi-obj bit)\n\n"
+     "Set the specified `bit` of `mpi-obj`. Returns `mpi-obj`."
     },
     {"mpi/clear-bit", mpi_clear_bit,
-     "(mpi/clear-bit mpi bit)\n\n"
-     "Clears the specified bit of `n`, return self."
+     "(mpi/clear-bit mpi-obj bit)\n\n"
+     "Clears the specified `bit` of `mpi-obj`. Returns `mpi-obj`."
     },
     {"mpi/is-zero", mpi_is_zero,
-     "(mpi/is-zero mpi)\n\n"
-     "Return true if x is zero, otherwise false."
+     "(mpi/is-zero mpi-obj)\n\n"
+     "Return true if `mpi-obj` is zero, otherwise returns false."
     },
     {"mpi/is-positive", mpi_is_positive,
-     "(mpi/is-positive mpi)\n\n"
-     "Return true if x is greater than or equal to zero."
+     "(mpi/is-positive mpi-obj)\n\n"
+     "Return true if `mpi-obj` is greater than or equal to zero. otherwise return false."
     },
     {"mpi/is-negative", mpi_is_negative,
-     "(mpi/is-negative mpi)\n\n"
-     "Return true if x is less than zero."
+     "(mpi/is-negative mpi-obj)\n\n"
+     "Return true if `mpi-obj` is less than zero, otherwise return false."
     },
     {"mpi/flip-sign", mpi_flip_sign,
-     "(mpi/flip-sign mpi)\n\n"
-     "Flip the sign of `mpi` and return self."
+     "(mpi/flip-sign mpi-obj)\n\n"
+     "Flip the sign of `mpi-obj`. Returns `mpi-obj`."
     },
     {"mpi/add", mpi_add,
-     "(mpi/add mpi x)\n\n"
-     "Add x to `mpi` and return the new MPI as a result. `x` can be either "
-     "MPI or u32 number."
+     "(mpi/add mpi-obj x)\n\n"
+     "Add x to `mpi-obj` and return the new `mpi-obj`. `x` can be either "
+     "`mpi-obj` or u32 number."
     },
     {"mpi/sub", mpi_sub,
-     "(mpi/sub mpi x)\n\n"
-     "Subtract x from `mpi` and return the new MPI as a result. `x` can be "
-     "either MPI or u32 number."
+     "(mpi/sub mpi-obj x)\n\n"
+     "Subtract x from `mpi-obj` and return the new `mpi-obj`. `x` can be "
+     "either `mpi-obj` or u32 number."
     },
     {"mpi/mul", mpi_mul,
-     "(mpi/sub mpi1 mpi2)\n\n"
-     "Multiply two MPI and return the new MPI as a result."
+     "(mpi/sub mpi-obj-1 mpi-obj-2)\n\n"
+     "Multiply two `mpi-obj` and return the new `mpi-obj` as a result."
     },
     {"mpi/div", mpi_div,
-     "(mpi/div mpi1 mpi2)\n\n"
-     "Divide `mpi1` by `mpi2` and return quotient MPI and remainder MPI in "
-     "tuple."
+     "(mpi/div mpi-obj-1 mpi-obj-2)\n\n"
+     "Divide `mpi-obj-1` by `mpi-obj-2`. Create new quotient `mpi-obj` and remainder "
+     "`mpi-obj`. Return quotient `mpi-obj` and remainder `mpi-obj` in tuple."
     },
     {"mpi/swap", mpi_swap,
-     "(mpi/swap mpi1 mpi2)\n\n"
-     "Swap `mpi1` and `mpi2` values, return `mpi1`."
+     "(mpi/swap mpi-obj-1 mpi-obj-2)\n\n"
+     "Swap `mpi-obj-1` and `mpi-obj-2` values, Return `mpi-obj-1`."
     },
     {"mpi/lshift", mpi_lshift,
-     "(mpi/lshift mpi shift)\n\n"
-     "Left shift by specified bit count, return the result MPI."
+     "(mpi/lshift mpi-obj shift)\n\n"
+     "Left shift by specified `shift` bit count. Return new `mpj-obj`."
     },
     {"mpi/rshift", mpi_rshift,
-     "(mpi/rshift mpi shift)\n\n"
-     "Right shift by specified bit count, return the result MPI."
+     "(mpi/rshift mpi-obj shift)\n\n"
+     "Right shift by specified `shift` bit count. Return new `mpj-obj`."
     },
     {"mpi/num-bytes", mpi_num_bytes,
-     "(mpi/num-bytes mpi)\n\n"
-     "Return the number of significant bytes in the MPI."
+     "(mpi/num-bytes mpi-obj)\n\n"
+     "Return the number of significant bytes in the `mpi-obj`."
     },
     {"mpi/to-u32", mpi_to_u32,
-     "(mpi/to-u32 mpi)\n\n"
-     "Convert the MPI to a uint32_t, if possible. Fails if MPI is negative "
-     "or too large"
+     "(mpi/to-u32 mpi-obj`)\n\n"
+     "Convert the `mpi-obj` to a uint32_t, if possible. Fails if `mpi-obj` is negative "
+     "or too large."
     },
     {"mpi/to-bin", mpi_to_bin,
-     "(mpi/to-bin mpi)\n\n"
-     "Convert the MPI to a binary and return as a string."
+     "(mpi/to-bin mpi-obj`)\n\n"
+     "Convert the `mpi-obj` to a binary and return as a string."
     },
 
     {NULL, NULL, NULL}
