@@ -708,12 +708,12 @@ static JanetReg mpi_cfuns[] = {
      "Return the number of significant bytes in the `mpi-obj`."
     },
     {"mpi/to-u32", mpi_to_u32,
-     "(mpi/to-u32 mpi-obj`)\n\n"
+     "(mpi/to-u32 mpi-obj)\n\n"
      "Convert the `mpi-obj` to a uint32_t, if possible. Fails if `mpi-obj` is negative "
      "or too large."
     },
     {"mpi/to-bin", mpi_to_bin,
-     "(mpi/to-bin mpi-obj`)\n\n"
+     "(mpi/to-bin mpi-obj)\n\n"
      "Convert the `mpi-obj` to a binary and return as a string."
     },
 
