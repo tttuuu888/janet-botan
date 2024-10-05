@@ -21,6 +21,8 @@
                      "-c"
                      `[ "$(git submodule status | awk '{print $1}')" = "$(cd botan && git rev-parse HEAD)" ]`]
                     :p))
+      (unless (= update-needed 0)
+        (os/execute ["git" "submodule" "update" "--recursive"] :p))
       (unless (and (= update-needed 0)
                    (os/stat "./botan/libbotan-3.a")
                    (os/stat "./botan/libbotan-3.so.5"))
