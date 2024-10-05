@@ -16,11 +16,18 @@
 (def project-path (os/cwd))
 
 (rule "botan-library" ["./botan"]
-      (unless (and (os/stat "./botan/libbotan-3.a")
+      (def update-needed
+        (os/execute ["bash"
+                     "-c"
+                     `[ "$(git submodule status | awk '{print $1}')" = "$(cd botan && git rev-parse HEAD)" ]`]
+                    :p))
+      (unless (and (= update-needed 0)
+                   (os/stat "./botan/libbotan-3.a")
                    (os/stat "./botan/libbotan-3.so.5"))
         (os/cd "botan")
         (print "Build botan library...")
-        (unless (os/stat "build")
+        (unless (and (= update-needed 0)
+                     (os/stat "build"))
           (os/execute ["./configure.py" "--without-documentation"] :p))
         (os/execute ["make" "-j8"] :p)
         (os/cd project-path)))
