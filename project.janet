@@ -32,7 +32,7 @@
                      (os/stat "build"))
           (os/execute ["./configure.py" "--without-documentation"] :p)
           (os/execute ["make" "clean"] :p))
-        (os/execute ["make" "-j"] :p)
+        (os/execute ["make" "-j8"] :p)
         (os/cd project-path)))
 
 (rule "botan-header" ["botan-library"]
