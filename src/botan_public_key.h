@@ -231,16 +231,17 @@ static Janet public_key_load_sm2(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
-static Janet public_key_load_kyber(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
+static Janet public_key_load_ml_kem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
 
     int ret;
     botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
     memset(obj, 0, sizeof(botan_public_key_obj_t));
 
     JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
 
-    ret = botan_pubkey_load_kyber(&obj->public_key, key.bytes, key.len);
+    ret = botan_pubkey_load_ml_kem(&obj->public_key, key.bytes, key.len, mode);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -252,20 +253,11 @@ static Janet public_key_to_pem(int32_t argc, Janet *argv) {
     botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
     botan_pubkey_t key = obj->public_key;
 
-    size_t key_len = 0;
-    int ret = botan_pubkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
-    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
-        janet_panic(getBotanError(ret));
-    }
-
-    JanetBuffer *output = janet_buffer(key_len);
-    ret = botan_pubkey_export(key, output->data, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
+    view_data_t data;
+    int ret = botan_pubkey_view_pem(key, &data, (botan_view_str_fn)view_str_func);
     JANET_BOTAN_ASSERT(ret);
-    if (output->data[key_len - 1] == 0) {
-        key_len -= 1;
-    }
 
-    return janet_wrap_string(janet_string(output->data, key_len));
+    return janet_wrap_string(janet_string(data.data, data.len));
 }
 
 static Janet public_key_to_der(int32_t argc, Janet *argv) {
@@ -274,17 +266,11 @@ static Janet public_key_to_der(int32_t argc, Janet *argv) {
     botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
     botan_pubkey_t key = obj->public_key;
 
-    size_t key_len = 0;
-    int ret = botan_pubkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_DER);
-    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
-        janet_panic(getBotanError(ret));
-    }
-
-    JanetBuffer *output = janet_buffer(key_len);
-    ret = botan_pubkey_export(key, output->data, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_DER);
+    view_data_t data;
+    int ret = botan_pubkey_view_der(key, &data, (botan_view_bin_fn)view_bin_func);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_string(janet_string(output->data, key_len));
+    return janet_wrap_string(janet_string(data.data, data.len));
 }
 
 static Janet public_key_export(int32_t argc, Janet *argv) {
@@ -444,9 +430,9 @@ static JanetReg public_key_cfuns[] = {
      "(pubkey/load-sm2 curve x y)\n\n"
      "Return a public SM2 key."
     },
-    {"pubkey/load-kyber", public_key_load_kyber,
-     "(pubkey/load-kyber key)\n\n"
-     "Return a public Kyber key."
+    {"pubkey/load-ml-kem", public_key_load_ml_kem,
+     "(pubkey/load-ml-kem key mode)\n\n"
+     "Return a public ML-KEM key based on the given mode."
     },
     {"pubkey/export", public_key_export,
      "(pubkey/export pubkey &opt pem)\n\n"
