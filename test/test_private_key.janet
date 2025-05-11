@@ -13,9 +13,14 @@
 
   (assert (= (:algo-name prikey1) "RSA"))
 
+  (assert (= (:stateful-operation prikey1) false))
+
   (assert (= (:to-pem prikey1) (:export prikey1 :pem)))
   (assert (= (:to-der prikey1) (:export prikey1))))
 
+(let [prikey (privkey/new "XMSS" "XMSS-SHA2_10_256")]
+  (assert (= (:stateful-operation prikey) true))
+  (assert (= (:remaining-operations prikey) 1024)))
 
 (let [p (mpi/from-str "1090660992520643446103273789680343")
       q (mpi/from-str "1162435056374824133712043309728653")
