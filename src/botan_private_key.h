@@ -24,6 +24,8 @@ static Janet private_key_check_key(int32_t argc, Janet *argv);
 static Janet private_key_algo_name(int32_t argc, Janet *argv);
 static Janet private_key_export(int32_t argc, Janet *argv);
 static Janet private_key_get_field(int32_t argc, Janet *argv);
+static Janet private_key_stateful_operation(int32_t argc, Janet *argv);
+static Janet private_key_remaining_operations(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -41,6 +43,8 @@ static JanetMethod private_key_methods[] = {
     {"algo-name", private_key_algo_name},
     {"export", private_key_export},
     {"get-field", private_key_get_field},
+    {"stateful-operation", private_key_stateful_operation},
+    {"remaining-operations", private_key_remaining_operations},
 
     {NULL, NULL},
 };
@@ -400,6 +404,32 @@ static Janet private_key_get_field(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj_mpi);
 }
 
+static Janet private_key_stateful_operation(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    int r = 0;
+    int ret = botan_privkey_stateful_operation(key, &r);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_boolean(r != 0);
+}
+
+static Janet private_key_remaining_operations(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    uint64_t r = 0;
+    int ret = botan_privkey_remaining_operations(key, &r);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)r);
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo param &opt rng)\n\n"
@@ -480,6 +510,15 @@ static JanetReg private_key_cfuns[] = {
      "names vary depending on the algorithm. For example first RSA secret "
      "prime can be extracted with `(privkey/get-field key \"p\")`. This "
      "function can also be used to extract the public parameters."
+    },
+    {"privkey/stateful-operation", private_key_stateful_operation,
+     "(privkey/stateful-operation privkey)\n\n"
+     "Checks whether a key is stateful. Return a boolean."
+    },
+    {"privkey/remaining-operations", private_key_remaining_operations,
+     "(privkey/remaining-operations privkey)\n\n"
+     "Return the number of remaining operations. If the key is not stateful, "
+     "an error will be occurred."
     },
 
     {NULL, NULL, NULL}
