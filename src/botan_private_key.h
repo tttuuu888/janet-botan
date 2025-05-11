@@ -301,20 +301,11 @@ static Janet private_key_to_pem(int32_t argc, Janet *argv) {
     botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
     botan_privkey_t key = obj->private_key;
 
-    size_t key_len = 0;
-    int ret = botan_privkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
-    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
-        janet_panic(getBotanError(ret));
-    }
-
-    JanetBuffer *output = janet_buffer(key_len);
-    ret = botan_privkey_export(key, output->data, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_PEM);
+    view_data_t data;
+    int ret = botan_privkey_view_pem(key, &data, (botan_view_str_fn)view_str_func);
     JANET_BOTAN_ASSERT(ret);
-    if (output->data[key_len - 1] == 0) {
-        key_len -= 1;
-    }
 
-    return janet_wrap_string(janet_string(output->data, key_len));
+    return janet_wrap_string(janet_string(data.data, data.len));
 }
 
 static Janet private_key_to_der(int32_t argc, Janet *argv) {
@@ -323,17 +314,11 @@ static Janet private_key_to_der(int32_t argc, Janet *argv) {
     botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
     botan_privkey_t key = obj->private_key;
 
-    size_t key_len = 0;
-    int ret = botan_privkey_export(key, NULL, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_DER);
-    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
-        janet_panic(getBotanError(ret));
-    }
-
-    JanetBuffer *output = janet_buffer(key_len);
-    ret = botan_privkey_export(key, output->data, &key_len, BOTAN_PRIVKEY_EXPORT_FLAG_DER);
+    view_data_t data;
+    int ret = botan_privkey_view_der(key, &data, (botan_view_bin_fn)view_bin_func);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_string(janet_string(output->data, key_len));
+    return janet_wrap_string(janet_string(data.data, data.len));
 }
 
 static Janet private_key_check_key(int32_t argc, Janet *argv) {
