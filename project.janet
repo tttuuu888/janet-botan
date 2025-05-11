@@ -13,37 +13,37 @@
  :lflags ["-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
  :source ["src/main.c"])
 
-(def project-path (os/cwd))
+(import spork/json)
 
 (rule "botan-library" ["./botan"]
-      (def update-needed
-        (os/execute ["bash"
-                     "-c"
-                     `[ "$(git submodule status | awk '{print $1}')" = "$(cd botan && git rev-parse HEAD)" ]`]
-                    :p))
-      (unless (= update-needed 0)
-        (os/execute ["git" "submodule" "update" "--recursive"] :p))
-      (unless (and (= update-needed 0)
-                   (os/stat "./botan/libbotan-3.a")
-                   (os/stat "./botan/libbotan-3.so.5"))
-        (os/cd "botan")
-        (print "Build botan library...")
-        (unless (and (= update-needed 0)
-                     (os/stat "build"))
-          (os/execute ["./configure.py" "--without-documentation"] :p)
-          (os/execute ["make" "clean"] :p))
-        (os/execute ["make" "-j8"] :p)
-        (os/cd project-path)))
+      (let [project-path  (os/cwd)
+            p (os/spawn ["git" "submodule" "status"] :p {:out :pipe})
+            rev1 ((string/split " " (:read (p :out) :all)) 1)
+            f (file/open "botan/build/build_config.json")
+            j (and f (json/decode (file/read f :all)))
+            rev2 (and f j (last (string/split ":" (j "version_vc_rev"))))]
+        (and f (file/close f))
 
-(rule "botan-header" ["botan-library"]
-      (unless (os/stat "botan/build.h")
+        (unless (= rev1 rev2)
+          (print "Initializing Botan library build...")
+          (os/execute ["git" "submodule" "update" "--recursive"] :p)
+          (os/cd "botan")
+          (os/execute ["./configure.py" "--without-documentation"] :p)
+          (os/execute ["make" "clean"] :p)
+          (os/cd project-path))
+
+        (print "Build botan library...")
+        (os/cd "botan")
+        (os/shell "make -j$(nproc)")
         (os/cd project-path)
-        (print "Copy botan header...")
-        (copyfile "botan/build/build.h" "botan/build.h")))
+
+        (unless (os/stat "botan/build.h")
+          (print "Copy botan header...")
+          (copyfile "botan/build/build.h" "botan/build.h"))))
 
 (rule "pre-install" ["build"]
       (os/execute ["./pre_install.sh"] :p))
 
-(add-dep "build" "botan-header")
-(add-dep "build/src___main.o" "botan-header")
+(add-dep "build" "botan-library")
+(add-dep "build/src___main.o" "botan-library")
 (add-dep "install" "pre-install")
