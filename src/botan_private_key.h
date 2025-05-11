@@ -472,7 +472,7 @@ static JanetReg private_key_cfuns[] = {
      "Return the PEM encoded private key (unencrypted)."
     },
     {"privkey/to-der", private_key_to_der,
-     "(privkey/to-pem privkey)\n\n"
+     "(privkey/to-der privkey)\n\n"
      "Return the DER encoded private key (unencrypted)."
     },
     {"privkey/check-key", private_key_check_key,
