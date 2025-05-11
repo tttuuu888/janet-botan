@@ -29,6 +29,8 @@ jobs:
 
     - name: "Test project"
       uses: pyrmont/action-janet-test@v5
+      with:
+        cmd-deps: jpm install spork
     - name: "Fetch all history"
       run: |
         git fetch --all
