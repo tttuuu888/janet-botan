@@ -264,16 +264,17 @@ static Janet private_key_load_sm2(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
-static Janet private_key_load_kyber(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
+static Janet private_key_load_ml_kem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
 
     int ret;
     botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
     memset(obj, 0, sizeof(botan_private_key_obj_t));
 
     JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
 
-    ret = botan_privkey_load_kyber(&obj->private_key, key.bytes, key.len);
+    ret = botan_privkey_load_ml_kem(&obj->private_key, key.bytes, key.len, mode);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -473,9 +474,9 @@ static JanetReg private_key_cfuns[] = {
      "(privkey/load-sm2 curve x)\n\n"
      "Return a private SM2 key."
     },
-    {"privkey/load-kyber", private_key_load_kyber,
-     "(privkey/load-kyber key)\n\n"
-     "Return a private Kyber key."
+    {"privkey/load-ml-kem", private_key_load_ml_kem,
+     "(privkey/load-ml-kem key mode)\n\n"
+     "Return a private ML-KEM key based on the given mode."
     },
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"

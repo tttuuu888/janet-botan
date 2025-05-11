@@ -231,16 +231,17 @@ static Janet public_key_load_sm2(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
-static Janet public_key_load_kyber(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
+static Janet public_key_load_ml_kem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
 
     int ret;
     botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
     memset(obj, 0, sizeof(botan_public_key_obj_t));
 
     JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
 
-    ret = botan_pubkey_load_kyber(&obj->public_key, key.bytes, key.len);
+    ret = botan_pubkey_load_ml_kem(&obj->public_key, key.bytes, key.len, mode);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -444,9 +445,9 @@ static JanetReg public_key_cfuns[] = {
      "(pubkey/load-sm2 curve x y)\n\n"
      "Return a public SM2 key."
     },
-    {"pubkey/load-kyber", public_key_load_kyber,
-     "(pubkey/load-kyber key)\n\n"
-     "Return a public Kyber key."
+    {"pubkey/load-ml-kem", public_key_load_ml_kem,
+     "(pubkey/load-ml-kem key mode)\n\n"
+     "Return a public ML-KEM key based on the given mode."
     },
     {"pubkey/export", public_key_export,
      "(pubkey/export pubkey &opt pem)\n\n"
