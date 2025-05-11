@@ -13,16 +13,14 @@
  :lflags ["-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
  :source ["src/main.c"])
 
-(import spork/json)
-
 (rule "botan-library" ["./botan"]
       (let [project-path  (os/cwd)
-            p (os/spawn ["git" "submodule" "status"] :p {:out :pipe})
-            rev1 ((string/split " " (:read (p :out) :all)) 1)
-            f (file/open "botan/build/build_config.json")
-            j (and f (json/decode (file/read f :all)))
-            rev2 (and f j (last (string/split ":" (j "version_vc_rev"))))]
-        (and f (file/close f))
+            p1 (os/spawn ["git" "submodule" "status"] :p {:out :pipe})
+            rev1 ((string/split " " (:read (p1 :out) :all)) 1)
+            p2 (os/spawn ["/bin/sh" "-c"
+                          "grep '\"version_vc_rev\"' botan/build/build_config.json | sed -E 's/.*\"version_vc_rev\": \"git:([^\"]+)\".*/\\1/'"]
+                         :p {:out :pipe})
+            rev2 (string/trim (:read (p2 :out) :all))]
 
         (unless (= rev1 rev2)
           (print "Initializing Botan library build...")
