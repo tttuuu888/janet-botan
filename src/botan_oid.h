@@ -20,8 +20,6 @@ static int oid_compare_fn(void *lhs, void *rhs);
 static Janet oid_register(int32_t argc, Janet *argv);
 static Janet oid_to_string(int32_t argc, Janet *argv);
 static Janet oid_to_name(int32_t argc, Janet *argv);
-static Janet oid_equal(int32_t argc, Janet *argv);
-static Janet oid_cmp(int32_t argc, Janet *argv);
 
 static JanetAbstractType oid_obj_type = {
     "botan/oid",
@@ -40,8 +38,6 @@ static JanetMethod oid_methods[] = {
     {"register", oid_register},
     {"to-string", oid_to_string},
     {"to-name", oid_to_name},
-    {"equal", oid_equal},
-    {"cmp", oid_cmp},
     {NULL, NULL},
 };
 
@@ -129,36 +125,6 @@ static Janet oid_to_name(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(data.data, data.len));
 }
 
-static Janet oid_equal(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 2);
-    botan_oid_obj_t *obj1 = janet_getabstract(argv, 0, get_oid_obj_type());
-    botan_asn1_oid_t oid1 = obj1->oid;
-
-    botan_oid_obj_t *obj2 = janet_getabstract(argv, 0, get_oid_obj_type());
-    botan_asn1_oid_t oid2 = obj2->oid;
-
-    int result = 0;
-    int ret = botan_oid_cmp(&result, oid1, oid2);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_boolean(result == 0);
-}
-
-static Janet oid_cmp(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 2);
-    botan_oid_obj_t *obj1 = janet_getabstract(argv, 0, get_oid_obj_type());
-    botan_asn1_oid_t oid1 = obj1->oid;
-
-    botan_oid_obj_t *obj2 = janet_getabstract(argv, 0, get_oid_obj_type());
-    botan_asn1_oid_t oid2 = obj2->oid;
-
-    int result = 0;
-    int ret = botan_oid_cmp(&result, oid1, oid2);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_number((double)result);
-}
-
 static JanetReg oid_cfuns[] = {
     {"oid/from-string", oid_from_string,
      "(oid/from-string str)\n\n"
@@ -177,16 +143,6 @@ static JanetReg oid_cfuns[] = {
     {"oid/to-name", oid_to_name,
      "(oid/to-name oid-obj)\n\n"
      "Returns the OID as a name if it has one, otherwise as dot notation."
-    },
-    {"oid/equal", oid_equal,
-     "(oid/equal oid-obj-a oid-obj-b)\n\n"
-     "Return True if `oid-obj-a` is equal to `oid-obj-b`, "
-     "False if a is not equal to b."
-    },
-    {"oid/cmp", oid_cmp,
-     "(oid/cmp oid-obj-a oid-obj-b)\n\n"
-     "Three way comparison: set result to -1 if `oid-obj-a` is less than "
-     "`oid-obj-b`, 0 if a is equal to b, and 1 if a is greater than b."
     },
     {NULL, NULL, NULL}
 };

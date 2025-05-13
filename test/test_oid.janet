@@ -19,10 +19,7 @@
   (assert (= (:to-string oid1)) oid-rsa-str)
   (assert (= (:to-string oid2)) oid-rsa-str)
   (assert (= (:to-name oid1)) oid-rsa-name)
-  (assert (= (:to-name oid2)) oid-rsa-name)
-
-  (assert (= true (:equal oid1 oid2)))
-  (assert (= 0 (:cmp oid1 oid2))))
+  (assert (= (:to-name oid2)) oid-rsa-name))
 
 (let [oid1 (oid/from-string "1.2.3.4.5.6")
       oid2 (oid/from-string "1.2.3.4.5.6")
