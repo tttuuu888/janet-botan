@@ -31,7 +31,15 @@
   (assert (= (:agree pk-ka1 (:get-public-point pubkey2) salt 128)
              (:agree pk-ka2 (:get-public-point pubkey1) salt 128))))
 
-(let [ml-kem-priv (privkey/new "ML-KEM""ML-KEM-1024")
+(let [prikey (privkey/new "ML-DSA" "ML-DSA-6x5")
+      pubkey (:get-pubkey prikey)
+      pk-sig (pk-sign/new prikey "")
+      pk-veri (pk-verify/new pubkey "")
+      plain "plaintext"
+      signature (:finish (:update pk-sig plain))]
+  (assert (:finish (:update pk-veri plain) signature)))
+
+(let [ml-kem-priv (privkey/new "ML-KEM" "ML-KEM-1024")
       ml-kem-pub (:get-pubkey ml-kem-priv)
       kem-enc (pk-kem-encrypt/new ml-kem-pub "KDF2(SHA-256)")
       kem-dec (pk-kem-decrypt/new ml-kem-priv "KDF2(SHA-256)")
