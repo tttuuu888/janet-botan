@@ -18,6 +18,7 @@ static int public_key_get_fn(void *data, Janet key, Janet *out);
 /* Janet functions */
 static Janet public_key_to_pem(int32_t argc, Janet *argv);
 static Janet public_key_to_der(int32_t argc, Janet *argv);
+static Janet public_key_to_raw(int32_t argc, Janet *argv);
 static Janet public_key_export(int32_t argc, Janet *argv);
 static Janet public_key_check_key(int32_t argc, Janet *argv);
 static Janet public_key_get_field(int32_t argc, Janet *argv);
@@ -37,6 +38,7 @@ static JanetAbstractType public_key_obj_type = {
 static JanetMethod public_key_methods[] = {
     {"to-pem", public_key_to_pem},
     {"to-der", public_key_to_der},
+    {"to-raw", public_key_to_raw},
     {"check-key", public_key_check_key},
     {"algo-name", public_key_algo_name},
     {"export", public_key_export},
@@ -247,6 +249,24 @@ static Janet public_key_load_ml_kem(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet public_key_load_ed25519(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 32) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_pubkey_load_ed25519(&obj->public_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet public_key_to_pem(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -268,6 +288,19 @@ static Janet public_key_to_der(int32_t argc, Janet *argv) {
 
     view_data_t data;
     int ret = botan_pubkey_view_der(key, &data, (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
+static Janet public_key_to_raw(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
+    botan_pubkey_t key = obj->public_key;
+
+    view_data_t data;
+    int ret = botan_pubkey_view_raw(key, &data, (botan_view_bin_fn)view_bin_func);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_string(janet_string(data.data, data.len));
@@ -434,6 +467,10 @@ static JanetReg public_key_cfuns[] = {
      "(pubkey/load-ml-kem key mode)\n\n"
      "Return a public ML-KEM key based on the given mode."
     },
+    {"pubkey/load-ed25519", public_key_load_ed25519,
+     "(pubkey/load-ed25519 key)\n\n"
+     "Return a public ed25519 key created from a 32-byte raw key value."
+    },
     {"pubkey/export", public_key_export,
      "(pubkey/export pubkey &opt pem)\n\n"
      "Exports the public key using the usual X.509 SPKI representation. "
@@ -442,11 +479,16 @@ static JanetReg public_key_cfuns[] = {
     },
     {"pubkey/to-pem", public_key_to_pem,
      "(pubkey/to-pem pubkey)\n\n"
-     "Return the PEM encoded public key (unencrypted)."
+     "Return the unencrypted PEM encoding of the public key."
     },
     {"pubkey/to-der", public_key_to_der,
      "(pubkey/to-pem pubkey)\n\n"
-     "Return the DER encoded public key (unencrypted)."
+     "Return the unencrypted DER encoding of the public key."
+    },
+    {"pubkey/to-raw", public_key_to_der,
+     "(pubkey/to-raw pubkey)\n\n"
+     "Return the unencrypted canonical raw encoding of the public key. "
+     "This might not be defined for all key types."
     },
     {"pubkey/check-key", public_key_check_key,
      "(pubkey/check-key pubkey rng &opt weak)\n\n"

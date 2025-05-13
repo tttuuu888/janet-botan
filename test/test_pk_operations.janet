@@ -31,7 +31,30 @@
   (assert (= (:agree pk-ka1 (:get-public-point pubkey2) salt 128)
              (:agree pk-ka2 (:get-public-point pubkey1) salt 128))))
 
-(let [ml-kem-priv (privkey/new "ML-KEM""ML-KEM-1024")
+(let [raw-pri "4CCD089B28FF96DA9DB6C346EC114E0F5B8A319F35ABA624DA8CF6ED4FB8A6FB"
+      raw-pub "3D4017C3E843895A92B70AA74D1B7EBC9C982CCF2EC4968CC0CD55F12AF4660C"
+      exp-sig "92A009A9F0D4CAB8720E820B5F642540A2B27B5416503F8FB3762223EBDB69DA085AC1E43E15996E458F3613D0F11D8C387B2EAEB4302AEEB00D291612BB0C00"
+      prikey (privkey/load-ed25519 (hex-decode raw-pri))
+      pubkey (pubkey/load-ed25519 (hex-decode raw-pub))
+      pk-sig (pk-sign/new prikey "")
+      pk-veri (pk-verify/new pubkey "")
+      plain "r"
+      signature (:finish (:update pk-sig plain))]
+  (assert (= raw-pub
+             (hex-encode (:to-raw (:get-pubkey prikey)))
+             (hex-encode (:to-raw pubkey))))
+  (assert (= exp-sig (hex-encode signature)))
+  (assert (:finish (:update pk-veri plain) signature)))
+
+(let [prikey (privkey/new "ML-DSA" "ML-DSA-6x5")
+      pubkey (:get-pubkey prikey)
+      pk-sig (pk-sign/new prikey "")
+      pk-veri (pk-verify/new pubkey "")
+      plain "plaintext"
+      signature (:finish (:update pk-sig plain))]
+  (assert (:finish (:update pk-veri plain) signature)))
+
+(let [ml-kem-priv (privkey/new "ML-KEM" "ML-KEM-1024")
       ml-kem-pub (:get-pubkey ml-kem-priv)
       kem-enc (pk-kem-encrypt/new ml-kem-pub "KDF2(SHA-256)")
       kem-dec (pk-kem-decrypt/new ml-kem-priv "KDF2(SHA-256)")

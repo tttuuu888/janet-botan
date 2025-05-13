@@ -20,6 +20,7 @@ static Janet private_key_new(int32_t argc, Janet *argv);
 static Janet private_key_get_public_key(int32_t argc, Janet *argv);
 static Janet private_key_to_pem(int32_t argc, Janet *argv);
 static Janet private_key_to_der(int32_t argc, Janet *argv);
+static Janet private_key_to_raw(int32_t argc, Janet *argv);
 static Janet private_key_check_key(int32_t argc, Janet *argv);
 static Janet private_key_algo_name(int32_t argc, Janet *argv);
 static Janet private_key_export(int32_t argc, Janet *argv);
@@ -39,6 +40,7 @@ static JanetMethod private_key_methods[] = {
     {"get-pubkey", private_key_get_public_key},
     {"to-pem", private_key_to_pem},
     {"to-der", private_key_to_der},
+    {"to-raw", private_key_to_raw},
     {"check-key", private_key_check_key},
     {"algo-name", private_key_algo_name},
     {"export", private_key_export},
@@ -280,6 +282,24 @@ static Janet private_key_load_ml_kem(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet private_key_load_ed25519(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 32) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_privkey_load_ed25519(&obj->private_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet private_key_get_public_key(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -316,6 +336,19 @@ static Janet private_key_to_der(int32_t argc, Janet *argv) {
 
     view_data_t data;
     int ret = botan_privkey_view_der(key, &data, (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
+static Janet private_key_to_raw(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    view_data_t data;
+    int ret = botan_privkey_view_raw(key, &data, (botan_view_bin_fn)view_bin_func);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_string(janet_string(data.data, data.len));
@@ -463,17 +496,26 @@ static JanetReg private_key_cfuns[] = {
      "(privkey/load-ml-kem key mode)\n\n"
      "Return a private ML-KEM key based on the given mode."
     },
+    {"privkey/load-ed25519", private_key_load_ed25519,
+     "(privkey/load-ed25519 key)\n\n"
+     "Return a private ed25519 key created from a 32-byte raw key value."
+    },
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"
      "Return a `pubkey` object."
     },
     {"privkey/to-pem", private_key_to_pem,
      "(privkey/to-pem privkey)\n\n"
-     "Return the PEM encoded private key (unencrypted)."
+     "Return the unencrypted PEM encoding of the private key."
     },
     {"privkey/to-der", private_key_to_der,
      "(privkey/to-der privkey)\n\n"
-     "Return the DER encoded private key (unencrypted)."
+     "Return the unencrypted DER encoding of the private key."
+    },
+    {"privkey/to-raw", private_key_to_raw,
+     "(privkey/to-raw privkey)\n\n"
+     "Return the unencrypted canonical raw encoding of the private key. "
+     "This might not be defined for all key types."
     },
     {"privkey/check-key", private_key_check_key,
      "(privkey/check-key privkey rng &opt weak)\n\n"
