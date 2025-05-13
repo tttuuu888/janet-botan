@@ -282,6 +282,24 @@ static Janet private_key_load_ml_kem(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet private_key_load_ed25519(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 32) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_privkey_load_ed25519(&obj->private_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet private_key_get_public_key(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -477,6 +495,10 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/load-ml-kem", private_key_load_ml_kem,
      "(privkey/load-ml-kem key mode)\n\n"
      "Return a private ML-KEM key based on the given mode."
+    },
+    {"privkey/load-ed25519", private_key_load_ed25519,
+     "(privkey/load-ed25519 key)\n\n"
+     "Return a private ed25519 key created from a 32-byte raw key value."
     },
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"

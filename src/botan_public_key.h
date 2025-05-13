@@ -249,6 +249,24 @@ static Janet public_key_load_ml_kem(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet public_key_load_ed25519(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 32) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_pubkey_load_ed25519(&obj->public_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet public_key_to_pem(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -448,6 +466,10 @@ static JanetReg public_key_cfuns[] = {
     {"pubkey/load-ml-kem", public_key_load_ml_kem,
      "(pubkey/load-ml-kem key mode)\n\n"
      "Return a public ML-KEM key based on the given mode."
+    },
+    {"pubkey/load-ed25519", public_key_load_ed25519,
+     "(pubkey/load-ed25519 key)\n\n"
+     "Return a public ed25519 key created from a 32-byte raw key value."
     },
     {"pubkey/export", public_key_export,
      "(pubkey/export pubkey &opt pem)\n\n"
