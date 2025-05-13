@@ -21,14 +21,14 @@
     <div class="twocol">
       <div class="toc toc-hidden">
         <ul>
-          <li><span><a href="../index.html">Janet-botan</a></span></li><li class="caret"><span><a href="index.html">API</a></span><ul><li><span><a href="versioning.html">Versioning</a></span></li><li><span><a href="utiltity.html">Utility</a></span></li><li><span><a href="rng.html">Random Number Generators</a></span></li><li><span><a href="block_cipher.html">Block Ciphers</a></span></li><li><span><a href="hash.html">Hash Functions</a></span></li><li><span><a href="mac.html">Message Authentication Codes</a></span></li><li><span><a href="cipher.html">Symmetric Ciphers</a></span></li><li><span><a href="pbkdf.html">PBKDF</a></span></li><li><span><a href="kdf.html">KDF</a></span></li><li><span><a href="mpi.html">Multiple Precision Integers</a></span></li><li><span><a href="oid.html">Object Identifiers</a></span></li><li><span class="selected"><a href="bcrypt.html">Bcrypt</a></span></li><li><span><a href="private_key.html">Private Key</a></span></li><li><span><a href="public_key.html">Public Key</a></span></li><li><span><a href="pk_operations.html">Public Key Operations</a></span></li><li><span><a href="x509_cert.html">X509 Certificate</a></span></li><li><span><a href="x509_crl.html">X509 CRL</a></span></li><li><span><a href="nist_key_wrapping.html">NIST Key Wrapping</a></span></li><li><span><a href="script.html">Scrypt</a></span></li><li><span><a href="hotp.html">HOTP</a></span></li><li><span><a href="totp.html">TOTP</a></span></li><li><span><a href="fpe.html">Format Preserving Encryption</a></span></li><li><span><a href="srp6.html">SRP6 Server Session</a></span></li><li><span><a href="zfec.html">ZFEC Forward Error Correction</a></span></li></ul></li>
+          <li><span><a href="../index.html">Janet-botan</a></span></li><li class="caret"><span><a href="index.html">API</a></span><ul><li><span><a href="versioning.html">Versioning</a></span></li><li><span><a href="utiltity.html">Utility</a></span></li><li><span><a href="rng.html">Random Number Generators</a></span></li><li><span><a href="block_cipher.html">Block Ciphers</a></span></li><li><span><a href="hash.html">Hash Functions</a></span></li><li><span><a href="mac.html">Message Authentication Codes</a></span></li><li><span><a href="cipher.html">Symmetric Ciphers</a></span></li><li><span><a href="pbkdf.html">PBKDF</a></span></li><li><span><a href="kdf.html">KDF</a></span></li><li><span><a href="mpi.html">Multiple Precision Integers</a></span></li><li><span class="selected"><a href="bcrypt.html">Bcrypt</a></span></li><li><span><a href="oid.html">Object Identifiers</a></span></li><li><span><a href="private_key.html">Private Key</a></span></li><li><span><a href="public_key.html">Public Key</a></span></li><li><span><a href="pk_operations.html">Public Key Operations</a></span></li><li><span><a href="x509_cert.html">X509 Certificate</a></span></li><li><span><a href="x509_crl.html">X509 CRL</a></span></li><li><span><a href="nist_key_wrapping.html">NIST Key Wrapping</a></span></li><li><span><a href="script.html">Scrypt</a></span></li><li><span><a href="hotp.html">HOTP</a></span></li><li><span><a href="totp.html">TOTP</a></span></li><li><span><a href="fpe.html">Format Preserving Encryption</a></span></li><li><span><a href="srp6.html">SRP6 Server Session</a></span></li><li><span><a href="zfec.html">ZFEC Forward Error Correction</a></span></li></ul></li>
         </ul>
       </div>
       <div class="content-wrapper">
         <h1>Bcrypt</h1>
         <div class="prevnext-bar">
-          <span class="prev"><a href="oid.html"><span class="prevnext-text">Object Identifiers</span></a></span>
-          <span class="next"><a href="private_key.html"><span class="prevnext-text">Private Key</span></a></span>
+          <span class="prev"><a href="mpi.html"><span class="prevnext-text">Multiple Precision Integers</span></a></span>
+          <span class="next"><a href="oid.html"><span class="prevnext-text">Object Identifiers</span></a></span>
         </div>
         
 
@@ -38,8 +38,8 @@
 </h2>
 <div class="docstring"><div class="binding-wrap"><span class="binding"><a id="bcrypt">bcrypt</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">bcrypt</span> <span class="mdzsyn-symbol">password</span> <span class="mdzsyn-symbol">rng</span> <span class="mdzsyn-symbol">&amp;opt</span> <span class="mdzsyn-symbol">work-factor</span>)</code></pre><p>Provided the password and an RNG object, returns a bcrypt string.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="bcrypt-is-valid">bcrypt-is-valid</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">bcrypt-is-valid</span> <span class="mdzsyn-symbol">password</span> <span class="mdzsyn-symbol">bcrypt</span>)</code></pre><p>Check a bcrypt hash against the provided password, returning true if the password matches.</p></div>
         <div class="prevnext-bar">
-          <span class="prev"><a href="oid.html"><span class="prevnext-text">Object Identifiers</span></a></span>
-          <span class="next"><a href="private_key.html"><span class="prevnext-text">Private Key</span></a></span>
+          <span class="prev"><a href="mpi.html"><span class="prevnext-text">Multiple Precision Integers</span></a></span>
+          <span class="next"><a href="oid.html"><span class="prevnext-text">Object Identifiers</span></a></span>
         </div>
       </div>
     </div>
