@@ -1,7 +1,7 @@
 {:title "Message Authentication Codes"
  :author "Seungki Kim"
  :license "MIT license"
- :template "mdzdoc/main.html"
+ :template "docpage.html"
  :order 6}
 ---
 
