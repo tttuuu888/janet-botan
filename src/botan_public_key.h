@@ -18,6 +18,7 @@ static int public_key_get_fn(void *data, Janet key, Janet *out);
 /* Janet functions */
 static Janet public_key_to_pem(int32_t argc, Janet *argv);
 static Janet public_key_to_der(int32_t argc, Janet *argv);
+static Janet public_key_to_raw(int32_t argc, Janet *argv);
 static Janet public_key_export(int32_t argc, Janet *argv);
 static Janet public_key_check_key(int32_t argc, Janet *argv);
 static Janet public_key_get_field(int32_t argc, Janet *argv);
@@ -37,6 +38,7 @@ static JanetAbstractType public_key_obj_type = {
 static JanetMethod public_key_methods[] = {
     {"to-pem", public_key_to_pem},
     {"to-der", public_key_to_der},
+    {"to-raw", public_key_to_raw},
     {"check-key", public_key_check_key},
     {"algo-name", public_key_algo_name},
     {"export", public_key_export},
@@ -273,6 +275,19 @@ static Janet public_key_to_der(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(data.data, data.len));
 }
 
+static Janet public_key_to_raw(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
+    botan_pubkey_t key = obj->public_key;
+
+    view_data_t data;
+    int ret = botan_pubkey_view_raw(key, &data, (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
 static Janet public_key_export(int32_t argc, Janet *argv) {
     janet_arity(argc, 1, 2);
 
@@ -442,11 +457,16 @@ static JanetReg public_key_cfuns[] = {
     },
     {"pubkey/to-pem", public_key_to_pem,
      "(pubkey/to-pem pubkey)\n\n"
-     "Return the PEM encoded public key (unencrypted)."
+     "Return the unencrypted PEM encoding of the public key."
     },
     {"pubkey/to-der", public_key_to_der,
      "(pubkey/to-pem pubkey)\n\n"
-     "Return the DER encoded public key (unencrypted)."
+     "Return the unencrypted DER encoding of the public key."
+    },
+    {"pubkey/to-raw", public_key_to_der,
+     "(pubkey/to-raw pubkey)\n\n"
+     "Return the unencrypted canonical raw encoding of the public key. "
+     "This might not be defined for all key types."
     },
     {"pubkey/check-key", public_key_check_key,
      "(pubkey/check-key pubkey rng &opt weak)\n\n"
