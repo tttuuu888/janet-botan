@@ -14,6 +14,7 @@ typedef struct botan_oid_obj {
 /* Abstract Object functions */
 static int oid_gc_fn(void *data, size_t len);
 static int oid_get_fn(void *data, Janet key, Janet *out);
+static void oid_tostring_fn(void *p, JanetBuffer *buffer);
 static int oid_compare_fn(void *lhs, void *rhs);
 
 /* Janet functions */
@@ -29,7 +30,7 @@ static JanetAbstractType oid_obj_type = {
     NULL,   // put
     NULL,   // marshal
     NULL,   // unmarshal
-    NULL,   // tostring
+    oid_tostring_fn,
     oid_compare_fn,
     JANET_ATEND_HASH
 };
@@ -62,6 +63,21 @@ static int oid_get_fn(void *data, Janet key, Janet *out) {
     }
 
     return janet_getmethod(janet_unwrap_keyword(key), oid_methods, out);
+}
+
+static void oid_tostring_fn(void *p, JanetBuffer *buffer) {
+    botan_oid_obj_t *obj = (botan_oid_obj_t *)p;
+    botan_asn1_oid_t oid = obj->oid;
+
+    view_data_t str;
+    int ret = botan_oid_view_string(oid, &str, (botan_view_str_fn)view_str_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    view_data_t name;
+    ret = botan_oid_view_name(oid, &name, (botan_view_str_fn)view_str_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    janet_formatb(buffer, "[string=\"%s\" name=\"%s\"]", str.data, name.data);
 }
 
 static int oid_compare_fn(void *lhs, void *rhs) {
