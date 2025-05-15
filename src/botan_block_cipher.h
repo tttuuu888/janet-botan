@@ -9,7 +9,6 @@
 
 typedef struct botan_block_cipher_obj {
     botan_block_cipher_t block_cipher;
-    JanetString name;
 } botan_block_cipher_obj_t;
 
 /* Abstract Object functions */
@@ -75,7 +74,14 @@ static int block_cipher_get_fn(void *data, Janet key, Janet *out) {
 
 static void block_cipher_tostring_fn(void *p, JanetBuffer *buffer) {
     botan_block_cipher_obj_t *obj = (botan_block_cipher_obj_t *)p;
-    janet_formatb(buffer, "[%s]", obj->name);
+    botan_block_cipher_t bc = obj->block_cipher;
+    size_t len = 32;
+    char name[32] = {0,};
+
+    int ret = botan_block_cipher_name(bc, name, &len);
+    JANET_BOTAN_ASSERT(ret);
+
+    janet_formatb(buffer, "[%s]", name);
 }
 
 /* Janet functions */
@@ -86,8 +92,6 @@ static Janet block_cipher_new(int32_t argc, Janet *argv) {
 
     int ret = botan_block_cipher_init(&obj->block_cipher, name);
     JANET_BOTAN_ASSERT(ret);
-
-    obj->name = janet_string((const uint8_t *)name, strlen(name));
 
     return janet_wrap_abstract(obj);
 }
