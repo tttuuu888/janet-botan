@@ -77,7 +77,10 @@ static void oid_tostring_fn(void *p, JanetBuffer *buffer) {
     ret = botan_oid_view_name(oid, &name, (botan_view_str_fn)view_str_func);
     JANET_BOTAN_ASSERT(ret);
 
-    janet_formatb(buffer, "[string=\"%s\" name=\"%s\"]", str.data, name.data);
+    janet_formatb(buffer,
+                  "[string=\"%s\" name=\"%s\"]",
+                  janet_string(str.data, str.len),
+                  janet_string(name.data, name.len));
 }
 
 static int oid_compare_fn(void *lhs, void *rhs) {

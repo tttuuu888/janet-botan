@@ -9,12 +9,14 @@
 
 typedef struct botan_cipher_obj {
     botan_cipher_t cipher;
+    JanetString name;
     bool is_encrypt;
 } botan_cipher_obj_t;
 
 /* Abstract Object functions */
 static int cipher_gc_fn(void *data, size_t len);
 static int cipher_get_fn(void *data, Janet key, Janet *out);
+static void cipher_tostring_fn(void *p, JanetBuffer *buffer);
 
 /* Janet functions */
 static Janet cipher_new(int32_t argc, Janet *argv);
@@ -37,7 +39,11 @@ static JanetAbstractType cipher_obj_type = {
     cipher_gc_fn,
     NULL,
     cipher_get_fn,
-    JANET_ATEND_GET
+    NULL,   // put
+    NULL,   // marshal
+    NULL,   // unmarshal
+    cipher_tostring_fn,
+    JANET_ATEND_COMPARE
 };
 
 static JanetMethod cipher_methods[] = {
@@ -80,6 +86,12 @@ static int cipher_get_fn(void *data, Janet key, Janet *out) {
     return janet_getmethod(janet_unwrap_keyword(key), cipher_methods, out);
 }
 
+static void cipher_tostring_fn(void *p, JanetBuffer *buffer) {
+    botan_cipher_obj_t *obj = (botan_cipher_obj_t *)p;
+
+    janet_formatb(buffer, "[%s, %s]", obj->name, obj->is_encrypt ? "Encrypt" : "Decrypt");
+}
+
 /* Janet functions */
 static Janet cipher_new(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
@@ -101,6 +113,8 @@ static Janet cipher_new(int32_t argc, Janet *argv) {
 
     int ret = botan_cipher_init(&obj->cipher, name, flag);
     JANET_BOTAN_ASSERT(ret);
+
+    obj->name = janet_string((const uint8_t *)name, strlen(name));
 
     return janet_wrap_abstract(obj);
 }
