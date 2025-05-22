@@ -1,0 +1,14 @@
+{:title "EC Groups"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "docpage.html"
+ :order 13}
+---
+
+## Index
+
+@api-index[/build/botan][ec-group/]
+
+## Reference
+
+@api-docs[/build/botan][ec-group/]

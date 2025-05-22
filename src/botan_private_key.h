@@ -104,6 +104,37 @@ static Janet private_key_new(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet private_key_new_ec(int32_t argc, Janet *argv) {
+    janet_arity(argc, 2, 3);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    botan_rng_t rng;
+    const char *algo = janet_getcstring(argv, 0);
+
+    botan_ec_group_obj_t *obj1 = janet_getabstract(argv, 1, get_ec_group_obj_type());
+    botan_ec_group_t ec_group = obj1->ec_group;
+
+    if (argc == 3) {
+        botan_rng_obj_t *obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
+        rng = obj2->rng;
+    } else {
+        botan_rng_obj_t *obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+        memset(obj2, 0, sizeof(botan_rng_obj_t));
+
+        ret = botan_rng_init(&obj2->rng, "system");
+        JANET_BOTAN_ASSERT(ret);
+        rng = obj2->rng;
+    }
+
+    ret = botan_ec_privkey_create(&obj->private_key, algo, ec_group, rng);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet private_key_load(int32_t argc, Janet *argv) {
     janet_arity(argc, 1, 2);
 
@@ -458,6 +489,10 @@ static JanetReg private_key_cfuns[] = {
      "\"ecdh\" there is also a special case for group \"curve25519\" (which "
      "is actually a completely distinct key type with a non-standard encoding)."
      " Use `rng` if provided."
+    },
+    {"privkey/new-ec", private_key_new_ec,
+     "(privkey/new-ec algo ec-group &opt rng)\n\n"
+     "Creates a new EC Group private key. Use `rng` if provided."
     },
     {"privkey/load", private_key_load,
      "(privkey/load blob &opt password)\n\n"
