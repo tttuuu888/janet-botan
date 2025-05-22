@@ -1,0 +1,69 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="../css/main.css" type="text/css" charset="utf-8">
+    <title>EC Groups</title>
+    <meta name="description" content="">
+  </head>
+  <body>
+    <!-- Toggles Navigation -->
+    <div id="toc-toggle" class="">
+      <div class="bar topbar"></div>
+      <div class="bar"></div>
+      <div class="bar botbar"></div>
+    </div>
+    <div class="twocol">
+      <div class="toc toc-hidden">
+        <ul>
+          <li><span><a href="../index.html">Janet-botan</a></span></li><li class="caret"><span><a href="index.html">API</a></span><ul><li><span><a href="versioning.html">Versioning</a></span></li><li><span><a href="utiltity.html">Utility</a></span></li><li><span><a href="rng.html">Random Number Generators</a></span></li><li><span><a href="block_cipher.html">Block Ciphers</a></span></li><li><span><a href="hash.html">Hash Functions</a></span></li><li><span><a href="mac.html">Message Authentication Codes</a></span></li><li><span><a href="cipher.html">Symmetric Ciphers</a></span></li><li><span><a href="pbkdf.html">PBKDF</a></span></li><li><span><a href="kdf.html">KDF</a></span></li><li><span><a href="mpi.html">Multiple Precision Integers</a></span></li><li><span><a href="bcrypt.html">Bcrypt</a></span></li><li><span><a href="oid.html">Object Identifiers</a></span></li><li><span class="selected"><a href="ec_group.html">EC Groups</a></span></li><li><span><a href="private_key.html">Private Key</a></span></li><li><span><a href="public_key.html">Public Key</a></span></li><li><span><a href="pk_operations.html">Public Key Operations</a></span></li><li><span><a href="x509_cert.html">X509 Certificate</a></span></li><li><span><a href="x509_crl.html">X509 CRL</a></span></li><li><span><a href="nist_key_wrapping.html">NIST Key Wrapping</a></span></li><li><span><a href="script.html">Scrypt</a></span></li><li><span><a href="hotp.html">HOTP</a></span></li><li><span><a href="totp.html">TOTP</a></span></li><li><span><a href="fpe.html">Format Preserving Encryption</a></span></li><li><span><a href="srp6.html">SRP6 Server Session</a></span></li><li><span><a href="zfec.html">ZFEC Forward Error Correction</a></span></li></ul></li>
+        </ul>
+      </div>
+      <div class="content-wrapper">
+        <h1>EC Groups</h1>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="oid.html"><span class="prevnext-text">Object Identifiers</span></a></span>
+          <span class="next"><a href="private_key.html"><span class="prevnext-text">Private Key</span></a></span>
+        </div>
+        
+
+<h2 id="Index-2">Index
+</h2>
+<p><a href="#ec-group/from-ber">ec-group/from-ber</a><span class="divider"> </span><a href="#ec-group/from-name">ec-group/from-name</a><span class="divider"> </span><a href="#ec-group/from-oid">ec-group/from-oid</a><span class="divider"> </span><a href="#ec-group/from-params">ec-group/from-params</a><span class="divider"> </span><a href="#ec-group/from-pem">ec-group/from-pem</a><span class="divider"> </span><a href="#ec-group/get-a">ec-group/get-a</a><span class="divider"> </span><a href="#ec-group/get-b">ec-group/get-b</a><span class="divider"> </span><a href="#ec-group/get-curve-oid">ec-group/get-curve-oid</a><span class="divider"> </span><a href="#ec-group/get-gx">ec-group/get-gx</a><span class="divider"> </span><a href="#ec-group/get-gy">ec-group/get-gy</a><span class="divider"> </span><a href="#ec-group/get-order">ec-group/get-order</a><span class="divider"> </span><a href="#ec-group/get-p">ec-group/get-p</a><span class="divider"> </span><a href="#ec-group/supports-application-specific-group">ec-group/supports-application-specific-group</a><span class="divider"> </span><a href="#ec-group/supports-named-group">ec-group/supports-named-group</a><span class="divider"> </span><a href="#ec-group/to-der">ec-group/to-der</a><span class="divider"> </span><a href="#ec-group/to-pem">ec-group/to-pem</a></p><h2 id="Reference-2">Reference
+</h2>
+<div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/from-ber">ec-group/from-ber</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/from-ber</span> <span class="mdzsyn-symbol">ber</span>)</code></pre><p>Create a new EC Group from a BER encoded ECC domain parameter set.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/from-name">ec-group/from-name</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/from-name</span> <span class="mdzsyn-symbol">name</span>)</code></pre><p>Create a new EC Group from a common group name (e.g., "secp256r1").</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/from-oid">ec-group/from-oid</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/from-oid</span> <span class="mdzsyn-symbol">oid</span>)</code></pre><p>Create a new EC Group from a group named by an object identifier.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/from-params">ec-group/from-params</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/from-params</span> <span class="mdzsyn-symbol">oid</span> <span class="mdzsyn-symbol">p</span> <span class="mdzsyn-symbol">a</span> <span class="mdzsyn-symbol">b</span> <span class="mdzsyn-symbol">gx</span> <span class="mdzsyn-symbol">gy</span> <span class="mdzsyn-symbol">order</span>)</code></pre><p>Create a new EC Group from the given parameters. The `oid` is an OID object, `p`, `a`, `b`, `gx`, gy` and `order` are MPI objects.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/from-pem">ec-group/from-pem</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/from-pem</span> <span class="mdzsyn-symbol">pem</span>)</code></pre><p>Create a new EC Group from the PEM/ASN.1 encoding.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/get-a">ec-group/get-a</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/get-a</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns the MPI object representing the `a` parameter of the elliptic curve equation.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/get-b">ec-group/get-b</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/get-b</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns the MPI object representing the `b` parameter of the elliptic curve equation.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/get-curve-oid">ec-group/get-curve-oid</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/get-curve-oid</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns the curve OID object of an EC Group.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/get-gx">ec-group/get-gx</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/get-gx</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns the MPI object representing the `x` coordinate of the base point.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/get-gy">ec-group/get-gy</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/get-gy</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns the MPI object representing the `y` coordinate of the base point.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/get-order">ec-group/get-order</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/get-order</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns the MPI object representing the order of the base point.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/get-p">ec-group/get-p</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/get-p</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns the MPI object representing the prime modulus of the elliptic curve field.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/supports-application-specific-group">ec-group/supports-application-specific-group</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/supports-application-specific-group</span>)</code></pre><p>Returns true if it is possible to register an application specific elliptic curve, false otherwise.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/supports-named-group">ec-group/supports-named-group</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/supports-named-group</span> <span class="mdzsyn-symbol">name</span>)</code></pre><p>Returns true if `name` is a supported EC group, false otherwise.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/to-der">ec-group/to-der</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/to-der</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns an EC Group in DER encoding.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-group/to-pem">ec-group/to-pem</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-group/to-pem</span> <span class="mdzsyn-symbol">ec-group-obj</span>)</code></pre><p>Returns an EC Group in PEM encoding.</p></div>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="oid.html"><span class="prevnext-text">Object Identifiers</span></a></span>
+          <span class="next"><a href="private_key.html"><span class="prevnext-text">Private Key</span></a></span>
+        </div>
+      </div>
+    </div>
+    <script charset="utf-8">
+      function toggleToc() {
+        var toggler = document.getElementById('toc-toggle');
+        var wrapper = document.querySelector('.toc');
+        wrapper.classList.toggle('toc-hidden');
+        toggler.classList.toggle('open');
+        window.localStorage.setItem('show-toc', toggler.classList.contains('open'));
+      }
+      function addTocToggle() {
+        var el = document.getElementById('toc-toggle');
+        el.addEventListener('click', toggleToc);
+      }
+      window.addEventListener('DOMContentLoaded', addTocToggle);
+      if (window.localStorage.getItem('show-toc') === 'true') {
+        toggleToc()
+      }
+    </script>
+    <footer>
+      <div class="content-wrapper">
+        Copyright &copy; Seungki Kim 2025
+      </div>
+    </footer>
+  </body>
+</html>
