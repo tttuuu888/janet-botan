@@ -27,6 +27,7 @@ static Janet private_key_export(int32_t argc, Janet *argv);
 static Janet private_key_get_field(int32_t argc, Janet *argv);
 static Janet private_key_stateful_operation(int32_t argc, Janet *argv);
 static Janet private_key_remaining_operations(int32_t argc, Janet *argv);
+static Janet private_key_oid(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -47,6 +48,7 @@ static JanetMethod private_key_methods[] = {
     {"get-field", private_key_get_field},
     {"stateful-operation", private_key_stateful_operation},
     {"remaining-operations", private_key_remaining_operations},
+    {"oid", private_key_oid},
 
     {NULL, NULL},
 };
@@ -480,6 +482,21 @@ static Janet private_key_remaining_operations(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)r);
 }
 
+static Janet private_key_oid(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    botan_oid_obj_t *obj1 = janet_abstract(&oid_obj_type, sizeof(botan_oid_obj_t));
+    memset(obj1, 0, sizeof(botan_oid_obj_t));
+
+    int ret = botan_privkey_oid(&obj1->oid, key);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj1);
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo param &opt rng)\n\n"
@@ -582,6 +599,10 @@ static JanetReg private_key_cfuns[] = {
      "(privkey/remaining-operations privkey)\n\n"
      "Return the number of remaining operations. If the key is not stateful, "
      "an error will be occurred."
+    },
+    {"privkey/oid", private_key_oid,
+     "(privkey/oid pubkey)\n\n"
+     "Return the key's associated OID."
     },
 
     {NULL, NULL, NULL}
