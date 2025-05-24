@@ -21,6 +21,15 @@
   (assert (= (:to-name oid1)) oid-rsa-name)
   (assert (= (:to-name oid2)) oid-rsa-name))
 
+(let [prikey-rsa (privkey/new "RSA" "1024")
+      pubkey-rsa (:get-pubkey prikey-rsa)
+      oid-rsa-priv (:oid prikey-rsa)
+      oid-rsa-pub (:oid pubkey-rsa)
+      oid-rsa (oid/from-string "RSA")]
+  (assert (= oid-rsa oid-rsa-priv oid-rsa-pub))
+  (assert (= (:to-string oid-rsa) (:to-string oid-rsa-priv) (:to-string oid-rsa-pub)))
+  (assert (= (:to-name oid-rsa) (:to-name oid-rsa-priv) (:to-name oid-rsa-pub))))
+
 (let [oid1 (oid/from-string "1.2.3.4.5.6")
       oid2 (oid/from-string "1.2.3.4.5.6")
       oid3 (oid/from-string "1.2.3.4")]
