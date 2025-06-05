@@ -177,13 +177,15 @@ static Janet srp6_client_agree(int32_t argc, Janet *argv) {
     const char *hash = janet_getcstring(argv, 3);
     JanetByteView salt = janet_getbytes(argv, 4);
     JanetByteView B = janet_getbytes(argv, 5);
+
+    botan_rng_obj_t *obj2;
     botan_rng_t rng;
 
     if (argc == 7) {
-        botan_rng_obj_t *obj2 = janet_getabstract(argv, 6, get_rng_obj_type());
+        obj2 = janet_getabstract(argv, 6, get_rng_obj_type());
         rng = obj2->rng;
     } else {
-        botan_rng_obj_t *obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+        obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
         memset(obj2, 0, sizeof(botan_rng_obj_t));
         ret = botan_rng_init(&obj2->rng, "system");
         JANET_BOTAN_ASSERT(ret);

@@ -81,13 +81,15 @@ static Janet pk_encrypt_encrypt(int32_t argc, Janet *argv) {
 
     JanetByteView msg = janet_getbytes(argv, 1);
     size_t out_len = 0;
+
+    botan_rng_obj_t *obj2;
     botan_rng_t rng;
 
     if (argc == 3) {
-        botan_rng_obj_t *obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
+        obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
         rng = obj2->rng;
     } else {
-        botan_rng_obj_t *obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+        obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
         memset(obj2, 0, sizeof(botan_rng_obj_t));
 
         ret = botan_rng_init(&obj2->rng, "system");
