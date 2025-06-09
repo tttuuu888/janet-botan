@@ -52,4 +52,8 @@
   (assert-error "Error expected" (:to-u32 mpi1))
   (assert (= (:to-bin mpi1)) (hex-decode long-hex-input)))
 
+(let [mpi1 (mpi/new-random 10)
+      mpi2 (mpi/new-random 10 (rng/new))]
+  (assert (not (= mpi1 mpi2))))
+
 (end-suite)
