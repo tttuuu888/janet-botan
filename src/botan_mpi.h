@@ -18,11 +18,7 @@ static int mpi_compare_fn(void *p1, void *p2);
 
 /* Janet functions */
 static Janet mpi_new(int32_t argc, Janet *argv);
-static Janet mpi_new_int(int32_t argc, Janet *argv);
-static Janet mpi_new_str(int32_t argc, Janet *argv);
-static Janet mpi_new_hex_str(int32_t argc, Janet *argv);
-static Janet mpi_new_mpi(int32_t argc, Janet *argv);
-static Janet mpi_new_rng(int32_t argc, Janet *argv);
+static Janet mpi_new_random(int32_t argc, Janet *argv);
 static Janet mpi_inverse_mod(int32_t argc, Janet *argv);
 static Janet mpi_pow_mod(int32_t argc, Janet *argv);
 static Janet mpi_mod_mul(int32_t argc, Janet *argv);
@@ -121,39 +117,50 @@ static int mpi_compare_fn(void *p1, void *p2) {
 
 /* Janet functions */
 static Janet mpi_new(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 0);
+    janet_arity(argc, 0, 2);
     botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
     memset(obj, 0, sizeof(botan_mpi_obj_t));
 
     int ret = botan_mp_init(&obj->mpi);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_abstract(obj);
-}
+    if (argc == 0) {
+        /* MPI with zero value */
+        return janet_wrap_abstract(obj);
+    } else if (argc == 2) {
+        /* MPI with hex string */
+        JanetByteView val = janet_getbytes(argv, 0);
+        ret = botan_mp_set_from_radix_str(obj->mpi, (const char *)val.bytes, 16);
+        JANET_BOTAN_ASSERT(ret);
 
-static Janet mpi_new_int(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
-    memset(obj, 0, sizeof(botan_mpi_obj_t));
+        return janet_wrap_abstract(obj);
+    }
 
-    int ret = botan_mp_init(&obj->mpi);
-    JANET_BOTAN_ASSERT(ret);
+    Janet value = argv[0];
+    if (janet_checktype(value, JANET_NUMBER)) {
+        /* MPI with integer number */
+        int64_t x = janet_getinteger64(argv, 0);
+        ret = botan_mp_set_from_int(obj->mpi, x);
+        JANET_BOTAN_ASSERT(ret);
 
-    int64_t x = janet_getinteger64(argv, 0);
-    ret = botan_mp_set_from_int(obj->mpi, x);
-    JANET_BOTAN_ASSERT(ret);
+        return janet_wrap_abstract(obj);
+    }
 
-    return janet_wrap_abstract(obj);
-}
+    if (janet_checktype(value, JANET_ABSTRACT)) {
+        /* MPI with MPI instance */
+        botan_mpi_obj_t *obj2 = janet_getabstract(argv, 0, get_mpi_obj_type());
+        botan_mp_t mpi2 = obj2->mpi;
+        ret = botan_mp_set_from_mp(obj->mpi, mpi2);
+        JANET_BOTAN_ASSERT(ret);
 
-static Janet mpi_new_str(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
-    memset(obj, 0, sizeof(botan_mpi_obj_t));
+        return janet_wrap_abstract(obj);
+    }
 
-    int ret = botan_mp_init(&obj->mpi);
-    JANET_BOTAN_ASSERT(ret);
+    if (!janet_checktype(value, JANET_STRING)) {
+        janet_panic("Unexpected argument");
+    }
 
+    /* MPI with integer string */
     JanetByteView val = janet_getbytes(argv, 0);
     ret = botan_mp_set_from_str(obj->mpi, (const char *)val.bytes);
     JANET_BOTAN_ASSERT(ret);
@@ -161,48 +168,31 @@ static Janet mpi_new_str(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
-static Janet mpi_new_hex_str(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-    botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
-    memset(obj, 0, sizeof(botan_mpi_obj_t));
-
-    int ret = botan_mp_init(&obj->mpi);
-    JANET_BOTAN_ASSERT(ret);
-    JanetByteView val = janet_getbytes(argv, 0);
-
-    ret = botan_mp_set_from_radix_str(obj->mpi, (const char *)val.bytes, 16);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_abstract(obj);
-}
-
-static Janet mpi_new_mpi(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
+static Janet mpi_new_random(int32_t argc, Janet *argv) {
+    janet_arity(argc, 1, 2);
     botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
     memset(obj, 0, sizeof(botan_mpi_obj_t));
 
     int ret = botan_mp_init(&obj->mpi);
     JANET_BOTAN_ASSERT(ret);
 
-    botan_mpi_obj_t *obj2 = janet_getabstract(argv, 0, get_mpi_obj_type());
-    botan_mp_t mpi2 = obj2->mpi;
-    ret = botan_mp_set_from_mp(obj->mpi, mpi2);
-    JANET_BOTAN_ASSERT(ret);
+    botan_rng_obj_t *obj2;
+    botan_rng_t rng;
 
-    return janet_wrap_abstract(obj);
-}
+    if (argc == 1) {
+        obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+        memset(obj2, 0, sizeof(botan_rng_obj_t));
 
-static Janet mpi_new_rng(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 2);
-    botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
-    memset(obj, 0, sizeof(botan_mpi_obj_t));
+        ret = botan_rng_init(&obj2->rng, "system");
+        JANET_BOTAN_ASSERT(ret);
+        rng = obj2->rng;
 
-    int ret = botan_mp_init(&obj->mpi);
-    JANET_BOTAN_ASSERT(ret);
+    } else {
+        obj2 = janet_getabstract(argv, 1, get_rng_obj_type());
+        rng = obj2->rng;
+    }
 
-    botan_rng_obj_t *obj2 = janet_getabstract(argv, 0, get_rng_obj_type());
-    botan_rng_t rng = obj2->rng;
-    size_t bits = janet_getsize(argv, 1);
+    size_t bits = janet_getsize(argv, 0);
     ret = botan_mp_rand_bits(obj->mpi, rng, bits);
     JANET_BOTAN_ASSERT(ret);
 
@@ -597,28 +587,21 @@ static Janet mpi_to_bin(int32_t argc, Janet *argv) {
 
 static JanetReg mpi_cfuns[] = {
     {"mpi/new", mpi_new,
-     "(mpi/new)\n\n"
-     "Create a new zero-valued MPI. Returns `mpi-obj`."
+     "(mpi/new &opt value radix)\n\n"
+     "Create a new MPI object with optional `value` and `radix`:\n\n"
+     "* No arguments: Returns a zero-valued MPI\n"
+     "* `value` is an MPI object: Creates an MPI from another MPI\n"
+     "* `value` is an integer: Creates an MPI with that integer value\n"
+     "* `value` is a string: Creates an MPI from the string\n"
+     "(`radix` determines how the string is interpreted)\n"
+     "* `radix = 16`: Treats the string as a hexadecimal value\n"
+     "* `radix` not given: Treats the string as a base-10 integer\n\n"
+     "Returns `mpi-obj`"
     },
-    {"mpi/from-int", mpi_new_int,
-     "(mpi/from-int value)\n\n"
-     "Create an MPI object with an integer `value`. Returns `mpi-obj`."
-    },
-    {"mpi/from-str", mpi_new_str,
-     "(mpi/from-str value)\n\n"
-     "Create an MPI object with an integer string `value`. Returns `mpi-obj`."
-    },
-    {"mpi/from-hex-str", mpi_new_hex_str,
-     "(mpi/from-hex-str value)\n\n"
-     "Create an MPI object with a hex string `value`. Returns `mpi-obj`."
-    },
-    {"mpi/from-mpi", mpi_new_mpi,
-     "(mpi/from-mpi mpi-obj)\n\n"
-     "Create an MPI object with an MPI object `mpi`. Returns new `mpi-obj`."
-    },
-    {"mpi/from-rng", mpi_new_rng,
-     "(mpi/from-rng rng bits)\n\n"
-     "Create a `bits` size random MPI object with `rng`. Returns `mpi-obj`."
+    {"mpi/new-random", mpi_new_random,
+     "(mpi/random bits &opt rng)\n\n"
+     "Create a `bits` sizes random MPI object. Use `rng` if provided. "
+     "Returns `mpi-obj`."
     },
     {"mpi/inverse-mod", mpi_inverse_mod,
      "(mpi/inverse-mod mpi-obj modulus)\n\n"
