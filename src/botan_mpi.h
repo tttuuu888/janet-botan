@@ -589,14 +589,14 @@ static JanetReg mpi_cfuns[] = {
     {"mpi/new", mpi_new,
      "(mpi/new &opt value radix)\n\n"
      "Create a new MPI object with optional `value` and `radix`:\n\n"
-     "* No arguments: Returns a zero-valued MPI\n"
-     "* `value` is an MPI object: Creates an MPI from another MPI\n"
-     "* `value` is an integer: Creates an MPI with that integer value\n"
-     "* `value` is a string: Creates an MPI from the string\n"
-     "(`radix` determines how the string is interpreted)\n"
-     "* `radix = 16`: Treats the string as a hexadecimal value\n"
+     "* No arguments: Returns a zero-valued MPI\n\n"
+     "* `value` is an MPI object: Creates an MPI from another MPI\n\n"
+     "* `value` is an integer: Creates an MPI with that integer value\n\n"
+     "* `value` is a string: Creates an MPI from the string\n\n"
+     "(`radix` determines how the string is interpreted)\n\n"
+     "* `radix = 16`: Treats the string as a hexadecimal value\n\n"
      "* `radix` not given: Treats the string as a base-10 integer\n\n"
-     "Returns `mpi-obj`"
+     "Returns `mpi-obj`."
     },
     {"mpi/new-random", mpi_new_random,
      "(mpi/random bits &opt rng)\n\n"
