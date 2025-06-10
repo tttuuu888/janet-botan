@@ -599,7 +599,7 @@ static JanetReg mpi_cfuns[] = {
      "Returns `mpi-obj`."
     },
     {"mpi/new-random", mpi_new_random,
-     "(mpi/random bits &opt rng)\n\n"
+     "(mpi/new-random bits &opt rng)\n\n"
      "Create a `bits` sizes random MPI object. Use `rng` if provided. "
      "Returns `mpi-obj`."
     },
