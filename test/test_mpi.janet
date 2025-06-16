@@ -47,10 +47,17 @@
     (assert (= q mpi2))
     (assert (= r mpi1))))
 
-(let [long-hex-input "0102030405060708090a0b0c0d0e0f"
+(let [long-hex-input "0102030405060708090A0B0C0D0E0F"
       mpi1 (mpi/new long-hex-input 16)]
   (assert-error "Error expected" (:to-u32 mpi1))
-  (assert (= (:to-bin mpi1)) (hex-decode long-hex-input)))
+  (assert (= (:to-bin mpi1)
+             (hex-decode long-hex-input)))
+  (assert (= (:to-hex mpi1)
+             (string "0x" long-hex-input)
+             (string "0x" (hex-encode (:to-bin mpi1))))))
+
+(let [mpi (mpi/new "5")]
+  (assert (= (:to-int mpi) "5")))
 
 (let [mpi1 (mpi/new-random 10)
       mpi2 (mpi/new-random 10 (rng/new))]
