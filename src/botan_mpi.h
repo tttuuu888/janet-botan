@@ -673,17 +673,18 @@ static JanetReg mpi_cfuns[] = {
     },
     {"mpi/pow-mod", mpi_pow_mod,
      "(mpi/pow-mod mpi-obj exponent modulus)\n\n"
-     "Create new `mpi-obj` to the `exponent` `mpi-obj` power modulo `modulus` `mpi-obj`."
-     "Returns new `mpi-obj`."
+     "Return a new `mpi-obj` representing (`mpi-obj` ^ `exponent`) mod `modulus`."
+     "`exponent` and `modulus` are also `mpi-obj` objects."
     },
     {"mpi/mod-mul", mpi_mod_mul,
-     "(mpi/mod-mul mpi-obj other-mpi-obj modulus)\n\n"
-     "Create new `mpi-obj` of the multiplication product of `mpi-obj` and "
-     "`other-mpi-obj` modulo `modulus`. Returns new `mpi-obj`."
+     "(mpi/mod-mul mpi-obj mpi-obj2 modulus)\n\n"
+     "Return a new `mpi-obj` representing (`mpi-obj` * `mpi-obj2`) modulo "
+     "`modulus`. `mpi-obj2` and `modulus` are also `mpi-obj` objects."
     },
     {"mpi/gcd", mpi_gcd,
-     "(mpi/gcd mpi-obj other-mpi-obj)\n\n"
-     "Create new `mpi-obj` of the greatest common divisor of `mpi-obj` and `other-mpi-obj`."
+     "(mpi/gcd mpi-obj mpi-obj2)\n\n"
+     "Return a new `mpi-obj` representing the greatest common divisor of "
+     "`mpi-obj` and `mpi-obj2`."
     },
     {"mpi/is-prime", mpi_is_prime,
      "(mpi/is-prime mpi-obj rng &opt prob)\n\n"
