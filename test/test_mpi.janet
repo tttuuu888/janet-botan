@@ -56,6 +56,9 @@
              (string "0x" long-hex-input)
              (string "0x" (hex-encode (:to-bin mpi1))))))
 
+(let [mpi (mpi/new "5")]
+  (assert (= (:to-int mpi) "5")))
+
 (let [mpi1 (mpi/new-random 10)
       mpi2 (mpi/new-random 10 (rng/new))]
   (assert (not (= mpi1 mpi2))))
