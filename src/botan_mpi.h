@@ -14,6 +14,7 @@ typedef struct botan_mpi_obj {
 /* Abstract Object functions */
 static int mpi_gc_fn(void *data, size_t len);
 static int mpi_get_fn(void *data, Janet key, Janet *out);
+static void mpi_tostring_fn(void *p, JanetBuffer *buffer);
 static int mpi_compare_fn(void *p1, void *p2);
 
 /* Janet functions */
@@ -51,7 +52,7 @@ static JanetAbstractType mpi_obj_type = {
     NULL,                       /* put */
     NULL,                       /* marshal */
     NULL,                       /* unmarshal */
-    NULL,                       /* tostring */
+    mpi_tostring_fn,
     mpi_compare_fn,
     JANET_ATEND_COMPARE
 };
@@ -104,6 +105,23 @@ static int mpi_get_fn(void *data, Janet key, Janet *out) {
     }
 
     return janet_getmethod(janet_unwrap_keyword(key), mpi_methods, out);
+}
+
+static void mpi_tostring_fn(void *p, JanetBuffer *buffer) {
+    botan_mpi_obj_t *obj = (botan_mpi_obj_t *)p;
+    botan_mp_t mpi = obj->mpi;
+
+    size_t bytes;
+    int ret = botan_mp_num_bytes(mpi, &bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    int len = bytes * 2 + 2;
+    JanetBuffer *vec = janet_buffer(len);
+
+    ret = botan_mp_to_hex(mpi, (char *)vec->data);
+    JANET_BOTAN_ASSERT(ret);
+
+    janet_formatb(buffer, "[mpi=\"%s\"]", janet_string(vec->data, len));
 }
 
 static int mpi_compare_fn(void *p1, void *p2) {
