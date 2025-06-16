@@ -57,7 +57,17 @@
              (string "0x" (hex-encode (:to-bin mpi1))))))
 
 (let [mpi (mpi/new "5")]
-  (assert (= (:to-int mpi) "5")))
+  (assert (= (:to-int mpi) "5"))
+
+  (assert (= (:get-bit mpi 0) 1))
+  (assert (= (:get-bit mpi 1) 0))
+  (assert (= (:get-bit mpi 2) 1))
+
+  (:set-bit mpi 1)
+  (assert (= (:get-bit mpi 1) 1))
+
+  (:clear-bit mpi 1)
+  (assert (= (:get-bit mpi 1) 0)))
 
 (let [mpi1 (mpi/new-random 10)
       mpi2 (mpi/new-random 10 (rng/new))]

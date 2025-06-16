@@ -65,7 +65,7 @@ static JanetMethod mpi_methods[] = {
     {"gcd", mpi_gcd},
     {"is-prime", mpi_is_prime},
     {"get-bit", mpi_get_bit},
-    {"set-bit", mpi_get_bit},
+    {"set-bit", mpi_set_bit},
     {"clear-bit", mpi_clear_bit},
     {"is-zero", mpi_is_zero},
     {"is-positive", mpi_is_positive},
@@ -331,7 +331,7 @@ static Janet mpi_get_bit(int32_t argc, Janet *argv) {
     int ret = botan_mp_get_bit(mpi, bit);
     JANET_BOTAN_ASSERT(ret);
 
-    return janet_wrap_boolean(ret == 1);
+    return janet_wrap_number((double)ret);
 }
 
 static Janet mpi_set_bit(int32_t argc, Janet *argv) {
