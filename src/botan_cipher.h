@@ -320,9 +320,9 @@ static Janet cipher_finish(int32_t argc, Janet *argv) {
 
 static JanetReg cipher_cfuns[] = {
     {"cipher/new", cipher_new, "(cipher/new name type)\n\n"
-     "Creates an cipher object of the given name, e.g., \"AES-256/GCM\"."
-     "Create an encryption cipher if `:encrypt` type is given, create "
-     "decryption cipher if `:decrypt` type is supplied."
+     "Creates an cipher object of the given name, e.g., \"AES-256/GCM\". "
+     "Create an encryption cipher if :encrypt type is given, create "
+     "decryption cipher if :decrypt type is supplied."
     },
     {"cipher/name", cipher_name, "(cipher/name cipher-obj)\n\n"
      "Returns the name of this algorithm."
