@@ -413,13 +413,13 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     botan_x509_cert_t cert = obj->x509_cert;
-    const char *usage = janet_getcstring(argv, 1);
+    JanetKeyword usage = janet_getkeyword(argv, 1);
 
     struct usage_key_pair {
         const char *usuage;
         unsigned int key;
     };
-    struct usage_key_pair pair_list[] = {
+    static struct usage_key_pair pair_list[] = {
         {"NO-CONSTRAINTS", 0},
         {"DIGITAL-SIGNATURE", 32768},
         {"NON-REPUDIATION", 16384},
@@ -434,7 +434,7 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
 
     unsigned int key = 1;
     for(int i=0; i<(sizeof(pair_list)/sizeof(struct usage_key_pair)); i++) {
-        if (strcmp(pair_list[i].usuage, usage) == 0) {
+        if (janet_cstrcmp(usage, pair_list[i].usuage) == 0) {
             key = pair_list[i].key;
             break;
         }
@@ -679,7 +679,20 @@ static JanetReg x509_cert_cfuns[] = {
     },
     {"x509-cert/allowed-usage", x509_cert_allowed_usage,
      "(x509-cert/allowed-usage cert-obj cert-usage)\n\n"
-     "Test if the certificate is allowed for a particular usage."
+     "Test if the certificate is allowed for a particular usage. "
+     "The cert-usage argument should be one of the following keywords:\n\n"
+     "* :NO-CONSTRAINTS\n\n"
+     "* :DIGITAL-SIGNATURE\n\n"
+     "* :NON-REPUDIATION\n\n"
+     "* :KEY-ENCIPHERMENT\n\n"
+     "* :DATA-ENCIPHERMENT\n\n"
+     "* :KEY-AGREEMENT\n\n"
+     "* :KEY-CERT-SIGN\n\n"
+     "* :CRL-SIGN\n\n"
+     "* :ENCIPHER-ONLY\n\n"
+     "* :DECIPHER-ONLY\n\n"
+     "Returns true if the given X.509 certificate `cert-obj` is allowed for "
+     "the specified cert-usage."
     },
     {"x509-cert/verify", x509_cert_verify,
      "(x509-cert/verify cert-obj &keys {:intermediates intermediates :trusted "
