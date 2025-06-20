@@ -67,20 +67,17 @@ static Janet rng_new(int32_t argc, Janet *argv) {
     memset(obj, 0, sizeof(botan_rng_obj_t));
 
     janet_arity(argc, 0, 1);
-    const char *type = janet_optcstring(argv, argc, 0, "system");
-    bool valid_type = false;
-    if (strcmp(type, "system") == 0 ||
-        strcmp(type, "user") == 0 ||
-        strcmp(type, "user-threadsafe") == 0 ||
-        strcmp(type, "null") == 0 ||
-        strcmp(type, "hwrnd") == 0 ||
-        strcmp(type, "rdrand") == 0) {
-        valid_type = true;
+    JanetKeyword type = janet_optkeyword(argv, argc, 0, (const uint8_t *)"system");
+    if (!janet_cstrcmp(type, "system")          &&
+        !janet_cstrcmp(type, "user")            &&
+        !janet_cstrcmp(type, "user-threadsafe") &&
+        !janet_cstrcmp(type, "null")            &&
+        !janet_cstrcmp(type, "hwrnd")           &&
+        !janet_cstrcmp(type, "rdrand")) {
+        janet_panic("Invalid argument");
     }
 
-    const char *type_input = valid_type ? type : "system";
-
-    int ret = botan_rng_init(&obj->rng, type_input);
+    int ret = botan_rng_init(&obj->rng, (const char *)type);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -143,12 +140,12 @@ static Janet rng_add_entropy(int32_t argc, Janet *argv) {
 static JanetReg rng_cfuns[] = {
     {"rng/new", rng_new, "(rng/new &opt type)\n\n"
      "Initialize a random number generator from the given `type`:\n\n"
-     "\"system\": System-RNG (defaulting to \"system\" type rng)\n\n"
-     "\"user\": AutoSeeded-RNG\n\n"
-     "\"user-threadsafe\": serialized AutoSeeded-RNG\n\n"
-     "\"null\": Null-RNG (always fails)\n\n"
-     "\"hwrnd\" or \"rdrand\": Processor-RNG (if available)\n\n"
-     "Returns `rng-obj`"
+     "* :system - System-RNG (defaulting to :system type rng)\n\n"
+     "* :user - AutoSeeded-RNG\n\n"
+     "* :user-threadsafe - serialized AutoSeeded-RNG\n\n"
+     "* :null - Null-RNG (always fails)\n\n"
+     "* :hwrnd or :rdrand - Processor-RNG (if available)\n\n"
+     "Returns `rng-obj`."
     },
     {"rng/get", rng_get, "(rng/get rng-obj len)\n\n"
      "Returns random bytes of length `len` from a random number generator `rng-obj`."

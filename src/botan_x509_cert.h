@@ -413,13 +413,13 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     botan_x509_cert_t cert = obj->x509_cert;
-    const char *usage = janet_getcstring(argv, 1);
+    JanetKeyword usage = janet_getkeyword(argv, 1);
 
     struct usage_key_pair {
         const char *usuage;
         unsigned int key;
     };
-    struct usage_key_pair pair_list[] = {
+    static struct usage_key_pair pair_list[] = {
         {"NO-CONSTRAINTS", 0},
         {"DIGITAL-SIGNATURE", 32768},
         {"NON-REPUDIATION", 16384},
@@ -434,7 +434,7 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
 
     unsigned int key = 1;
     for(int i=0; i<(sizeof(pair_list)/sizeof(struct usage_key_pair)); i++) {
-        if (strcmp(pair_list[i].usuage, usage) == 0) {
+        if (janet_cstrcmp(usage, pair_list[i].usuage) == 0) {
             key = pair_list[i].key;
             break;
         }
@@ -679,24 +679,37 @@ static JanetReg x509_cert_cfuns[] = {
     },
     {"x509-cert/allowed-usage", x509_cert_allowed_usage,
      "(x509-cert/allowed-usage cert-obj cert-usage)\n\n"
-     "Test if the certificate is allowed for a particular usage."
+     "Test if the certificate is allowed for a particular usage. "
+     "The cert-usage argument should be one of the following keywords:\n\n"
+     "* :NO-CONSTRAINTS\n\n"
+     "* :DIGITAL-SIGNATURE\n\n"
+     "* :NON-REPUDIATION\n\n"
+     "* :KEY-ENCIPHERMENT\n\n"
+     "* :DATA-ENCIPHERMENT\n\n"
+     "* :KEY-AGREEMENT\n\n"
+     "* :KEY-CERT-SIGN\n\n"
+     "* :CRL-SIGN\n\n"
+     "* :ENCIPHER-ONLY\n\n"
+     "* :DECIPHER-ONLY\n\n"
+     "Returns true if the given X.509 certificate `cert-obj` is allowed for "
+     "the specified cert-usage."
     },
     {"x509-cert/verify", x509_cert_verify,
      "(x509-cert/verify cert-obj &keys {:intermediates intermediates :trusted "
      "trusted :truste trusted-path :required-strength required-strength "
      ":hostname hostname :reference-time reference-time :crl crls})\n\n"
      "Verify a certificate. Returns 0 if validation was successful, returns a "
-     " positive error code if the validation was unsuccesful.\n"
-     "* `:intermediates` - A tuple of untrusted subauthorities.\n\n"
-     "* `:trusted` - A tuple of trusted root CAs.\n\n"
-     "* `:trusted-path` - A path refers to a directory where one or more "
+     " positive error code if the validation was unsuccesful.\n\n"
+     "* :intermediates - A tuple of untrusted subauthorities.\n\n"
+     "* :trusted - A tuple of trusted root CAs.\n\n"
+     "* :trusted-path - A path refers to a directory where one or more "
      "trusted CA certificates are stored.\n\n"
-     "* `:required-strength` - Indicates the minimum key and hash strength "
+     "* :required-strength - Indicates the minimum key and hash strength "
      "that is allowed. For instance setting to 80 allows 1024-bit RSA and "
      "SHA-1. Setting to 110 requires 2048-bit RSA and SHA-256 or higher. Set "
      "to zero to accept a default. Default value is 0, if omitted.\n\n"
-     "* `:hostname` - Check against the certificates CN field.\n\n"
-     "* `:reference-time` - Time value which the certificate chain is "
+     "* :hostname - Check against the certificates CN field.\n\n"
+     "* :reference-time - Time value which the certificate chain is "
      "validated against. Use zero(default) to use the current system clock.\n\n"
      "* `crls` - A tuple of CRLs issued by either trusted or untrusted "
      "authorities."
