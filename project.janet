@@ -44,9 +44,8 @@
       (os/execute ["./pre_install.sh"] :p))
 
 (rule "remove-pre-botan-a" []
-      (os/execute ["rm" "build/botan.a"] :p))
+      (os/execute ["rm" "-f" "build/botan.a"] :p))
 
-(add-dep "build" "remove-pre-botan-a")
-(add-dep "build" "botan-library")
+(add-dep "botan-library" "remove-pre-botan-a")
 (add-dep "build/src___main.o" "botan-library")
 (add-dep "install" "pre-install")
