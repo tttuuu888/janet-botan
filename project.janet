@@ -27,7 +27,9 @@
           (print "Initializing Botan library build...")
           (os/execute ["git" "submodule" "update" "--recursive"] :p)
           (os/cd "botan")
-          (os/execute ["./configure.py" "--without-documentation"] :p)
+          (os/execute ["./configure.py"
+                       "--without-documentation"
+                       "--build-targets=static"] :p)
           (os/execute ["make" "clean"] :p)
           (os/cd project-path))
 
