@@ -17,11 +17,12 @@
       (let [project-path  (os/cwd)
             p1 (os/spawn ["git" "submodule" "status"] :p {:out :pipe})
             rev1 ((string/split " " (:read (p1 :out) :all)) 1)
+            peg-rev '{:vc "\"version_vc_rev\": \"git:"
+                      :main (sequence (to :vc) :vc
+                               (capture (sequence (any :w) (any :d))))}
             p2 (and (os/stat "botan/build/build_config.json")
-                    (os/spawn ["/bin/sh" "-c"
-                               "grep '\"version_vc_rev\"' botan/build/build_config.json | sed -E 's/.*\"version_vc_rev\": \"git:([^\"]+)\".*/\\1/'"]
-                              :p {:out :pipe}))
-            rev2 (and p2 (string/trim (:read (p2 :out) :all)))]
+                    (os/spawn ["cat" "botan/build/build_config.json"] :p {:out :pipe}))
+            rev2 (and p2 (first (peg/match peg-rev (:read (p2 :out) :all))))]
 
         (unless (= rev1 rev2)
           (print "Initializing Botan library build...")
