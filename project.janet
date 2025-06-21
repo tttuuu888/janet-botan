@@ -20,9 +20,9 @@
             peg-rev '{:vc "\"version_vc_rev\": \"git:"
                       :main (sequence (to :vc) :vc
                                (capture (sequence (any :w) (any :d))))}
-            p2 (and (os/stat "botan/build/build_config.json")
-                    (os/spawn ["cat" "botan/build/build_config.json"] :p {:out :pipe}))
-            rev2 (and p2 (first (peg/match peg-rev (:read (p2 :out) :all))))]
+            p2 (file/open "botan/build/build_config.json")
+            rev2 (and p2 (first (peg/match peg-rev (file/read p2 :all))))]
+        (when p2 (file/close p2))
 
         (unless (= rev1 rev2)
           (print "Initializing Botan library build...")
