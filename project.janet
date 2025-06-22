@@ -37,11 +37,7 @@
         (print "Build botan library...")
         (os/cd "botan")
         (os/shell "make -j$(nproc)")
-        (os/cd project-path)
-
-        (unless (os/stat "botan/build.h")
-          (print "Copy botan header...")
-          (copyfile "botan/build/build.h" "botan/build.h"))))
+        (os/cd project-path)))
 
 (rule "pre-install" ["build"]
       (os/execute ["./pre_install.sh"] :p))
