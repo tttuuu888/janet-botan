@@ -17,7 +17,7 @@
       (let [project-path  (os/cwd)
             p1 (os/spawn ["git" "submodule" "status"] :p {:out :pipe})
             rev1 ((string/split " " (:read (p1 :out) :all)) 1)
-            peg-rev '{:vc "\"version_vc_rev\": \"git:"
+            peg-rev '{:vc `"version_vc_rev": "git:`
                       :main (sequence (to :vc) :vc
                                (capture (sequence (any :w) (any :d))))}
             p2 (file/open "botan/build/build_config.json")
