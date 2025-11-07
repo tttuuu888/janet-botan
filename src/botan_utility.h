@@ -34,7 +34,7 @@ static Janet cfun_hex_decode(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     JanetByteView str = janet_getbytes(argv, 0);
     JanetBuffer *decoded = janet_buffer(str.len);
-    size_t out_len;
+    size_t out_len = str.len;
 
     int ret = botan_hex_decode((const char *)str.bytes, str.len, (uint8_t *)decoded->data, &out_len);
     JANET_BOTAN_ASSERT(ret);
