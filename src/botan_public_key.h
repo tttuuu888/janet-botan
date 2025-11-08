@@ -196,6 +196,22 @@ static Janet public_key_load_ecdsa(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet public_key_load_ecdsa_sec1(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    JanetByteView sec1 = janet_getbytes(argv, 1);
+
+    ret = botan_pubkey_load_ecdsa_sec1(&obj->public_key, sec1.bytes, sec1.len, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet public_key_load_ecdh(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 3);
 
@@ -216,6 +232,22 @@ static Janet public_key_load_ecdh(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet public_key_load_ecdh_sec1(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    JanetByteView sec1 = janet_getbytes(argv, 1);
+
+    ret = botan_pubkey_load_ecdh_sec1(&obj->public_key, sec1.bytes, sec1.len, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet public_key_load_sm2(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 3);
 
@@ -230,6 +262,22 @@ static Janet public_key_load_sm2(int32_t argc, Janet *argv) {
     botan_mp_t mpi_y = obj_y->mpi;
 
     ret = botan_pubkey_load_sm2(&obj->public_key, mpi_x, mpi_y, curve);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_sm2_sec1(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    const char *curve = janet_getcstring(argv, 0);
+    JanetByteView sec1 = janet_getbytes(argv, 1);
+
+    ret = botan_pubkey_load_sm2_sec1(&obj->public_key, sec1.bytes, sec1.len, curve);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -472,12 +520,24 @@ static JanetReg public_key_cfuns[] = {
      "(pubkey/load-ecdsa curve x y)\n\n"
      "Return a public ECDSA key."
     },
+    {"pubkey/load-ecdsa-sec1", public_key_load_ecdsa_sec1,
+     "(pubkey/load-ecdsa curve sec1)\n\n"
+     "Return a public ECDSA key."
+    },
     {"pubkey/load-ecdh", public_key_load_ecdh,
      "(pubkey/load-ecdh curve x y)\n\n"
      "Return a public ECDH key."
     },
+    {"pubkey/load-ecdh-sec1", public_key_load_ecdh_sec1,
+     "(pubkey/load-ecdh-sec1 curve sec1)\n\n"
+     "Return a public ECDH key."
+    },
     {"pubkey/load-sm2", public_key_load_sm2,
      "(pubkey/load-sm2 curve x y)\n\n"
+     "Return a public SM2 key."
+    },
+    {"pubkey/load-sm2-sec1", public_key_load_sm2_sec1,
+     "(pubkey/load-sm2-sec1 curve sec1)\n\n"
      "Return a public SM2 key."
     },
     {"pubkey/load-ml-kem", public_key_load_ml_kem,
