@@ -518,30 +518,37 @@ static JanetReg private_key_cfuns[] = {
     },
     {"privkey/load-rsa", private_key_load_rsa,
      "(privkey/load-rsa p q e)\n\n"
+     "`p`, `q`, `e` are MPI objects.\n"
      "Return a private RSA key."
     },
     {"privkey/load-dsa", private_key_load_dsa,
      "(privkey/load-dsa p q g x)\n\n"
+     "`p`, `q`, `g`, `x` are MPI objects.\n"
      "Return a private DSA key."
     },
     {"privkey/load-dh", private_key_load_dh,
      "(privkey/load-dh p g x)\n\n"
+     "`p`, `g`, `x` are MPI objects.\n"
      "Return a private DH key."
     },
     {"privkey/load-elgamal", private_key_load_elgamal,
      "(privkey/load-elgamal p g x)\n\n"
+     "`p`, `g`, `x` are MPI objects.\n"
      "Return a private ElGamal key."
     },
     {"privkey/load-ecdsa", private_key_load_ecdsa,
      "(privkey/load-ecdsa curve x)\n\n"
+     "`x` is an MPI object.\n"
      "Return a private ECDSA key."
     },
     {"privkey/load-ecdh", private_key_load_ecdh,
      "(privkey/load-ecdh curve x)\n\n"
+     "`x` is an MPI object.\n"
      "Return a private ECDH key."
     },
     {"privkey/load-sm2", private_key_load_sm2,
      "(privkey/load-sm2 curve x)\n\n"
+     "`x` is an MPI object.\n"
      "Return a private SM2 key."
     },
     {"privkey/load-ml-kem", private_key_load_ml_kem,
@@ -571,7 +578,7 @@ static JanetReg private_key_cfuns[] = {
     },
     {"privkey/check-key", private_key_check_key,
      "(privkey/check-key privkey rng &opt weak)\n\n"
-     "Test the key for consistency. If weak is provided then less expensive "
+     "Test the key for consistency. If `weak` is provided then less expensive "
      "tests are performed."
     },
     {"privkey/algo-name", private_key_check_key,

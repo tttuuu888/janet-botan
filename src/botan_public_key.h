@@ -506,38 +506,47 @@ static JanetReg public_key_cfuns[] = {
     },
     {"pubkey/load-dsa", public_key_load_dsa,
      "(pubkey/load-dsa p q g y)\n\n"
+     "`p`, `q`, `g`, `y` are MPI objects.\n"
      "Return a public DSA key."
     },
     {"pubkey/load-dh", public_key_load_dh,
      "(pubkey/load-dh p g y)\n\n"
+     "`p`, `g`, `y` are MPI objects.\n"
      "Return a public DH key."
     },
     {"pubkey/load-elgamal", public_key_load_elgamal,
      "(pubkey/load-elgamal p g y)\n\n"
+     "`p`, `g`, `y` are MPI objects.\n"
      "Return a public ElGamal key."
     },
     {"pubkey/load-ecdsa", public_key_load_ecdsa,
      "(pubkey/load-ecdsa curve x y)\n\n"
+     "`x`, `y` are MPI objects.\n"
      "Return a public ECDSA key."
     },
     {"pubkey/load-ecdsa-sec1", public_key_load_ecdsa_sec1,
-     "(pubkey/load-ecdsa curve sec1)\n\n"
+     "(pubkey/load-ecdsa-sec1 curve sec1)\n\n"
+     "`sec1` is a byte string.\n"
      "Return a public ECDSA key."
     },
     {"pubkey/load-ecdh", public_key_load_ecdh,
      "(pubkey/load-ecdh curve x y)\n\n"
+     "`x`, `y` are MPI objects.\n"
      "Return a public ECDH key."
     },
     {"pubkey/load-ecdh-sec1", public_key_load_ecdh_sec1,
      "(pubkey/load-ecdh-sec1 curve sec1)\n\n"
+     "`sec1` is a byte string.\n"
      "Return a public ECDH key."
     },
     {"pubkey/load-sm2", public_key_load_sm2,
      "(pubkey/load-sm2 curve x y)\n\n"
+     "`x`, `y` are MPI objects.\n"
      "Return a public SM2 key."
     },
     {"pubkey/load-sm2-sec1", public_key_load_sm2_sec1,
      "(pubkey/load-sm2-sec1 curve sec1)\n\n"
+     "`sec1` is a byte string.\n"
      "Return a public SM2 key."
     },
     {"pubkey/load-ml-kem", public_key_load_ml_kem,
