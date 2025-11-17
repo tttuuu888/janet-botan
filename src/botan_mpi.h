@@ -113,17 +113,11 @@ static void mpi_tostring_fn(void *p, JanetBuffer *buffer) {
     botan_mpi_obj_t *obj = (botan_mpi_obj_t *)p;
     botan_mp_t mpi = obj->mpi;
 
-    size_t bytes;
-    int ret = botan_mp_num_bytes(mpi, &bytes);
+    view_data_t str;
+    int ret = botan_mp_view_hex(mpi, &str, (botan_view_str_fn)view_str_func);
     JANET_BOTAN_ASSERT(ret);
 
-    int len = bytes * 2 + 2;
-    JanetBuffer *vec = janet_buffer(len);
-
-    ret = botan_mp_to_hex(mpi, (char *)vec->data);
-    JANET_BOTAN_ASSERT(ret);
-
-    janet_formatb(buffer, "[mpi=\"%s\"]", janet_string(vec->data, len));
+    janet_formatb(buffer, "[mpi=\"%s\"]", janet_string(str.data, str.len));
 }
 
 static int mpi_compare_fn(void *p1, void *p2) {
@@ -594,17 +588,12 @@ static Janet mpi_to_bin(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
     botan_mp_t mpi = obj->mpi;
-    size_t bytes;
 
-    int ret = botan_mp_num_bytes(mpi, &bytes);
+    view_data_t str;
+    int ret = botan_mp_view_bin(mpi, &str, (botan_view_bin_fn)view_bin_func);
     JANET_BOTAN_ASSERT(ret);
 
-    JanetBuffer *vec = janet_buffer(bytes);
-
-    ret = botan_mp_to_bin(mpi, vec->data);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_string(janet_string(vec->data, bytes));
+    return janet_wrap_string(janet_string(str.data, str.len));
 }
 
 static Janet mpi_to_hex(int32_t argc, Janet *argv) {
@@ -612,17 +601,11 @@ static Janet mpi_to_hex(int32_t argc, Janet *argv) {
     botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
     botan_mp_t mpi = obj->mpi;
 
-    size_t bytes;
-    int ret = botan_mp_num_bytes(mpi, &bytes);
+    view_data_t str;
+    int ret = botan_mp_view_hex(mpi, &str, (botan_view_str_fn)view_str_func);
     JANET_BOTAN_ASSERT(ret);
 
-    int len = bytes * 2 + 2;
-    JanetBuffer *vec = janet_buffer(len);
-
-    ret = botan_mp_to_hex(mpi, (char *)vec->data);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_string(janet_string(vec->data, len));
+    return janet_wrap_string(janet_string(str.data, str.len));
 }
 
 static Janet mpi_to_int(int32_t argc, Janet *argv) {
@@ -630,22 +613,11 @@ static Janet mpi_to_int(int32_t argc, Janet *argv) {
     botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
     botan_mp_t mpi = obj->mpi;
 
-    size_t out_len = 0;
-    int ret = botan_mp_to_str(mpi, 10, NULL, &out_len);
-    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
-        janet_panic(getBotanError(ret));
-    }
-
-    JanetBuffer *vec = janet_buffer(out_len);
-
-    ret = botan_mp_to_str(mpi, 10, (char *)vec->data, &out_len);
+    view_data_t str;
+    int ret = botan_mp_view_str(mpi, 10, &str, (botan_view_str_fn)view_str_func);
     JANET_BOTAN_ASSERT(ret);
 
-    if (vec->data[out_len - 1] == 0) {
-        out_len -= 1;
-    }
-
-    return janet_wrap_string(janet_string(vec->data, out_len));
+    return janet_wrap_string(janet_string(str.data, str.len));
 }
 
 static JanetReg mpi_cfuns[] = {
