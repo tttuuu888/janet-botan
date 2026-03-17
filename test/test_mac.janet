@@ -9,7 +9,7 @@
   (assert (= (mac/output-length mac) 32))
   (let [[min-key max-key mod-key] (mac/get-keyspec mac)]
     (assert (= min-key 0))
-    (assert (= max-key 4096))
+    (assert (= max-key 8192))
     (assert (= mod-key 1)))
 
   (assert (mac/set-key mac (hex-decode "AABBCCDD")))
