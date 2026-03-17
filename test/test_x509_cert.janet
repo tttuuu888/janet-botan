@@ -104,9 +104,16 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (:allowed-usage cert1 :CRL-SIGN))
   (assert (:allowed-usage cert1 :ENCIPHER-ONLY))
   (assert (:allowed-usage cert1 :DECIPHER-ONLY))
+  (assert (not (:is-ca cert1)))
   (assert (= (x509-cert/verify cert1) 3001))
   (assert (= (x509-cert/validation-status 3001) "Cannot establish trust"))
   (assert (= (x509-cert/validation-status 0) "Verified")))
+
+(let [cert2 (x509-cert/load cert-pem2)]
+  (assert (not (:is-ca cert2)))
+  (assert (:allowed-extended-usage cert2 "PKIX.ServerAuth"))
+  (assert (not (:allowed-extended-usage cert2 "PKIX.ClientAuth")))
+  (assert (not (:allowed-extended-usage cert2 "PKIX.CodeSigning"))))
 
 (let [crl (x509-crl/load crl-pem)
      cert (x509-cert/load cert-pem2)]

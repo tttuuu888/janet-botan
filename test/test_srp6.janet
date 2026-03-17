@@ -3,7 +3,6 @@
 
 (start-suite "SRP6 Server Session")
 
-
 (let [identity "userid"
       password "userpassword1234"
       rng (rng/new)
@@ -17,7 +16,6 @@
       [A key-c] (srp6-client-agree identity password group hash salt B)
 
       key-s (:step2 server A)]
-  (assert (= key-c key-s))
-)
+  (assert (= key-c key-s)))
 
 (end-suite)

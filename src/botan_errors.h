@@ -53,6 +53,8 @@ static const char* getBotanError(int error) {
             return "BOTAN_FFI_ERROR_INVALID_KEY_LENGTH";
         case BOTAN_FFI_ERROR_INVALID_OBJECT_STATE:
             return "BOTAN_FFI_ERROR_INVALID_OBJECT_STATE";
+        case BOTAN_FFI_ERROR_OUT_OF_RANGE:
+            return "BOTAN_FFI_ERROR_OUT_OF_RANGE";
 
         case BOTAN_FFI_ERROR_NOT_IMPLEMENTED:
             return "BOTAN_FFI_ERROR_NOT_IMPLEMENTED";

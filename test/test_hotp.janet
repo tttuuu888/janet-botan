@@ -15,5 +15,4 @@
   (assert (= (:check hotp 359152 1 0) [false 1]))
   (assert (= (:check hotp 359152 0 2) [true 3])))
 
-
 (end-suite)

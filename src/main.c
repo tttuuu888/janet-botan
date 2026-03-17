@@ -16,6 +16,7 @@
 #include "botan_versioning.h"
 #include "botan_utility.h"
 #include "botan_rng.h"
+#include "botan_xof.h"
 #include "botan_block_cipher.h"
 #include "botan_hash.h"
 #include "botan_mac.h"
@@ -48,6 +49,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_versioning(env);
     submod_utility(env);
     submod_rng(env);
+    submod_xof(env);
     submod_block_cipher(env);
     submod_hash(env);
     submod_mac(env);
