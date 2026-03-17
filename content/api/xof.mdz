@@ -1,0 +1,14 @@
+{:title "eXtendable Output Functions"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "docpage.html"
+ :order 5}
+---
+
+## Index
+
+@api-index[/build/botan][xof/]
+
+## Reference
+
+@api-docs[/build/botan][xof/]
