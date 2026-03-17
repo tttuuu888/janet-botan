@@ -36,8 +36,10 @@ static Janet x509_cert_subject_public_key_bits(int32_t argc, Janet *argv);
 static Janet x509_cert_subject_public_key(int32_t argc, Janet *argv);
 static Janet x509_cert_subject_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv);
+static Janet x509_cert_is_ca(int32_t argc, Janet *argv);
 static Janet x509_cert_hostname_match(int32_t argc, Janet *argv);
 static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv);
+static Janet x509_cert_allowed_extended_usage(int32_t argc, Janet *argv);
 static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
@@ -73,8 +75,10 @@ static JanetMethod x509_cert_methods[] = {
     {"subject-public-key", x509_cert_subject_public_key},
     {"subject-dn", x509_cert_subject_dn},
     {"issuer-dn", x509_cert_issuer_dn},
+    {"is-ca", x509_cert_is_ca},
     {"hostname-match", x509_cert_hostname_match},
     {"allowed-usage", x509_cert_allowed_usage},
+    {"allowed-extended-usage", x509_cert_allowed_extended_usage},
     {"verify", x509_cert_verify},
     {"validation-status", x509_cert_validation_status},
     {NULL, NULL},
@@ -393,6 +397,17 @@ static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(out->data, out_len));
 }
 
+static Janet x509_cert_is_ca(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    int ret = botan_x509_cert_is_ca(cert);
+
+    return janet_wrap_boolean(ret == 1);
+}
+
 static Janet x509_cert_hostname_match(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
 
@@ -448,6 +463,21 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_boolean(ret == 0);
+}
+
+static Janet x509_cert_allowed_extended_usage(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+    const char *oid = janet_getcstring(argv, 1);
+
+    int ret = botan_x509_cert_allowed_extended_usage_str(cert, oid);
+    if (ret < 0) {
+        JANET_BOTAN_ASSERT(ret);
+    }
+
+    return janet_wrap_boolean(ret == 1);
 }
 
 static Janet x509_cert_verify(int32_t argc, Janet *argv) {
@@ -667,15 +697,21 @@ static JanetReg x509_cert_cfuns[] = {
      "Get a value from the issuer DN field. `key` specifies a value to get, "
      "for instance \"Name\" or \"Country\"."
     },
-    {"x509-cert/hostname-match", x509_cert_hostname_match,
-     "(x509-cert/hostname-match cert-obj hostname)\n\n"
-     "Return true if the Common Name (CN) field of the certificate matches "
-     "a given `hostname`."
+    {"x509-cert/is-ca", x509_cert_is_ca,
+     "(x509-cert/is-ca cert-obj)\n\n"
+     "Return true if the certificate is a CA certificate."
     },
     {"x509-cert/hostname-match", x509_cert_hostname_match,
      "(x509-cert/hostname-match cert-obj hostname)\n\n"
      "Return true if the Common Name (CN) field of the certificate matches "
      "a given `hostname`."
+    },
+    {"x509-cert/allowed-extended-usage", x509_cert_allowed_extended_usage,
+     "(x509-cert/allowed-extended-usage cert-obj oid)\n\n"
+     "Check if the certificate allows the specified extended usage OID. "
+     "The `oid` parameter can be either a canonical OID string or identifiers "
+     "like \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
+     "\"PKIX.OCSPSigning\". Returns true if the certificate allows the usage."
     },
     {"x509-cert/allowed-usage", x509_cert_allowed_usage,
      "(x509-cert/allowed-usage cert-obj cert-usage)\n\n"
