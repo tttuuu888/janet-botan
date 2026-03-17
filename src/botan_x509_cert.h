@@ -381,13 +381,13 @@ static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv) {
 
     size_t out_len = 0;
 
-    int ret = botan_x509_cert_get_subject_dn(cert, key, index, NULL, &out_len);
+    int ret = botan_x509_cert_get_issuer_dn(cert, key, index, NULL, &out_len);
     if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
         JANET_BOTAN_ASSERT(ret);
     }
 
     JanetBuffer *out = janet_buffer(out_len);
-    ret = botan_x509_cert_get_subject_dn(cert, key, index, out->data, &out_len);
+    ret = botan_x509_cert_get_issuer_dn(cert, key, index, out->data, &out_len);
     JANET_BOTAN_ASSERT(ret);
 
     if (out->data[out_len - 1] == 0) {
