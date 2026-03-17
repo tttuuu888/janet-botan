@@ -17,5 +17,4 @@
   (assert (= (version-patch) ver-patch))
   (assert (= (version-datestamp) ver-date)))
 
-
 (end-suite)
