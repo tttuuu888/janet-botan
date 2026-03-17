@@ -45,17 +45,17 @@
                (hex-decode "0583c92e58ec7df9365dfa9ae3fab8bab0ae1a85c24cc834751a39159fe17d77")))))
 
 (let [xof   (assert (xof/new "SHAKE-128"))
-      _     (assert (xof/update xof (hex-decode "d94be6703183babe2a30331b0028193c")))
-      xof2  (assert (xof/copy xof))
-      _     (assert (= (xof/name xof2) "SHAKE-128"))
-      out1  (xof/output xof 32)
-      out2  (xof/output xof2 32)]
+      _     (assert (:update xof (hex-decode "d94be6703183babe2a30331b0028193c")))
+      xof2  (assert (:copy xof))
+      _     (assert (= (:name xof2) "SHAKE-128"))
+      out1  (:output xof 32)
+      out2  (:output xof2 32)]
   (assert (= out1 out2)))
 
 (let [xof   (assert (xof/new "Ascon-XOF128"))
-      _     (assert (= (xof/name xof) "Ascon-XOF128"))
-      _     (assert (xof/update xof (hex-decode "b97478ce249b899f010195e709636901")))
-      out   (xof/output xof 32)]
+      _     (assert (= (:name xof) "Ascon-XOF128"))
+      _     (assert (:update xof (hex-decode "b97478ce249b899f010195e709636901")))
+      out   (:output xof 32)]
   (assert out
           (hex-decode "c6cd1bf440b71f124da6dae310e15e2ead208798604a6371dfda5c4a34548c64")))
 
