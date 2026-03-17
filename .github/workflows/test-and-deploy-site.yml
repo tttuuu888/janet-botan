@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: "Merge master to gh-pages"
+    - name: "Merge main to gh-pages"
       uses: devmasx/merge-branch@1.4.0
       with:
         type: now
