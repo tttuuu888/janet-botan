@@ -420,7 +420,7 @@ static Janet private_key_algo_name(int32_t argc, Janet *argv) {
     ret = botan_privkey_algo_name(key, (char *)output->data, &algo_len);
     JANET_BOTAN_ASSERT(ret);
 
-    if (output->data[algo_len - 1] == 0) {
+    if (algo_len > 0 && output->data[algo_len - 1] == 0) {
         algo_len -= 1;
     }
 

@@ -239,7 +239,7 @@ static Janet x509_cert_fingerprint(int32_t argc, Janet *argv) {
     ret = botan_x509_cert_get_fingerprint(cert, hash, out->data, &out_len);
     JANET_BOTAN_ASSERT(ret);
 
-    if (out->data[out_len - 1] == 0) {
+    if (out_len > 0 && out->data[out_len - 1] == 0) {
         out_len -= 1;
     }
 
@@ -363,7 +363,7 @@ static Janet x509_cert_subject_dn(int32_t argc, Janet *argv) {
     ret = botan_x509_cert_get_subject_dn(cert, key, index, out->data, &out_len);
     JANET_BOTAN_ASSERT(ret);
 
-    if (out->data[out_len - 1] == 0) {
+    if (out_len > 0 && out->data[out_len - 1] == 0) {
         out_len -= 1;
     }
 
@@ -390,7 +390,7 @@ static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv) {
     ret = botan_x509_cert_get_issuer_dn(cert, key, index, out->data, &out_len);
     JANET_BOTAN_ASSERT(ret);
 
-    if (out->data[out_len - 1] == 0) {
+    if (out_len > 0 && out->data[out_len - 1] == 0) {
         out_len -= 1;
     }
 

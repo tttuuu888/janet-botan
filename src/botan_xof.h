@@ -90,7 +90,7 @@ static Janet xof_name(int32_t argc, Janet *argv) {
     int ret = botan_xof_name(xof, name_buf, &name_len);
     JANET_BOTAN_ASSERT(ret);
 
-    if (name_buf[name_len - 1] == 0) {
+    if (name_len > 0 && name_buf[name_len - 1] == 0) {
         name_len -= 1;
     }
 
