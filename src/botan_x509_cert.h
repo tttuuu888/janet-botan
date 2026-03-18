@@ -165,7 +165,7 @@ static Janet x509_cert_load_file(int32_t argc, Janet *argv) {
 }
 
 static Janet x509_cert_dup(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 2);
+    janet_fixarity(argc, 1);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     botan_x509_cert_t cert = obj->x509_cert;
