@@ -317,6 +317,124 @@ static Janet public_key_load_ed25519(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet public_key_load_ed448(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 57) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_pubkey_load_ed448(&obj->public_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_x25519(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 32) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_pubkey_load_x25519(&obj->public_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_x448(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 56) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_pubkey_load_x448(&obj->public_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_ml_dsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_pubkey_load_ml_dsa(&obj->public_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_slh_dsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_pubkey_load_slh_dsa(&obj->public_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_frodokem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_pubkey_load_frodokem(&obj->public_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet public_key_load_classic_mceliece(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_public_key_obj_t *obj = janet_abstract(&public_key_obj_type, sizeof(botan_public_key_obj_t));
+    memset(obj, 0, sizeof(botan_public_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_pubkey_load_classic_mceliece(&obj->public_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet public_key_to_pem(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -555,7 +673,35 @@ static JanetReg public_key_cfuns[] = {
     },
     {"pubkey/load-ed25519", public_key_load_ed25519,
      "(pubkey/load-ed25519 key)\n\n"
-     "Return a public ed25519 key created from a 32-byte raw key value."
+     "Load an Ed25519 public key."
+    },
+    {"pubkey/load-ed448", public_key_load_ed448,
+     "(pubkey/load-ed448 key)\n\n"
+     "Load an Ed448 public key."
+    },
+    {"pubkey/load-x25519", public_key_load_x25519,
+     "(pubkey/load-x25519 key)\n\n"
+     "Load an X25519 public key."
+    },
+    {"pubkey/load-x448", public_key_load_x448,
+     "(pubkey/load-x448 key)\n\n"
+     "Load an X448 public key."
+    },
+    {"pubkey/load-ml-dsa", public_key_load_ml_dsa,
+     "(pubkey/load-ml-dsa key mode)\n\n"
+     "Load a ML-DSA public key with the given `mode`, e.g., \"ML-DSA-65\"."
+    },
+    {"pubkey/load-slh-dsa", public_key_load_slh_dsa,
+     "(pubkey/load-slh-dsa key mode)\n\n"
+     "Load a SLH-DSA public key with the given `mode`."
+    },
+    {"pubkey/load-frodokem", public_key_load_frodokem,
+     "(pubkey/load-frodokem key mode)\n\n"
+     "Load a FrodoKEM public key with the given `mode`."
+    },
+    {"pubkey/load-classic-mceliece", public_key_load_classic_mceliece,
+     "(pubkey/load-classic-mceliece key mode)\n\n"
+     "Load a Classic McEliece public key with the given `mode`."
     },
     {"pubkey/export", public_key_export,
      "(pubkey/export pubkey &opt pem)\n\n"
