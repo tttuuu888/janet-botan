@@ -31,6 +31,7 @@ static Janet cipher_get_tag_length(int32_t argc, Janet *argv);
 static Janet cipher_valid_nonce_length(int32_t argc, Janet *argv);
 static Janet cipher_get_default_nonce_length(int32_t argc, Janet *argv);
 static Janet cipher_get_update_granularity(int32_t argc, Janet *argv);
+static Janet cipher_get_ideal_update_granularity(int32_t argc, Janet *argv);
 static Janet cipher_set_associated_data(int32_t argc, Janet *argv);
 static Janet cipher_start(int32_t argc, Janet *argv);
 static Janet cipher_update(int32_t argc, Janet *argv);
@@ -60,6 +61,7 @@ static JanetMethod cipher_methods[] = {
     {"valid-nonce-length", cipher_valid_nonce_length},
     {"get-default-nonce-length", cipher_get_default_nonce_length},
     {"get-update-granularity", cipher_get_update_granularity},
+    {"get-ideal-update-granularity", cipher_get_ideal_update_granularity},
     {"set-associated-data", cipher_set_associated_data},
     {"start", cipher_start},
     {"update", cipher_update},
@@ -261,6 +263,18 @@ static Janet cipher_get_update_granularity(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)len);
 }
 
+static Janet cipher_get_ideal_update_granularity(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
+    botan_cipher_t cipher = obj->cipher;
+    size_t len;
+
+    int ret = botan_cipher_get_ideal_update_granularity(cipher, &len);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)len);
+}
+
 static Janet cipher_set_associated_data(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
@@ -395,6 +409,10 @@ static JanetReg cipher_cfuns[] = {
      "(cipher/get-update-granularity cipher-obj)\n\n"
      "Return the update granularity of the cipher. `cipher/update` must "
      "be called with blocks of this size, except for the final."
+    },
+    {"cipher/get-ideal-update-granularity", cipher_get_ideal_update_granularity,
+     "(cipher/get-ideal-update-granularity cipher-obj)\n\n"
+     "Return the ideal update granularity of the cipher for best performance."
     },
     {"cipher/set-associated-data", cipher_set_associated_data,
      "(cipher/set-associated-data cipher-obj ad)\n\n"

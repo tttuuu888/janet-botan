@@ -30,6 +30,7 @@
   (assert (= (cipher/get-tag-length cipher) 0))
   (assert (= (cipher/get-default-nonce-length cipher) 16))
   (assert (= (cipher/get-update-granularity cipher) 16))
+  (assert (> (cipher/get-ideal-update-granularity cipher) 0))
   (assert (cipher/valid-nonce-length cipher 16))
   (assert (not (cipher/valid-nonce-length cipher 1)))
 
