@@ -17,6 +17,7 @@ static int mac_get_fn(void *data, Janet key, Janet *out);
 
 /* Janet functions */
 static Janet mac_new(int32_t argc, Janet *argv);
+static Janet mac_name(int32_t argc, Janet *argv);
 static Janet mac_clear(int32_t argc, Janet *argv);
 static Janet mac_output_length(int32_t argc, Janet *argv);
 static Janet mac_get_keyspec(int32_t argc, Janet *argv);
@@ -34,6 +35,7 @@ static JanetAbstractType mac_obj_type = {
 };
 
 static JanetMethod mac_methods[] = {
+    {"name", mac_name},
     {"clear", mac_clear},
     {"output-length", mac_output_length},
     {"get-keyspec", mac_get_keyspec},
@@ -78,6 +80,23 @@ static Janet mac_new(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
+}
+
+static Janet mac_name(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_mac_obj_t *obj = janet_getabstract(argv, 0, get_mac_obj_type());
+    botan_mac_t mac = obj->mac;
+    char name_buf[64] = {0,};
+    size_t name_len = 64;
+
+    int ret = botan_mac_name(mac, name_buf, &name_len);
+    JANET_BOTAN_ASSERT(ret);
+
+    if (name_buf[name_len - 1] == 0) {
+        name_len -= 1;
+    }
+
+    return janet_wrap_string(janet_string((const uint8_t *)name_buf, name_len));
 }
 
 static Janet mac_clear(int32_t argc, Janet *argv) {
@@ -174,6 +193,9 @@ static JanetReg mac_cfuns[] = {
     {"mac/new", mac_new, "(mac/new name)\n\n"
      "Creates a MAC of the given name, e.g., \"HMAC(SHA-384)\"."
      "Returns `mac-obj`."
+    },
+    {"mac/name", mac_name, "(mac/name mac-obj)\n\n"
+     "Return the name of the MAC."
     },
     {"mac/clear", mac_clear, "(mac/clear mac-obj)\n\n"
      "Reset the state of `mac` back to clean, "
