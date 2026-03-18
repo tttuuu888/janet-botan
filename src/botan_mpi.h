@@ -40,6 +40,7 @@ static Janet mpi_swap(int32_t argc, Janet *argv);
 static Janet mpi_lshift(int32_t argc, Janet *argv);
 static Janet mpi_rshift(int32_t argc, Janet *argv);
 static Janet mpi_num_bytes(int32_t argc, Janet *argv);
+static Janet mpi_num_bits(int32_t argc, Janet *argv);
 static Janet mpi_to_u32(int32_t argc, Janet *argv);
 static Janet mpi_to_bin(int32_t argc, Janet *argv);
 static Janet mpi_to_hex(int32_t argc, Janet *argv);
@@ -79,6 +80,7 @@ static JanetMethod mpi_methods[] = {
     {"lshift", mpi_lshift},
     {"rshift", mpi_rshift},
     {"num-bytes", mpi_num_bytes},
+    {"num-bits", mpi_num_bits},
     {"to-u32", mpi_to_u32},
     {"to-bin", mpi_to_bin},
     {"to-hex", mpi_to_hex},
@@ -210,6 +212,38 @@ static Janet mpi_new_random(int32_t argc, Janet *argv) {
 
     size_t bits = janet_getsize(argv, 0);
     ret = botan_mp_rand_bits(obj->mpi, rng, bits);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet mpi_new_random_range(int32_t argc, Janet *argv) {
+    janet_arity(argc, 2, 3);
+    botan_mpi_obj_t *obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
+    memset(obj, 0, sizeof(botan_mpi_obj_t));
+
+    int ret = botan_mp_init(&obj->mpi);
+    JANET_BOTAN_ASSERT(ret);
+
+    botan_mpi_obj_t *lower = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mpi_obj_t *upper = janet_getabstract(argv, 1, get_mpi_obj_type());
+
+    botan_rng_obj_t *rng_obj;
+    botan_rng_t rng;
+
+    if (argc == 2) {
+        rng_obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+        memset(rng_obj, 0, sizeof(botan_rng_obj_t));
+
+        ret = botan_rng_init(&rng_obj->rng, "system");
+        JANET_BOTAN_ASSERT(ret);
+        rng = rng_obj->rng;
+    } else {
+        rng_obj = janet_getabstract(argv, 2, get_rng_obj_type());
+        rng = rng_obj->rng;
+    }
+
+    ret = botan_mp_rand_range(obj->mpi, rng, lower->mpi, upper->mpi);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -572,6 +606,18 @@ static Janet mpi_num_bytes(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)bytes);
 }
 
+static Janet mpi_num_bits(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
+    botan_mp_t mpi = obj->mpi;
+    size_t bits;
+
+    int ret = botan_mp_num_bits(mpi, &bits);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)bits);
+}
+
 static Janet mpi_to_u32(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_mpi_obj_t *obj = janet_getabstract(argv, 0, get_mpi_obj_type());
@@ -637,6 +683,10 @@ static JanetReg mpi_cfuns[] = {
      "(mpi/new-random bits &opt rng)\n\n"
      "Create a `bits` sizes random MPI object. Use `rng` if provided. "
      "Returns `mpi-obj`."
+    },
+    {"mpi/new-random-range", mpi_new_random_range,
+     "(mpi/new-random-range lower upper &opt rng)\n\n"
+     "Create a random MPI in the range [lower, upper]. Returns `mpi-obj`."
     },
     {"mpi/inverse-mod", mpi_inverse_mod,
      "(mpi/inverse-mod mpi-obj modulus)\n\n"
@@ -725,6 +775,10 @@ static JanetReg mpi_cfuns[] = {
     {"mpi/num-bytes", mpi_num_bytes,
      "(mpi/num-bytes mpi-obj)\n\n"
      "Return the number of significant bytes in the `mpi-obj`."
+    },
+    {"mpi/num-bits", mpi_num_bits,
+     "(mpi/num-bits mpi-obj)\n\n"
+     "Return the number of significant bits in the `mpi-obj`."
     },
     {"mpi/to-u32", mpi_to_u32,
      "(mpi/to-u32 mpi-obj)\n\n"
