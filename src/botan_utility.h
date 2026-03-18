@@ -43,6 +43,35 @@ static Janet cfun_hex_decode(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(decoded->data, decoded->count));
 }
 
+static Janet cfun_base64_encode(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    JanetByteView bin = janet_getbytes(argv, 0);
+    size_t out_len = ((bin.len + 2) / 3) * 4 + 1;
+    JanetBuffer *encoded = janet_buffer(out_len);
+
+    int ret = botan_base64_encode(bin.bytes, bin.len, (char *)encoded->data, &out_len);
+    JANET_BOTAN_ASSERT(ret);
+
+    /* Remove null terminator */
+    if (out_len > 0 && encoded->data[out_len - 1] == 0) {
+        out_len -= 1;
+    }
+
+    return janet_wrap_string(janet_string(encoded->data, out_len));
+}
+
+static Janet cfun_base64_decode(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    JanetByteView str = janet_getbytes(argv, 0);
+    size_t out_len = ((str.len + 3) / 4) * 3;
+    JanetBuffer *decoded = janet_buffer(out_len);
+
+    int ret = botan_base64_decode((const char *)str.bytes, str.len, decoded->data, &out_len);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(decoded->data, out_len));
+}
+
 static JanetReg utility_cfuns[] = {
     {"constant-time-compare", cfun_constant_time_compare,
      "(constant-time-compare x y)\n\n"
@@ -53,6 +82,12 @@ static JanetReg utility_cfuns[] = {
     },
     {"hex-decode", cfun_hex_decode, "(hex-decode str)\n\n"
      "Performs hex decoding of string data in `str`. Returns the string."
+    },
+    {"base64-encode", cfun_base64_encode, "(base64-encode bin)\n\n"
+     "Performs base64 encoding of binary data in `bin`. Returns the string."
+    },
+    {"base64-decode", cfun_base64_decode, "(base64-decode str)\n\n"
+     "Performs base64 decoding of string data in `str`. Returns the string."
     },
     {NULL, NULL, NULL}
 };
