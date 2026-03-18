@@ -79,7 +79,7 @@
 
 # Test encrypted export/import
 (let [passphrase "testpass"
-      pri (privkey/new "Ed25519" "")
+      pri (privkey/new "Ed25519")
       enc-pem (:to-encrypted-pem pri passphrase)
       enc-der (:to-encrypted-der pri passphrase)]
   (assert (string/has-prefix? "-----BEGIN ENCRYPTED PRIVATE KEY-----" enc-pem))

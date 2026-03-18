@@ -82,7 +82,7 @@ static int private_key_get_fn(void *data, Janet key, Janet *out) {
 
 /* Janet functions */
 static Janet private_key_new(int32_t argc, Janet *argv) {
-    janet_arity(argc, 2, 3);
+    janet_arity(argc, 1, 3);
 
     int ret;
     botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
@@ -90,7 +90,7 @@ static Janet private_key_new(int32_t argc, Janet *argv) {
 
     botan_rng_t rng;
     const char *algo = janet_getcstring(argv, 0);
-    const char *param = janet_getcstring(argv, 1);
+    const char *param = (argc >= 2) ? janet_getcstring(argv, 1) : "";
 
     if (argc == 3) {
         botan_rng_obj_t *obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
@@ -545,13 +545,14 @@ static Janet private_key_oid(int32_t argc, Janet *argv) {
 
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
-     "(privkey/new algo param &opt rng)\n\n"
-     "Creates a new private key. The parameter type/value depends on the "
+     "(privkey/new algo &opt param rng)\n\n"
+     "Creates a new private key. The `param` type/value depends on the "
      "algorithm. For \"rsa\" it is the size of the key in bits. For \"ecdsa\" "
      "and \"ecdh\" it is a group name (for instance \"secp256r1\"). For "
      "\"ecdh\" there is also a special case for group \"curve25519\" (which "
-     "is actually a completely distinct key type with a non-standard encoding)."
-     " Use `rng` if provided."
+     "is actually a completely distinct key type with a non-standard "
+     "encoding). For \"Ed25519\", `param` can be omitted. "
+     "Use `rng` if provided."
     },
     {"privkey/new-ec", private_key_new_ec,
      "(privkey/new-ec algo ec-group &opt rng)\n\n"
