@@ -21,6 +21,8 @@
     (assert (= mod-key 1)))
 
   (assert (cipher/set-key cipher key))
+  (assert (> (cipher/output-length cipher 32) 0))
+  (assert (> (:output-length cipher 32) 0))
 
   (assert-error "Error expected" (cipher/set-associated-data cipher nonce))
 
@@ -31,8 +33,14 @@
   (assert (cipher/valid-nonce-length cipher 16))
   (assert (not (cipher/valid-nonce-length cipher 1)))
 
+  # Test clear (key and message state cleared)
   (assert (cipher/clear cipher))
   (assert (cipher/set-key cipher key))
+  (assert (cipher/start cipher nonce))
+  (assert (= (cipher/finish cipher plain) encrypted))
+
+  # Test reset (key remains set, message state cleared)
+  (assert (cipher/reset cipher))
   (assert (cipher/start cipher nonce))
   (assert (= (cipher/finish cipher plain) encrypted))
 
