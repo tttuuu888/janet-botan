@@ -8,6 +8,8 @@
 (let [hash (assert (hash/new "SHA-256"))]
   (assert (= (hash/name hash) "SHA-256"))
   (assert (= (hash/output-length hash) 32))
+  (assert (= (hash/block-size hash) 64))
+  (assert (= (:block-size hash) 64))
 
   (assert (hash/update hash "ABC"))
   (assert (deep= (hex-encode (hash/final hash))

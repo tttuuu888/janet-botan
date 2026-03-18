@@ -21,6 +21,7 @@ static Janet hash_name(int32_t argc, Janet *argv);
 static Janet hash_copy_state(int32_t argc, Janet *argv);
 static Janet hash_clear(int32_t argc, Janet *argv);
 static Janet hash_output_length(int32_t argc, Janet *argv);
+static Janet hash_block_size(int32_t argc, Janet *argv);
 static Janet hash_update(int32_t argc, Janet *argv);
 static Janet hash_final(int32_t argc, Janet *argv);
 
@@ -37,6 +38,7 @@ static JanetMethod hash_methods[] = {
     {"copy", hash_copy_state},
     {"clear", hash_clear},
     {"output-length", hash_output_length},
+    {"block-size", hash_block_size},
     {"update", hash_update},
     {"final", hash_final},
     {NULL, NULL},
@@ -132,6 +134,18 @@ static Janet hash_output_length(int32_t argc, Janet *argv) {
     return janet_wrap_number((double)output_len);
 }
 
+static Janet hash_block_size(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_hash_obj_t *obj = janet_getabstract(argv, 0, get_hash_obj_type());
+    botan_hash_t hash = obj->hash;
+    size_t block_size;
+
+    int ret = botan_hash_block_size(hash, &block_size);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)block_size);
+}
+
 static Janet hash_update(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_hash_obj_t *obj = janet_getabstract(argv, 0, get_hash_obj_type());
@@ -177,6 +191,10 @@ static JanetReg hash_cfuns[] = {
     {"hash/output-length", hash_output_length,
      "(hash/output-length hash-obj)\n\n"
      "Return the output length of the `hash-obj`."
+    },
+    {"hash/block-size", hash_block_size,
+     "(hash/block-size hash-obj)\n\n"
+     "Return the block size of the `hash-obj`."
     },
     {"hash/update", hash_update, "(hash/update hash-boj input)\n\n"
      "Add input to the hash computation. Returns `hash-obj`."
