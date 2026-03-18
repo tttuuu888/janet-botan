@@ -92,4 +92,28 @@
     (assert (= (:algo-name pri3) "Ed25519"))
     (assert (= (:to-raw pri) (:to-raw pri3)))))
 
+# Test Ed448 load
+(let [pri (privkey/new "Ed448")
+      raw (:to-raw pri)
+      pri2 (privkey/load-ed448 raw)
+      raw2 (:to-raw pri2)]
+  (assert (= (:algo-name pri2) "Ed448"))
+  (assert (= raw raw2)))
+
+# Test X25519 load
+(let [pri (privkey/new "X25519")
+      raw (:to-raw pri)
+      pri2 (privkey/load-x25519 raw)
+      raw2 (:to-raw pri2)]
+  (assert (= (:algo-name pri2) "X25519"))
+  (assert (= raw raw2)))
+
+# Test X448 load
+(let [pri (privkey/new "X448")
+      raw (:to-raw pri)
+      pri2 (privkey/load-x448 raw)
+      raw2 (:to-raw pri2)]
+  (assert (= (:algo-name pri2) "X448"))
+  (assert (= raw raw2)))
+
 (end-suite)

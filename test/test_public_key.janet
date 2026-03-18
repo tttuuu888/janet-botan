@@ -81,4 +81,31 @@
              (:get-field sm2-pubkey2 "public_y")
              (:get-field sm2-pubkey3 "public_y"))))
 
+# Test Ed448 load
+(let [pri (privkey/new "Ed448")
+      pub (:get-pubkey pri)
+      pub-raw (:to-raw pub)
+      pub2 (pubkey/load-ed448 pub-raw)
+      pub-raw2 (:to-raw pub2)]
+  (assert (= (:algo-name pub2) "Ed448"))
+  (assert (= pub-raw pub-raw2)))
+
+# Test X25519 load
+(let [pri (privkey/new "X25519")
+      pub (:get-pubkey pri)
+      pub-raw (:to-raw pub)
+      pub2 (pubkey/load-x25519 pub-raw)
+      pub-raw2 (:to-raw pub2)]
+  (assert (= (:algo-name pub2) "X25519"))
+  (assert (= pub-raw pub-raw2)))
+
+# Test X448 load
+(let [pri (privkey/new "X448")
+      pub (:get-pubkey pri)
+      pub-raw (:to-raw pub)
+      pub2 (pubkey/load-x448 pub-raw)
+      pub-raw2 (:to-raw pub2)]
+  (assert (= (:algo-name pub2) "X448"))
+  (assert (= pub-raw pub-raw2)))
+
 (end-suite)

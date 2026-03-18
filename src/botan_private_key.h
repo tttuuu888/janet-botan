@@ -337,6 +337,124 @@ static Janet private_key_load_ed25519(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet private_key_load_ed448(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 57) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_privkey_load_ed448(&obj->private_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_x25519(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 32) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_privkey_load_x25519(&obj->private_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_x448(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    if (key.len != 56) {
+        janet_panic(getBotanError(BOTAN_FFI_ERROR_INVALID_KEY_LENGTH));
+    }
+
+    ret = botan_privkey_load_x448(&obj->private_key, key.bytes);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_ml_dsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_privkey_load_ml_dsa(&obj->private_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_slh_dsa(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_privkey_load_slh_dsa(&obj->private_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_frodokem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_privkey_load_frodokem(&obj->private_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet private_key_load_classic_mceliece(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    int ret;
+    botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
+    memset(obj, 0, sizeof(botan_private_key_obj_t));
+
+    JanetByteView key = janet_getbytes(argv, 0);
+    const char *mode = janet_getcstring(argv, 1);
+
+    ret = botan_privkey_load_classic_mceliece(&obj->private_key, key.bytes, key.len, mode);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet private_key_get_public_key(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -605,6 +723,34 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/load-ed25519", private_key_load_ed25519,
      "(privkey/load-ed25519 key)\n\n"
      "Return a private ed25519 key created from a 32-byte raw key value."
+    },
+    {"privkey/load-ed448", private_key_load_ed448,
+     "(privkey/load-ed448 key)\n\n"
+     "Load an Ed448 private key."
+    },
+    {"privkey/load-x25519", private_key_load_x25519,
+     "(privkey/load-x25519 key)\n\n"
+     "Load an X25519 private key."
+    },
+    {"privkey/load-x448", private_key_load_x448,
+     "(privkey/load-x448 key)\n\n"
+     "Load an X448 private key."
+    },
+    {"privkey/load-ml-dsa", private_key_load_ml_dsa,
+     "(privkey/load-ml-dsa key mode)\n\n"
+     "Load a ML-DSA private key with the given `mode`, e.g., \"ML-DSA-65\"."
+    },
+    {"privkey/load-slh-dsa", private_key_load_slh_dsa,
+     "(privkey/load-slh-dsa key mode)\n\n"
+     "Load a SLH-DSA private key with the given `mode`."
+    },
+    {"privkey/load-frodokem", private_key_load_frodokem,
+     "(privkey/load-frodokem key mode)\n\n"
+     "Load a FrodoKEM private key with the given `mode`."
+    },
+    {"privkey/load-classic-mceliece", private_key_load_classic_mceliece,
+     "(privkey/load-classic-mceliece key mode)\n\n"
+     "Load a Classic McEliece private key with the given `mode`."
     },
     {"privkey/get-pubkey", private_key_get_public_key,
      "(privkey/get-pubkey privkey)\n\n"
