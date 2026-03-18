@@ -81,7 +81,9 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
       cert-authority-key-id ""
       cert-subject-key-id (hex-decode "07276621D55D4F10E52A06191AB73DCB25BCF411")
       cert-pubkey-bits (hex-decode "301306072A8648CE3D020106082A8648CE3D0301070342000471F57D8A570E6F837225E9884F1B9F01EE7F981ADACF948C8E58EAD04E50539E668B7FAD88B991810C4FD4468090747EB04A497CAE09EE40FE5DEDBEBFCDF5A7")
-      cert1 (x509-cert/load cert-pem)]
+      cert1 (x509-cert/load cert-pem)
+      cert1-dup (:dup cert1)]
+  (assert (= (:fingerprint cert1) (:fingerprint cert1-dup)))
   (assert (= (:not-before cert1) cert-not-before))
   (assert (= (:not-after cert1) cert-not-after))
   (assert (= (:fingerprint cert1) cert-fingerprint))

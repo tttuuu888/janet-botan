@@ -73,4 +73,20 @@
       mpi2 (mpi/new-random 10 (rng/new))]
   (assert (not (= mpi1 mpi2))))
 
+# Test num-bits
+(let [mpi (mpi/new "255")]
+  (assert (= (:num-bits mpi) 8))
+  (assert (= (:num-bytes mpi) 1)))
+
+(let [mpi (mpi/new "256")]
+  (assert (= (:num-bits mpi) 9))
+  (assert (= (:num-bytes mpi) 2)))
+
+# Test rand-range
+(let [lower (mpi/new "10")
+      upper (mpi/new "100")
+      r (mpi/new-random-range lower upper)]
+  (assert (>= r lower))
+  (assert (< r upper)))
+
 (end-suite)

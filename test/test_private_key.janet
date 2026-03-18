@@ -77,4 +77,19 @@
   (assert (= (:get-field sm2-priv-key1 "x")
              (:get-field sm2-priv-key2 "x"))))
 
+# Test encrypted export/import
+(let [passphrase "testpass"
+      pri (privkey/new "Ed25519")
+      enc-pem (:to-encrypted-pem pri passphrase)
+      enc-der (:to-encrypted-der pri passphrase)]
+  (assert (string/has-prefix? "-----BEGIN ENCRYPTED PRIVATE KEY-----" enc-pem))
+
+  (let [pri2 (privkey/load enc-der passphrase)]
+    (assert (= (:algo-name pri2) "Ed25519"))
+    (assert (= (:to-raw pri) (:to-raw pri2))))
+
+  (let [pri3 (privkey/load enc-pem passphrase)]
+    (assert (= (:algo-name pri3) "Ed25519"))
+    (assert (= (:to-raw pri) (:to-raw pri3)))))
+
 (end-suite)

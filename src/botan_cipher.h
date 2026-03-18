@@ -21,7 +21,9 @@ static void cipher_tostring_fn(void *p, JanetBuffer *buffer);
 /* Janet functions */
 static Janet cipher_new(int32_t argc, Janet *argv);
 static Janet cipher_name(int32_t argc, Janet *argv);
+static Janet cipher_output_length(int32_t argc, Janet *argv);
 static Janet cipher_clear(int32_t argc, Janet *argv);
+static Janet cipher_reset(int32_t argc, Janet *argv);
 static Janet cipher_get_keyspec(int32_t argc, Janet *argv);
 static Janet cipher_set_key(int32_t argc, Janet *argv);
 static Janet cipher_is_authenticated(int32_t argc, Janet *argv);
@@ -29,6 +31,7 @@ static Janet cipher_get_tag_length(int32_t argc, Janet *argv);
 static Janet cipher_valid_nonce_length(int32_t argc, Janet *argv);
 static Janet cipher_get_default_nonce_length(int32_t argc, Janet *argv);
 static Janet cipher_get_update_granularity(int32_t argc, Janet *argv);
+static Janet cipher_get_ideal_update_granularity(int32_t argc, Janet *argv);
 static Janet cipher_set_associated_data(int32_t argc, Janet *argv);
 static Janet cipher_start(int32_t argc, Janet *argv);
 static Janet cipher_update(int32_t argc, Janet *argv);
@@ -48,7 +51,9 @@ static JanetAbstractType cipher_obj_type = {
 
 static JanetMethod cipher_methods[] = {
     {"name", cipher_name},
+    {"output-length", cipher_output_length},
     {"clear", cipher_clear},
+    {"reset", cipher_reset},
     {"get-keyspec", cipher_get_keyspec},
     {"set-key", cipher_set_key},
     {"is-authenticated", cipher_is_authenticated},
@@ -56,6 +61,7 @@ static JanetMethod cipher_methods[] = {
     {"valid-nonce-length", cipher_valid_nonce_length},
     {"get-default-nonce-length", cipher_get_default_nonce_length},
     {"get-update-granularity", cipher_get_update_granularity},
+    {"get-ideal-update-granularity", cipher_get_ideal_update_granularity},
     {"set-associated-data", cipher_set_associated_data},
     {"start", cipher_start},
     {"update", cipher_update},
@@ -129,11 +135,24 @@ static Janet cipher_name(int32_t argc, Janet *argv) {
     int ret = botan_cipher_name(cipher, name_buf, &name_len);
     JANET_BOTAN_ASSERT(ret);
 
-    if (name_buf[name_len - 1] == 0) {
+    if (name_len > 0 && name_buf[name_len - 1] == 0) {
         name_len -= 1;
     }
 
     return janet_wrap_string(janet_string((const uint8_t *)name_buf, name_len));
+}
+
+static Janet cipher_output_length(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+    botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
+    botan_cipher_t cipher = obj->cipher;
+    size_t input_len = janet_getsize(argv, 1);
+    size_t output_len;
+
+    int ret = botan_cipher_output_length(cipher, input_len, &output_len);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)output_len);
 }
 
 static Janet cipher_clear(int32_t argc, Janet *argv) {
@@ -142,6 +161,17 @@ static Janet cipher_clear(int32_t argc, Janet *argv) {
     botan_cipher_t cipher = obj->cipher;
 
     int ret = botan_cipher_clear(cipher);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet cipher_reset(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
+    botan_cipher_t cipher = obj->cipher;
+
+    int ret = botan_cipher_reset(cipher);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -228,6 +258,18 @@ static Janet cipher_get_update_granularity(int32_t argc, Janet *argv) {
     size_t len;
 
     int ret = botan_cipher_get_update_granularity(cipher, &len);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)len);
+}
+
+static Janet cipher_get_ideal_update_granularity(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
+    botan_cipher_t cipher = obj->cipher;
+    size_t len;
+
+    int ret = botan_cipher_get_ideal_update_granularity(cipher, &len);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_number((double)len);
@@ -327,6 +369,14 @@ static JanetReg cipher_cfuns[] = {
     {"cipher/name", cipher_name, "(cipher/name cipher-obj)\n\n"
      "Returns the name of this algorithm."
     },
+    {"cipher/output-length", cipher_output_length,
+     "(cipher/output-length cipher-obj input-len)\n\n"
+     "Returns the output length of this cipher, for a given `input-len`."
+    },
+    {"cipher/reset", cipher_reset, "(cipher/reset cipher-obj)\n\n"
+     "Reset the message specific state of `cipher-obj`. "
+     "The key remains set. Returns `cipher-obj`."
+    },
     {"cipher/clear", cipher_clear, "(cipher/clear cipher-obj)\n\n"
      "Reset the state of `cipher` back to clean, "
      "as if no key and input has been supplied. Returns `cipher-obj`."
@@ -359,6 +409,10 @@ static JanetReg cipher_cfuns[] = {
      "(cipher/get-update-granularity cipher-obj)\n\n"
      "Return the update granularity of the cipher. `cipher/update` must "
      "be called with blocks of this size, except for the final."
+    },
+    {"cipher/get-ideal-update-granularity", cipher_get_ideal_update_granularity,
+     "(cipher/get-ideal-update-granularity cipher-obj)\n\n"
+     "Return the ideal update granularity of the cipher for best performance."
     },
     {"cipher/set-associated-data", cipher_set_associated_data,
      "(cipher/set-associated-data cipher-obj ad)\n\n"

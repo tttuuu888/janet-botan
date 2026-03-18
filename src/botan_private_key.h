@@ -20,6 +20,8 @@ static Janet private_key_new(int32_t argc, Janet *argv);
 static Janet private_key_get_public_key(int32_t argc, Janet *argv);
 static Janet private_key_to_pem(int32_t argc, Janet *argv);
 static Janet private_key_to_der(int32_t argc, Janet *argv);
+static Janet private_key_to_encrypted_pem(int32_t argc, Janet *argv);
+static Janet private_key_to_encrypted_der(int32_t argc, Janet *argv);
 static Janet private_key_to_raw(int32_t argc, Janet *argv);
 static Janet private_key_check_key(int32_t argc, Janet *argv);
 static Janet private_key_algo_name(int32_t argc, Janet *argv);
@@ -41,6 +43,8 @@ static JanetMethod private_key_methods[] = {
     {"get-pubkey", private_key_get_public_key},
     {"to-pem", private_key_to_pem},
     {"to-der", private_key_to_der},
+    {"to-encrypted-pem", private_key_to_encrypted_pem},
+    {"to-encrypted-der", private_key_to_encrypted_der},
     {"to-raw", private_key_to_raw},
     {"check-key", private_key_check_key},
     {"algo-name", private_key_algo_name},
@@ -78,7 +82,7 @@ static int private_key_get_fn(void *data, Janet key, Janet *out) {
 
 /* Janet functions */
 static Janet private_key_new(int32_t argc, Janet *argv) {
-    janet_arity(argc, 2, 3);
+    janet_arity(argc, 1, 3);
 
     int ret;
     botan_private_key_obj_t *obj = janet_abstract(&private_key_obj_type, sizeof(botan_private_key_obj_t));
@@ -86,7 +90,7 @@ static Janet private_key_new(int32_t argc, Janet *argv) {
 
     botan_rng_t rng;
     const char *algo = janet_getcstring(argv, 0);
-    const char *param = janet_getcstring(argv, 1);
+    const char *param = (argc >= 2) ? janet_getcstring(argv, 1) : "";
 
     if (argc == 3) {
         botan_rng_obj_t *obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
@@ -374,6 +378,48 @@ static Janet private_key_to_der(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(data.data, data.len));
 }
 
+static Janet private_key_to_encrypted_pem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+    const char *passphrase = janet_getcstring(argv, 1);
+
+    botan_rng_obj_t *rng_obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+    memset(rng_obj, 0, sizeof(botan_rng_obj_t));
+    int ret = botan_rng_init(&rng_obj->rng, "system");
+    JANET_BOTAN_ASSERT(ret);
+
+    view_data_t data;
+    ret = botan_privkey_view_encrypted_pem(key, rng_obj->rng, passphrase,
+                                            NULL, NULL, 0,
+                                            &data, (botan_view_str_fn)view_str_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
+static Janet private_key_to_encrypted_der(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+    const char *passphrase = janet_getcstring(argv, 1);
+
+    botan_rng_obj_t *rng_obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+    memset(rng_obj, 0, sizeof(botan_rng_obj_t));
+    int ret = botan_rng_init(&rng_obj->rng, "system");
+    JANET_BOTAN_ASSERT(ret);
+
+    view_data_t data;
+    ret = botan_privkey_view_encrypted_der(key, rng_obj->rng, passphrase,
+                                            NULL, NULL, 0,
+                                            &data, (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
 static Janet private_key_to_raw(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -420,7 +466,7 @@ static Janet private_key_algo_name(int32_t argc, Janet *argv) {
     ret = botan_privkey_algo_name(key, (char *)output->data, &algo_len);
     JANET_BOTAN_ASSERT(ret);
 
-    if (output->data[algo_len - 1] == 0) {
+    if (algo_len > 0 && output->data[algo_len - 1] == 0) {
         algo_len -= 1;
     }
 
@@ -499,13 +545,14 @@ static Janet private_key_oid(int32_t argc, Janet *argv) {
 
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
-     "(privkey/new algo param &opt rng)\n\n"
-     "Creates a new private key. The parameter type/value depends on the "
+     "(privkey/new algo &opt param rng)\n\n"
+     "Creates a new private key. The `param` type/value depends on the "
      "algorithm. For \"rsa\" it is the size of the key in bits. For \"ecdsa\" "
      "and \"ecdh\" it is a group name (for instance \"secp256r1\"). For "
      "\"ecdh\" there is also a special case for group \"curve25519\" (which "
-     "is actually a completely distinct key type with a non-standard encoding)."
-     " Use `rng` if provided."
+     "is actually a completely distinct key type with a non-standard "
+     "encoding). For \"Ed25519\", `param` can be omitted. "
+     "Use `rng` if provided."
     },
     {"privkey/new-ec", private_key_new_ec,
      "(privkey/new-ec algo ec-group &opt rng)\n\n"
@@ -570,6 +617,14 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/to-der", private_key_to_der,
      "(privkey/to-der privkey)\n\n"
      "Return the unencrypted DER encoding of the private key."
+    },
+    {"privkey/to-encrypted-pem", private_key_to_encrypted_pem,
+     "(privkey/to-encrypted-pem privkey passphrase)\n\n"
+     "Return the PEM encoding of the private key encrypted with `passphrase`."
+    },
+    {"privkey/to-encrypted-der", private_key_to_encrypted_der,
+     "(privkey/to-encrypted-der privkey passphrase)\n\n"
+     "Return the DER encoding of the private key encrypted with `passphrase`."
     },
     {"privkey/to-raw", private_key_to_raw,
      "(privkey/to-raw privkey)\n\n"
