@@ -119,6 +119,9 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
 
 (let [crl (x509-crl/load crl-pem)
      cert (x509-cert/load cert-pem2)]
-  (assert (:is-revoked crl cert)))
+  (assert (:is-revoked crl cert))
+  (assert (> (:this-update crl) 0))
+  (assert (> (:next-update crl) (:this-update crl)))
+  (assert (= (:entries-count crl) 1)))
 
 (end-suite)

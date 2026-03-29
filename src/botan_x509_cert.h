@@ -44,6 +44,9 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
 /* Janet functions x509-crl */
+static Janet x509_crl_this_update(int32_t argc, Janet *argv);
+static Janet x509_crl_next_update(int32_t argc, Janet *argv);
+static Janet x509_crl_entries_count(int32_t argc, Janet *argv);
 static Janet x509_crl_is_revoked(int32_t argc, Janet *argv);
 
 static JanetAbstractType x509_cert_obj_type = {
@@ -85,6 +88,9 @@ static JanetMethod x509_cert_methods[] = {
 };
 
 static JanetMethod x509_crl_methods[] = {
+    {"this-update", x509_crl_this_update},
+    {"next-update", x509_crl_next_update},
+    {"entries-count", x509_crl_entries_count},
     {"is-revoked", x509_crl_is_revoked},
     {NULL, NULL},
 };
@@ -620,6 +626,45 @@ static Janet x509_crl_load_file(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet x509_crl_this_update(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    uint64_t time_since_epoch;
+    int ret = botan_x509_crl_this_update(crl, &time_since_epoch);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)time_since_epoch);
+}
+
+static Janet x509_crl_next_update(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    uint64_t time_since_epoch;
+    int ret = botan_x509_crl_next_update(crl, &time_since_epoch);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)time_since_epoch);
+}
+
+static Janet x509_crl_entries_count(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    size_t count;
+    int ret = botan_x509_crl_entries_count(crl, &count);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)count);
+}
+
 static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
 
@@ -766,6 +811,18 @@ static JanetReg x509_crl_cfuns[] = {
     {"x509-crl/load-file", x509_crl_load_file,
      "(x509-crl/load file-name)\n\n"
      "Load a CRL from a file."
+    },
+    {"x509-crl/this-update", x509_crl_this_update,
+     "(x509-crl/this-update crl-obj)\n\n"
+     "Return the time the CRL was issued, as seconds since epoch."
+    },
+    {"x509-crl/next-update", x509_crl_next_update,
+     "(x509-crl/next-update crl-obj)\n\n"
+     "Return the time the next CRL update is expected, as seconds since epoch."
+    },
+    {"x509-crl/entries-count", x509_crl_entries_count,
+     "(x509-crl/entries-count crl-obj)\n\n"
+     "Return the number of entries in the CRL."
     },
     {"x509-crl/is-revoked", x509_crl_is_revoked,
      "(x509-crl/load crl cert)\n\n"
