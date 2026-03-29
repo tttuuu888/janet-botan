@@ -1,15 +1,18 @@
 #!/bin/bash
 
-# Merge libbotan-3.a and botan.a
+# Create merged static library from .static.o and libbotan-3.a
+ar rcs janet_botan.a build/src___main.static.o
+
 ar -M <<EOM
     CREATE botan.a
-    ADDLIB build/botan.a
+    ADDLIB janet_botan.a
     ADDLIB botan/libbotan-3.a
     SAVE
     END
 EOM
 
 mv botan.a build/botan.a
+rm -f janet_botan.a
 
 # Update botan.meta.janet
 cat <<EOT > build/botan.meta.janet
