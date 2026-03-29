@@ -935,7 +935,7 @@ static JanetReg x509_crl_cfuns[] = {
      "to get the number of entries."
     },
     {"x509-crl/is-revoked", x509_crl_is_revoked,
-     "(x509-crl/load crl cert)\n\n"
+     "(x509-crl/is-revoked crl cert)\n\n"
      "Check whether a given `crl` contains a given `cert`. Return true when "
      "the certificate is revoked."
     },
@@ -967,7 +967,6 @@ static JanetReg x509_crl_entry_cfuns[] = {
     },
     {NULL, NULL, NULL}
 };
-
 
 static void submod_x509_cert(JanetTable *env) {
     janet_cfuns(env, "botan", x509_cert_cfuns);
