@@ -15,6 +15,10 @@ typedef struct botan_x509_crl_obj {
     botan_x509_crl_t x509_crl;
 } botan_x509_crl_obj_t;
 
+typedef struct botan_x509_crl_entry_obj {
+    botan_x509_crl_entry_t entry;
+} botan_x509_crl_entry_obj_t;
+
 /* Abstract Object functions x509-cert */
 static int x509_cert_gc_fn(void *data, size_t len);
 static int x509_cert_get_fn(void *data, Janet key, Janet *out);
@@ -22,6 +26,10 @@ static int x509_cert_get_fn(void *data, Janet key, Janet *out);
 /* Abstract Object functions x509-crl */
 static int x509_crl_gc_fn(void *data, size_t len);
 static int x509_crl_get_fn(void *data, Janet key, Janet *out);
+
+/* Abstract Object functions x509-crl-entry */
+static int x509_crl_entry_gc_fn(void *data, size_t len);
+static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out);
 
 /* Janet functions x509-cert */
 static Janet x509_cert_dup(int32_t argc, Janet *argv);
@@ -44,7 +52,16 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
 /* Janet functions x509-crl */
+static Janet x509_crl_this_update(int32_t argc, Janet *argv);
+static Janet x509_crl_next_update(int32_t argc, Janet *argv);
+static Janet x509_crl_entries_count(int32_t argc, Janet *argv);
+static Janet x509_crl_get_entry(int32_t argc, Janet *argv);
 static Janet x509_crl_is_revoked(int32_t argc, Janet *argv);
+
+/* Janet functions x509-crl-entry */
+static Janet x509_crl_entry_reason(int32_t argc, Janet *argv);
+static Janet x509_crl_entry_revocation_date(int32_t argc, Janet *argv);
+static Janet x509_crl_entry_serial_number(int32_t argc, Janet *argv);
 
 static JanetAbstractType x509_cert_obj_type = {
     "botan/x509_cert",
@@ -59,6 +76,14 @@ static JanetAbstractType x509_crl_obj_type = {
     x509_crl_gc_fn,
     NULL,
     x509_crl_get_fn,
+    JANET_ATEND_GET
+};
+
+static JanetAbstractType x509_crl_entry_obj_type = {
+    "botan/x509_crl_entry",
+    x509_crl_entry_gc_fn,
+    NULL,
+    x509_crl_entry_get_fn,
     JANET_ATEND_GET
 };
 
@@ -84,7 +109,18 @@ static JanetMethod x509_cert_methods[] = {
     {NULL, NULL},
 };
 
+static JanetMethod x509_crl_entry_methods[] = {
+    {"reason", x509_crl_entry_reason},
+    {"revocation-date", x509_crl_entry_revocation_date},
+    {"serial-number", x509_crl_entry_serial_number},
+    {NULL, NULL},
+};
+
 static JanetMethod x509_crl_methods[] = {
+    {"this-update", x509_crl_this_update},
+    {"next-update", x509_crl_next_update},
+    {"entries-count", x509_crl_entries_count},
+    {"get-entry", x509_crl_get_entry},
     {"is-revoked", x509_crl_is_revoked},
     {NULL, NULL},
 };
@@ -95,6 +131,10 @@ static JanetAbstractType *get_x509_cert_obj_type() {
 
 static JanetAbstractType *get_x509_crl_obj_type() {
     return &x509_crl_obj_type;
+}
+
+static JanetAbstractType *get_x509_crl_entry_obj_type() {
+    return &x509_crl_entry_obj_type;
 }
 
 /* Abstract Object functions x509-cert */
@@ -133,6 +173,25 @@ static int x509_crl_get_fn(void *data, Janet key, Janet *out) {
     }
 
     return janet_getmethod(janet_unwrap_keyword(key), x509_crl_methods, out);
+}
+
+/* Abstract Object functions x509-crl-entry */
+static int x509_crl_entry_gc_fn(void *data, size_t len) {
+    botan_x509_crl_entry_obj_t *obj = (botan_x509_crl_entry_obj_t *)data;
+
+    int ret = botan_x509_crl_entry_destroy(obj->entry);
+    JANET_BOTAN_ASSERT(ret);
+
+    return 0;
+}
+
+static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
+    (void)data;
+    if (!janet_checktype(key, JANET_KEYWORD)) {
+        return 0;
+    }
+
+    return janet_getmethod(janet_unwrap_keyword(key), x509_crl_entry_methods, out);
 }
 
 /* Janet functions x509-cert */
@@ -620,6 +679,97 @@ static Janet x509_crl_load_file(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet x509_crl_this_update(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    uint64_t time_since_epoch;
+    int ret = botan_x509_crl_this_update(crl, &time_since_epoch);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)time_since_epoch);
+}
+
+static Janet x509_crl_next_update(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    uint64_t time_since_epoch;
+    int ret = botan_x509_crl_next_update(crl, &time_since_epoch);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)time_since_epoch);
+}
+
+static Janet x509_crl_entries_count(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    size_t count;
+    int ret = botan_x509_crl_entries_count(crl, &count);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)count);
+}
+
+static Janet x509_crl_get_entry(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+    size_t index = janet_getsize(argv, 1);
+
+    botan_x509_crl_entry_obj_t *entry_obj = janet_abstract(&x509_crl_entry_obj_type, sizeof(botan_x509_crl_entry_obj_t));
+    memset(entry_obj, 0, sizeof(botan_x509_crl_entry_obj_t));
+
+    int ret = botan_x509_crl_entries(crl, index, &entry_obj->entry);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(entry_obj);
+}
+
+static Janet x509_crl_entry_reason(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_entry_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_entry_obj_type());
+    int reason_code;
+
+    int ret = botan_x509_crl_entry_reason(obj->entry, &reason_code);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)reason_code);
+}
+
+static Janet x509_crl_entry_revocation_date(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_entry_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_entry_obj_type());
+    uint64_t time_since_epoch;
+
+    int ret = botan_x509_crl_entry_revocation_date(obj->entry, &time_since_epoch);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_number((double)time_since_epoch);
+}
+
+static Janet x509_crl_entry_serial_number(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_entry_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_entry_obj_type());
+
+    view_data_t data;
+    int ret = botan_x509_crl_entry_view_serial_number(obj->entry, &data, (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
 static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
 
@@ -767,14 +917,56 @@ static JanetReg x509_crl_cfuns[] = {
      "(x509-crl/load file-name)\n\n"
      "Load a CRL from a file."
     },
+    {"x509-crl/this-update", x509_crl_this_update,
+     "(x509-crl/this-update crl-obj)\n\n"
+     "Return the time the CRL was issued, as seconds since epoch."
+    },
+    {"x509-crl/next-update", x509_crl_next_update,
+     "(x509-crl/next-update crl-obj)\n\n"
+     "Return the time the next CRL update is expected, as seconds since epoch."
+    },
+    {"x509-crl/entries-count", x509_crl_entries_count,
+     "(x509-crl/entries-count crl-obj)\n\n"
+     "Return the number of entries in the CRL."
+    },
+    {"x509-crl/get-entry", x509_crl_get_entry,
+     "(x509-crl/get-entry crl-obj index)\n\n"
+     "Return the CRL entry at the given `index`. Use `x509-crl/entries-count` "
+     "to get the number of entries."
+    },
     {"x509-crl/is-revoked", x509_crl_is_revoked,
-     "(x509-crl/load crl cert)\n\n"
+     "(x509-crl/is-revoked crl cert)\n\n"
      "Check whether a given `crl` contains a given `cert`. Return true when "
      "the certificate is revoked."
     },
     {NULL, NULL, NULL}
 };
 
+static JanetReg x509_crl_entry_cfuns[] = {
+    {"x509-crl-entry/reason", x509_crl_entry_reason,
+     "(x509-crl-entry/reason crl-entry)\n\n"
+     "Return the revocation reason code for the CRL entry.\n\n"
+     "0: Unspecified\n\n"
+     "1: Key Compromise\n\n"
+     "2: CA Compromise\n\n"
+     "3: Affiliation Changed\n\n"
+     "4: Superseded\n\n"
+     "5: Cessation of Operation\n\n"
+     "6: Certificate Hold\n\n"
+     "8: Remove from CRL\n\n"
+     "9: Privilege Withdrawn\n\n"
+     "10: AA Compromise"
+    },
+    {"x509-crl-entry/revocation-date", x509_crl_entry_revocation_date,
+     "(x509-crl-entry/revocation-date crl-entry)\n\n"
+     "Return the revocation date as seconds since epoch."
+    },
+    {"x509-crl-entry/serial-number", x509_crl_entry_serial_number,
+     "(x509-crl-entry/serial-number crl-entry)\n\n"
+     "Return the serial number of the revoked certificate."
+    },
+    {NULL, NULL, NULL}
+};
 
 static void submod_x509_cert(JanetTable *env) {
     janet_cfuns(env, "botan", x509_cert_cfuns);
@@ -783,7 +975,9 @@ static void submod_x509_cert(JanetTable *env) {
 
 static void submod_x509_crl(JanetTable *env) {
     janet_cfuns(env, "botan", x509_crl_cfuns);
+    janet_cfuns(env, "botan", x509_crl_entry_cfuns);
     janet_register_abstract_type(get_x509_crl_obj_type());
+    janet_register_abstract_type(get_x509_crl_entry_obj_type());
 }
 
 #endif /* BOTAN_X509_CERT_H */
