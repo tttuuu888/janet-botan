@@ -8,7 +8,9 @@
 ## Index
 
 @api-index[/build/botan][x509-crl/]
+@api-index[/build/botan][x509-crl-entry/]
 
 ## Reference
 
 @api-docs[/build/botan][x509-crl/]
+@api-docs[/build/botan][x509-crl-entry/]

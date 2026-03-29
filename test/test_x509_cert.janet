@@ -122,6 +122,12 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (:is-revoked crl cert))
   (assert (> (:this-update crl) 0))
   (assert (> (:next-update crl) (:this-update crl)))
-  (assert (= (:entries-count crl) 1)))
+  (assert (= (:entries-count crl) 1))
+
+  # Test CRL entry inspection
+  (let [entry (:get-entry crl 0)]
+    (assert (>= (:reason entry) 0))
+    (assert (> (:revocation-date entry) 0))
+    (assert (= (:serial-number entry) (hex-decode "01")))))
 
 (end-suite)
