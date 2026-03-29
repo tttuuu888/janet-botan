@@ -13,7 +13,7 @@
  :lflags ["-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
  :source ["src/main.c"])
 
-(rule "botan-library" ["./botan"]
+(rule "botan/libbotan-3.a" ["./botan"]
       (let [project-path  (os/cwd)
             p1 (os/spawn ["git" "submodule" "status"] :p {:out :pipe})
             rev1 ((string/split " " (:read (p1 :out) :all)) 1)
@@ -42,9 +42,8 @@
 (rule "pre-install" ["build"]
       (os/execute ["./pre_install.sh"] :p))
 
-(rule "remove-pre-botan-a" []
-      (os/execute ["rm" "-f" "build/botan.a"] :p))
-
-(add-dep "botan-library" "remove-pre-botan-a")
-(add-dep "build/src___main.o" "botan-library")
+(add-dep "build/src___main.o" "botan/libbotan-3.a")
+(each h (os/dir "src")
+  (when (string/has-suffix? ".h" h)
+    (add-dep "build/src___main.o" (string "src/" h))))
 (add-dep "install" "pre-install")
