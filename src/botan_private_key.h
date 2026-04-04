@@ -90,13 +90,13 @@ static Janet private_key_new(int32_t argc, Janet *argv) {
 
     botan_rng_t rng;
     const char *algo = janet_getcstring(argv, 0);
-    const char *param = (argc >= 2) ? janet_getcstring(argv, 1) : "";
+    const char *param = janet_optcstring(argv, argc, 1, "");
 
-    if (argc == 3) {
-        botan_rng_obj_t *obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
+    botan_rng_obj_t *obj2 = janet_optabstract(argv, argc, 2, get_rng_obj_type(), NULL);
+    if (obj2) {
         rng = obj2->rng;
     } else {
-        botan_rng_obj_t *obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+        obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
         memset(obj2, 0, sizeof(botan_rng_obj_t));
 
         ret = botan_rng_init(&obj2->rng, "system");
@@ -123,11 +123,11 @@ static Janet private_key_new_ec(int32_t argc, Janet *argv) {
     botan_ec_group_obj_t *obj1 = janet_getabstract(argv, 1, get_ec_group_obj_type());
     botan_ec_group_t ec_group = obj1->ec_group;
 
-    if (argc == 3) {
-        botan_rng_obj_t *obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
+    botan_rng_obj_t *obj2 = janet_optabstract(argv, argc, 2, get_rng_obj_type(), NULL);
+    if (obj2) {
         rng = obj2->rng;
     } else {
-        botan_rng_obj_t *obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+        obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
         memset(obj2, 0, sizeof(botan_rng_obj_t));
 
         ret = botan_rng_init(&obj2->rng, "system");
@@ -149,11 +149,7 @@ static Janet private_key_load(int32_t argc, Janet *argv) {
     memset(obj, 0, sizeof(botan_private_key_obj_t));
 
     JanetByteView blob = janet_getbytes(argv, 0);
-    char *pass = NULL;
-
-    if (argc == 2) {
-        pass = (char *)janet_getcstring(argv, 1);
-    }
+    const char *pass = janet_optcstring(argv, argc, 1, NULL);
 
     ret = botan_privkey_load(&obj->private_key, (botan_rng_t)NULL, blob.bytes, blob.len, (const char*)pass);
     JANET_BOTAN_ASSERT(ret);

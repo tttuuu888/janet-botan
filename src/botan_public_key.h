@@ -562,10 +562,7 @@ static Janet public_key_fingerprint(int32_t argc, Janet *argv) {
     botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
     botan_pubkey_t key = obj->public_key;
 
-    const char *hash_name = "SHA-256";
-    if (argc == 2) {
-        hash_name = janet_getcstring(argv, 1);
-    }
+    const char *hash_name = janet_optcstring(argv, argc, 1, "SHA-256");
 
     botan_hash_obj_t *obj_hash = janet_abstract(&hash_obj_type, sizeof(botan_hash_obj_t));
     memset(obj_hash, 0, sizeof(botan_hash_obj_t));

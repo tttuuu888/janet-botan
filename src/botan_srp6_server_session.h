@@ -178,11 +178,9 @@ static Janet srp6_client_agree(int32_t argc, Janet *argv) {
     JanetByteView salt = janet_getbytes(argv, 4);
     JanetByteView B = janet_getbytes(argv, 5);
 
-    botan_rng_obj_t *obj2;
     botan_rng_t rng;
-
-    if (argc == 7) {
-        obj2 = janet_getabstract(argv, 6, get_rng_obj_type());
+    botan_rng_obj_t *obj2 = janet_optabstract(argv, argc, 6, get_rng_obj_type(), NULL);
+    if (obj2) {
         rng = obj2->rng;
     } else {
         obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));

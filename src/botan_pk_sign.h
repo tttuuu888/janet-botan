@@ -95,11 +95,9 @@ static Janet pk_sign_finish(int32_t argc, Janet *argv) {
     botan_pk_sign_obj_t *obj = janet_getabstract(argv, 0, get_pk_sign_obj_type());
     botan_pk_op_sign_t op = obj->pk_sign;
 
-    botan_rng_obj_t *obj2;
     botan_rng_t rng;
-
-    if (argc == 2) {
-        obj2 = janet_getabstract(argv, 1, get_rng_obj_type());
+    botan_rng_obj_t *obj2 = janet_optabstract(argv, argc, 1, get_rng_obj_type(), NULL);
+    if (obj2) {
         rng = obj2->rng;
     } else {
         obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
