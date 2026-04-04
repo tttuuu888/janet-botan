@@ -115,11 +115,9 @@ static Janet pk_kem_encrypt_kem_create_shared_key(int32_t argc, Janet *argv) {
     JanetByteView salt = janet_getbytes(argv, 1);
     size_t desired_len = janet_getsize(argv, 2);
 
-    botan_rng_obj_t *obj2;
     botan_rng_t rng;
-
-    if (argc == 4) {
-        obj2 = janet_getabstract(argv, 3, get_rng_obj_type());
+    botan_rng_obj_t *obj2 = janet_optabstract(argv, argc, 3, get_rng_obj_type(), NULL);
+    if (obj2) {
         rng = obj2->rng;
     } else {
         obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));

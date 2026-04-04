@@ -194,19 +194,16 @@ static Janet mpi_new_random(int32_t argc, Janet *argv) {
     int ret = botan_mp_init(&obj->mpi);
     JANET_BOTAN_ASSERT(ret);
 
-    botan_rng_obj_t *obj2;
     botan_rng_t rng;
-
-    if (argc == 1) {
+    botan_rng_obj_t *obj2 = janet_optabstract(argv, argc, 1, get_rng_obj_type(), NULL);
+    if (obj2) {
+        rng = obj2->rng;
+    } else {
         obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
         memset(obj2, 0, sizeof(botan_rng_obj_t));
 
         ret = botan_rng_init(&obj2->rng, "system");
         JANET_BOTAN_ASSERT(ret);
-        rng = obj2->rng;
-
-    } else {
-        obj2 = janet_getabstract(argv, 1, get_rng_obj_type());
         rng = obj2->rng;
     }
 
@@ -228,18 +225,16 @@ static Janet mpi_new_random_range(int32_t argc, Janet *argv) {
     botan_mpi_obj_t *lower = janet_getabstract(argv, 0, get_mpi_obj_type());
     botan_mpi_obj_t *upper = janet_getabstract(argv, 1, get_mpi_obj_type());
 
-    botan_rng_obj_t *rng_obj;
     botan_rng_t rng;
-
-    if (argc == 2) {
+    botan_rng_obj_t *rng_obj = janet_optabstract(argv, argc, 2, get_rng_obj_type(), NULL);
+    if (rng_obj) {
+        rng = rng_obj->rng;
+    } else {
         rng_obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
         memset(rng_obj, 0, sizeof(botan_rng_obj_t));
 
         ret = botan_rng_init(&rng_obj->rng, "system");
         JANET_BOTAN_ASSERT(ret);
-        rng = rng_obj->rng;
-    } else {
-        rng_obj = janet_getabstract(argv, 2, get_rng_obj_type());
         rng = rng_obj->rng;
     }
 

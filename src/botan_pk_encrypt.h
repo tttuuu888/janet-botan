@@ -82,11 +82,9 @@ static Janet pk_encrypt_encrypt(int32_t argc, Janet *argv) {
     JanetByteView msg = janet_getbytes(argv, 1);
     size_t out_len = 0;
 
-    botan_rng_obj_t *obj2;
     botan_rng_t rng;
-
-    if (argc == 3) {
-        obj2 = janet_getabstract(argv, 2, get_rng_obj_type());
+    botan_rng_obj_t *obj2 = janet_optabstract(argv, argc, 2, get_rng_obj_type(), NULL);
+    if (obj2) {
         rng = obj2->rng;
     } else {
         obj2 = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));

@@ -65,15 +65,11 @@ static Janet pbkdf_timed(int32_t argc, Janet *argv) {
     size_t out_len = janet_getsize(argv, 2);
     JanetBuffer *out = janet_buffer(out_len);
 
-    size_t ms_to_run = 300;
+    size_t ms_to_run = janet_optsize(argv, argc, 3, 300);
     size_t iter;
     uint8_t *salt;
     size_t salt_len;
     int ret;
-
-    if (argc >= 4) {
-        ms_to_run = janet_getsize(argv, 3);
-    }
 
     if (argc == 5) {
         JanetByteView salt_data = janet_getbytes(argv, 4);
