@@ -130,4 +130,28 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
     (assert (> (:revocation-date entry) 0))
     (assert (= (:serial-number entry) (hex-decode "01")))))
 
+# Test x509-cert/create-self-signed and x509-cert/issue
+(let [ca-key (privkey/new "RSA" "2048")
+      ca-cert (x509-cert/create-self-signed
+               ca-key
+               :dn "Test CA/KR/Test Org"
+               :is-ca true)]
+  (assert (:is-ca ca-cert))
+  (assert (= (:subject-dn ca-cert "CN" 0) "Test CA"))
+  (assert (= (:subject-dn ca-cert "C" 0) "KR"))
+  (assert (= (:subject-dn ca-cert "O" 0) "Test Org"))
+  (assert (= (:issuer-dn ca-cert "CN" 0) "Test CA"))
+  (assert (:hostname-match ca-cert "Test CA"))
+
+  (let [server-key (privkey/new "RSA" "2048")
+        now (os/time)
+        server-cert (x509-cert/issue
+                     server-key ca-cert ca-key
+                     (- now 3600) (+ now (* 365 24 3600))
+                     :dn "server.example.com/KR/Test Org")]
+    (assert (not (:is-ca server-cert)))
+    (assert (= (:subject-dn server-cert "CN" 0) "server.example.com"))
+    (assert (= (:issuer-dn server-cert "CN" 0) "Test CA"))
+    (assert (= (x509-cert/verify server-cert :trusted [ca-cert]) 0))))
+
 (end-suite)

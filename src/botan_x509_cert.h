@@ -31,7 +31,19 @@ static int x509_crl_get_fn(void *data, Janet key, Janet *out);
 static int x509_crl_entry_gc_fn(void *data, size_t len);
 static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out);
 
+/* External C++ functions for x509 cert creation */
+extern int jbotan_x509_create_self_signed(
+    botan_x509_cert_t *cert_obj, botan_privkey_t key, botan_rng_t rng,
+    const char *hash_fn, const char *dn_spec, uint32_t expire_time, int is_ca);
+extern int jbotan_x509_cert_issue(
+    botan_x509_cert_t *cert_obj, botan_privkey_t subject_key,
+    botan_x509_cert_t ca_cert, botan_privkey_t ca_key, botan_rng_t rng,
+    const char *hash_fn, const char *dn_spec,
+    uint64_t not_before, uint64_t not_after, int is_ca);
+
 /* Janet functions x509-cert */
+static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv);
+static Janet x509_cert_issue(int32_t argc, Janet *argv);
 static Janet x509_cert_dup(int32_t argc, Janet *argv);
 static Janet x509_cert_not_before(int32_t argc, Janet *argv);
 static Janet x509_cert_not_after(int32_t argc, Janet *argv);
@@ -195,6 +207,110 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
 }
 
 /* Janet functions x509-cert */
+static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
+    janet_arity(argc, 1, 11);
+
+    botan_private_key_obj_t *key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+
+    botan_rng_t rng = 0;
+    botan_rng_obj_t *rng_obj = NULL;
+    const char *hash_fn = "SHA-256";
+    const char *dn_spec = NULL;
+    uint32_t expire_time = 365 * 24 * 60 * 60;
+    int is_ca = 0;
+    int rng_created = 0;
+
+    for (int i = 1; i < argc; i += 2) {
+        JanetKeyword keyword = janet_getkeyword(argv, i);
+        if (!janet_cstrcmp(keyword, "rng")) {
+            rng_obj = janet_getabstract(argv, i + 1, get_rng_obj_type());
+        } else if (!janet_cstrcmp(keyword, "hash")) {
+            hash_fn = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "dn")) {
+            dn_spec = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "expire-time")) {
+            expire_time = (uint32_t)janet_getinteger(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "is-ca")) {
+            is_ca = janet_getboolean(argv, i + 1);
+        } else {
+            janet_panicf("unknown keyword %v", argv[i]);
+        }
+    }
+
+    if (rng_obj) {
+        rng = rng_obj->rng;
+    } else {
+        int ret = botan_rng_init(&rng, "system");
+        JANET_BOTAN_ASSERT(ret);
+        rng_created = 1;
+    }
+
+    botan_x509_cert_obj_t *obj = janet_abstract(&x509_cert_obj_type, sizeof(botan_x509_cert_obj_t));
+    memset(obj, 0, sizeof(botan_x509_cert_obj_t));
+
+    int ret = jbotan_x509_create_self_signed(
+        &obj->x509_cert, key_obj->private_key, rng,
+        hash_fn, dn_spec, expire_time, is_ca);
+
+    if (rng_created) botan_rng_destroy(rng);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet x509_cert_issue(int32_t argc, Janet *argv) {
+    janet_arity(argc, 5, 15);
+
+    botan_private_key_obj_t *subject_key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_x509_cert_obj_t *ca_cert_obj = janet_getabstract(argv, 1, get_x509_cert_obj_type());
+    botan_private_key_obj_t *ca_key_obj = janet_getabstract(argv, 2, get_private_key_obj_type());
+    uint64_t not_before = (uint64_t)janet_getinteger64(argv, 3);
+    uint64_t not_after = (uint64_t)janet_getinteger64(argv, 4);
+
+    botan_rng_t rng = 0;
+    botan_rng_obj_t *rng_obj = NULL;
+    const char *hash_fn = "SHA-256";
+    const char *dn_spec = NULL;
+    int is_ca = 0;
+    int rng_created = 0;
+
+    for (int i = 5; i < argc; i += 2) {
+        JanetKeyword keyword = janet_getkeyword(argv, i);
+        if (!janet_cstrcmp(keyword, "rng")) {
+            rng_obj = janet_getabstract(argv, i + 1, get_rng_obj_type());
+        } else if (!janet_cstrcmp(keyword, "hash")) {
+            hash_fn = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "dn")) {
+            dn_spec = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "is-ca")) {
+            is_ca = janet_getboolean(argv, i + 1);
+        } else {
+            janet_panicf("unknown keyword %v", argv[i]);
+        }
+    }
+
+    if (rng_obj) {
+        rng = rng_obj->rng;
+    } else {
+        int ret = botan_rng_init(&rng, "system");
+        JANET_BOTAN_ASSERT(ret);
+        rng_created = 1;
+    }
+
+    botan_x509_cert_obj_t *obj = janet_abstract(&x509_cert_obj_type, sizeof(botan_x509_cert_obj_t));
+    memset(obj, 0, sizeof(botan_x509_cert_obj_t));
+
+    int ret = jbotan_x509_cert_issue(
+        &obj->x509_cert, subject_key_obj->private_key,
+        ca_cert_obj->x509_cert, ca_key_obj->private_key,
+        rng, hash_fn, dn_spec, not_before, not_after, is_ca);
+
+    if (rng_created) botan_rng_destroy(rng);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
 static Janet x509_cert_load(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -786,6 +902,43 @@ static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {
 }
 
 static JanetReg x509_cert_cfuns[] = {
+    {"x509-cert/create-self-signed", x509_cert_create_self_signed,
+     "(x509-cert/create-self-signed key &keys {:rng rng :hash hash "
+     ":dn dn :expire-time expire-time :is-ca is-ca})\n\n"
+     "Create a self-signed X.509 certificate.\n\n"
+     "* `key` - A private key object.\n\n"
+     "* `:rng` - A random number generator object. "
+     "Default is system RNG.\n\n"
+     "* `:hash` - Hash algorithm name, e.g. \"SHA-256\". "
+     "Default is \"SHA-256\".\n\n"
+     "* `:dn` - Distinguished name in \"CN/C/O/OU\" format. "
+     "Default is empty.\n\n"
+     "* `:expire-time` - Expiration time in seconds from now. "
+     "Default is 365 days.\n\n"
+     "* `:is-ca` - If true, mark certificate as a CA certificate. "
+     "Default is false."
+    },
+    {"x509-cert/issue", x509_cert_issue,
+     "(x509-cert/issue subject-key ca-cert ca-key "
+     "not-before not-after &keys {:rng rng :hash hash :dn dn "
+     ":is-ca is-ca})\n\n"
+     "Issue a new X.509 certificate signed by a CA.\n\n"
+     "* `subject-key` - The subject's private key object.\n\n"
+     "* `ca-cert` - The CA's certificate object.\n\n"
+     "* `ca-key` - The CA's private key object.\n\n"
+     "* `not-before` - Certificate validity start time, as seconds "
+     "since epoch.\n\n"
+     "* `not-after` - Certificate validity end time, as seconds "
+     "since epoch.\n\n"
+     "* `:rng` - A random number generator object. "
+     "Default is system RNG.\n\n"
+     "* `:hash` - Hash algorithm name, e.g. \"SHA-256\". "
+     "Default is \"SHA-256\".\n\n"
+     "* `:dn` - Distinguished name in \"CN/C/O/OU\" format. "
+     "Default is empty.\n\n"
+     "* `:is-ca` - If true, mark certificate as a CA certificate. "
+     "Default is false."
+    },
     {"x509-cert/load", x509_cert_load,
      "(x509-cert/load cert)\n\n"
      "Load a X.509 certificate from DER or PEM representation."

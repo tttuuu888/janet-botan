@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Create merged static library from .static.o and libbotan-3.a
-ar rcs janet_botan.a build/src___main.static.o
+ar rcs janet_botan.a build/src___main.static.o build/x509_ext.o
 
 ar -M <<EOM
     CREATE botan.a
