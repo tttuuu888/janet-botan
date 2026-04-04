@@ -10,7 +10,7 @@
 (declare-native
  :name "botan"
  :cflags ["-I." "-Ibotan/build/include/public/botan" "-Wall" ;default-cflags]
- :lflags ["-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
+ :lflags ["build/x509_ext.o" "-Lbotan" "-l:libbotan-3.a" "-lstdc++"]
  :source ["src/main.c"])
 
 (rule "botan/libbotan-3.a" ["./botan"]
@@ -39,10 +39,19 @@
         (os/shell "make -j$(nproc)")
         (os/cd project-path)))
 
-(rule "pre-install" ["build"]
+(rule "build/x509_ext.o" ["src/x509_ext.cpp" "botan/libbotan-3.a"]
+      (os/execute ["g++"
+                   "-c" "-fPIC" "-O2" "-std=c++20"
+                   "-Ibotan/build/include/public"
+                   "-Ibotan/build/include/internal"
+                   "-o" "build/x509_ext.o"
+                   "src/x509_ext.cpp"] :p))
+
+(rule "pre-install" ["build" "build/x509_ext.o"]
       (os/execute ["./pre_install.sh"] :p))
 
 (add-dep "build/src___main.o" "botan/libbotan-3.a")
+(add-dep "build/src___main.o" "build/x509_ext.o")
 (each h (os/dir "src")
   (when (string/has-suffix? ".h" h)
     (add-dep "build/src___main.o" (string "src/" h))))
