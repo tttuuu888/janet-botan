@@ -40,6 +40,7 @@
         (os/cd project-path)))
 
 (rule "build/x509_ext.o" ["src/x509_ext.cpp" "botan/libbotan-3.a"]
+      (print "compiling src/x509_ext.cpp to build/x509_ext.o...")
       (os/execute ["g++"
                    "-c" "-fPIC" "-O2" "-std=c++20"
                    "-Ibotan/build/include/public"
