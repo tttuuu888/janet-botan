@@ -22,6 +22,7 @@ typedef struct botan_x509_crl_entry_obj {
 /* Abstract Object functions x509-cert */
 static int x509_cert_gc_fn(void *data, size_t len);
 static int x509_cert_get_fn(void *data, Janet key, Janet *out);
+static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer);
 
 /* Abstract Object functions x509-crl */
 static int x509_crl_gc_fn(void *data, size_t len);
@@ -80,7 +81,11 @@ static JanetAbstractType x509_cert_obj_type = {
     x509_cert_gc_fn,
     NULL,
     x509_cert_get_fn,
-    JANET_ATEND_GET
+    NULL,                       /* put */
+    NULL,                       /* marshal */
+    NULL,                       /* unmarshal */
+    x509_cert_tostring_fn,
+    JANET_ATEND_TOSTRING
 };
 
 static JanetAbstractType x509_crl_obj_type = {
@@ -166,6 +171,17 @@ static int x509_cert_get_fn(void *data, Janet key, Janet *out) {
     }
 
     return janet_getmethod(janet_unwrap_keyword(key), x509_cert_methods, out);
+}
+
+static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer) {
+    botan_x509_cert_obj_t *obj = (botan_x509_cert_obj_t *)p;
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    view_data_t data;
+    int ret = botan_x509_cert_view_as_string(cert, &data, (botan_view_str_fn)view_str_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    janet_formatb(buffer, "\n%s", janet_string(data.data, data.len));
 }
 
 /* Abstract Object functions x509-crl */
