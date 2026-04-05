@@ -6,6 +6,8 @@
 
 #include <botan/x509self.h>
 #include <botan/x509_ca.h>
+#include <botan/x509_crl.h>
+#include <botan/pem.h>
 #include <botan/internal/ffi_util.h>
 #include <botan/internal/ffi_cert.h>
 #include <botan/internal/ffi_pkey.h>
@@ -110,6 +112,44 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
                             Botan::X509_Time(std::chrono::system_clock::from_time_t(not_after))));
 
         return ffi_new_object(cert_obj, std::move(cert));
+    });
+}
+
+int jbotan_x509_cert_to_pem(botan_x509_cert_t cert,
+                            botan_view_ctx ctx,
+                            botan_view_str_fn view) {
+    return ffi_guard_thunk(__func__, [=]() -> int {
+        auto der = safe_get(cert).BER_encode();
+        auto pem = Botan::PEM_Code::encode(der, "CERTIFICATE");
+        return view(ctx, pem.data(), pem.size());
+    });
+}
+
+int jbotan_x509_cert_to_der(botan_x509_cert_t cert,
+                            botan_view_ctx ctx,
+                            botan_view_bin_fn view) {
+    return ffi_guard_thunk(__func__, [=]() -> int {
+        auto der = safe_get(cert).BER_encode();
+        return view(ctx, der.data(), der.size());
+    });
+}
+
+int jbotan_x509_crl_to_pem(botan_x509_crl_t crl,
+                           botan_view_ctx ctx,
+                           botan_view_str_fn view) {
+    return ffi_guard_thunk(__func__, [=]() -> int {
+        auto der = safe_get(crl).BER_encode();
+        auto pem = Botan::PEM_Code::encode(der, "X509 CRL");
+        return view(ctx, pem.data(), pem.size());
+    });
+}
+
+int jbotan_x509_crl_to_der(botan_x509_crl_t crl,
+                           botan_view_ctx ctx,
+                           botan_view_bin_fn view) {
+    return ffi_guard_thunk(__func__, [=]() -> int {
+        auto der = safe_get(crl).BER_encode();
+        return view(ctx, der.data(), der.size());
     });
 }
 

@@ -33,6 +33,14 @@ static int x509_crl_entry_gc_fn(void *data, size_t len);
 static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out);
 
 /* External C++ functions for x509 cert creation */
+extern int jbotan_x509_crl_to_pem(
+    botan_x509_crl_t crl, botan_view_ctx ctx, botan_view_str_fn view);
+extern int jbotan_x509_crl_to_der(
+    botan_x509_crl_t crl, botan_view_ctx ctx, botan_view_bin_fn view);
+extern int jbotan_x509_cert_to_pem(
+    botan_x509_cert_t cert, botan_view_ctx ctx, botan_view_str_fn view);
+extern int jbotan_x509_cert_to_der(
+    botan_x509_cert_t cert, botan_view_ctx ctx, botan_view_bin_fn view);
 extern int jbotan_x509_create_self_signed(
     botan_x509_cert_t *cert_obj, botan_privkey_t key, botan_rng_t rng,
     const char *hash_fn, uint32_t expire_time, int is_ca,
@@ -50,6 +58,8 @@ extern int jbotan_x509_cert_issue(
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv);
 static Janet x509_cert_issue(int32_t argc, Janet *argv);
+static Janet x509_cert_to_pem(int32_t argc, Janet *argv);
+static Janet x509_cert_to_der(int32_t argc, Janet *argv);
 static Janet x509_cert_dup(int32_t argc, Janet *argv);
 static Janet x509_cert_not_before(int32_t argc, Janet *argv);
 static Janet x509_cert_not_after(int32_t argc, Janet *argv);
@@ -70,6 +80,8 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
 /* Janet functions x509-crl */
+static Janet x509_crl_to_pem(int32_t argc, Janet *argv);
+static Janet x509_crl_to_der(int32_t argc, Janet *argv);
 static Janet x509_crl_this_update(int32_t argc, Janet *argv);
 static Janet x509_crl_next_update(int32_t argc, Janet *argv);
 static Janet x509_crl_entries_count(int32_t argc, Janet *argv);
@@ -111,6 +123,8 @@ static JanetAbstractType x509_crl_entry_obj_type = {
 
 static JanetMethod x509_cert_methods[] = {
     {"dup", x509_cert_dup},
+    {"to-pem", x509_cert_to_pem},
+    {"to-der", x509_cert_to_der},
     {"not-before", x509_cert_not_before},
     {"not-after", x509_cert_not_after},
     {"to-string", x509_cert_to_string},
@@ -139,6 +153,8 @@ static JanetMethod x509_crl_entry_methods[] = {
 };
 
 static JanetMethod x509_crl_methods[] = {
+    {"to-pem", x509_crl_to_pem},
+    {"to-der", x509_crl_to_der},
     {"this-update", x509_crl_this_update},
     {"next-update", x509_crl_next_update},
     {"entries-count", x509_crl_entries_count},
@@ -388,6 +404,32 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
+}
+
+static Janet x509_cert_to_pem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    view_data_t data;
+    int ret = jbotan_x509_cert_to_pem(cert, &data, (botan_view_str_fn)view_str_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
+static Janet x509_cert_to_der(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    view_data_t data;
+    int ret = jbotan_x509_cert_to_der(cert, &data, (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
 }
 
 static Janet x509_cert_load(int32_t argc, Janet *argv) {
@@ -874,6 +916,32 @@ static Janet x509_crl_load_file(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj);
 }
 
+static Janet x509_crl_to_pem(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    view_data_t data;
+    int ret = jbotan_x509_crl_to_pem(crl, &data, (botan_view_str_fn)view_str_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
+static Janet x509_crl_to_der(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+
+    view_data_t data;
+    int ret = jbotan_x509_crl_to_der(crl, &data, (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_string(janet_string(data.data, data.len));
+}
+
 static Janet x509_crl_this_update(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -1037,6 +1105,14 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN."
     },
+    {"x509-cert/to-pem", x509_cert_to_pem,
+     "(x509-cert/to-pem cert)\n\n"
+     "Encode the certificate as a PEM string."
+    },
+    {"x509-cert/to-der", x509_cert_to_der,
+     "(x509-cert/to-der cert)\n\n"
+     "Encode the certificate as DER binary data."
+    },
     {"x509-cert/load", x509_cert_load,
      "(x509-cert/load cert)\n\n"
      "Load a X.509 certificate from DER or PEM representation."
@@ -1160,6 +1236,14 @@ static JanetReg x509_cert_cfuns[] = {
 };
 
 static JanetReg x509_crl_cfuns[] = {
+    {"x509-crl/to-pem", x509_crl_to_pem,
+     "(x509-crl/to-pem crl)\n\n"
+     "Encode the CRL as a PEM string."
+    },
+    {"x509-crl/to-der", x509_crl_to_der,
+     "(x509-crl/to-der crl)\n\n"
+     "Encode the CRL as DER binary data."
+    },
     {"x509-crl/load", x509_crl_load,
      "(x509-crl/load crl)\n\n"
      "Load a CRL from the DER or PEM representation."
