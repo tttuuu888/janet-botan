@@ -21,13 +21,25 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
                                    const char* hash_fn,
                                    const char* dn_spec,
                                    uint32_t expire_time,
-                                   int is_ca) {
+                                   int is_ca,
+                                   const char* locality,
+                                   const char* state,
+                                   const char* email,
+                                   const char* dns,
+                                   const char* uri,
+                                   const char* serial_number) {
     if(Botan::any_null_pointers(cert_obj))
         return BOTAN_FFI_ERROR_NULL_POINTER;
 
     return ffi_guard_thunk(__func__, [=]() -> int {
         Botan::X509_Cert_Options opts(dn_spec ? dn_spec : "", expire_time);
         if(is_ca) opts.CA_key();
+        if(locality) opts.locality = locality;
+        if(state) opts.state = state;
+        if(email) opts.email = email;
+        if(dns) opts.dns = dns;
+        if(uri) opts.uri = uri;
+        if(serial_number) opts.serial_number = serial_number;
 
         auto cert = std::make_unique<Botan::X509_Certificate>(
             Botan::X509::create_self_signed_cert(
@@ -48,13 +60,25 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
                            const char* dn_spec,
                            uint64_t not_before,
                            uint64_t not_after,
-                           int is_ca) {
+                           int is_ca,
+                           const char* locality,
+                           const char* state,
+                           const char* email,
+                           const char* dns,
+                           const char* uri,
+                           const char* serial_number) {
     if(Botan::any_null_pointers(cert_obj))
         return BOTAN_FFI_ERROR_NULL_POINTER;
 
     return ffi_guard_thunk(__func__, [=]() -> int {
         Botan::X509_Cert_Options opts(dn_spec ? dn_spec : "");
         if(is_ca) opts.CA_key();
+        if(locality) opts.locality = locality;
+        if(state) opts.state = state;
+        if(email) opts.email = email;
+        if(dns) opts.dns = dns;
+        if(uri) opts.uri = uri;
+        if(serial_number) opts.serial_number = serial_number;
 
         auto req = Botan::X509::create_cert_req(
             opts, safe_get(subject_key),
@@ -68,8 +92,8 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
 
         auto cert = std::make_unique<Botan::X509_Certificate>(
             ca.sign_request(req, safe_get(rng),
-                Botan::X509_Time(std::chrono::system_clock::from_time_t(not_before)),
-                Botan::X509_Time(std::chrono::system_clock::from_time_t(not_after))));
+                            Botan::X509_Time(std::chrono::system_clock::from_time_t(not_before)),
+                            Botan::X509_Time(std::chrono::system_clock::from_time_t(not_after))));
 
         return ffi_new_object(cert_obj, std::move(cert));
     });

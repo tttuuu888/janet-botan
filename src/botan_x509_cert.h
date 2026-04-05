@@ -35,12 +35,16 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out);
 /* External C++ functions for x509 cert creation */
 extern int jbotan_x509_create_self_signed(
     botan_x509_cert_t *cert_obj, botan_privkey_t key, botan_rng_t rng,
-    const char *hash_fn, const char *dn_spec, uint32_t expire_time, int is_ca);
+    const char *hash_fn, const char *dn_spec, uint32_t expire_time, int is_ca,
+    const char *locality, const char *state, const char *email,
+    const char *dns, const char *uri, const char *serial_number);
 extern int jbotan_x509_cert_issue(
     botan_x509_cert_t *cert_obj, botan_privkey_t subject_key,
     botan_x509_cert_t ca_cert, botan_privkey_t ca_key, botan_rng_t rng,
     const char *hash_fn, const char *dn_spec,
-    uint64_t not_before, uint64_t not_after, int is_ca);
+    uint64_t not_before, uint64_t not_after, int is_ca,
+    const char *locality, const char *state, const char *email,
+    const char *dns, const char *uri, const char *serial_number);
 
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv);
@@ -224,7 +228,7 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
 
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
-    janet_arity(argc, 1, 11);
+    janet_arity(argc, 1, 23);
 
     botan_private_key_obj_t *key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
 
@@ -235,6 +239,12 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
     uint32_t expire_time = 365 * 24 * 60 * 60;
     int is_ca = 0;
     int rng_created = 0;
+    const char *locality = NULL;
+    const char *state = NULL;
+    const char *email = NULL;
+    const char *dns = NULL;
+    const char *uri = NULL;
+    const char *serial_number = NULL;
 
     for (int i = 1; i < argc; i += 2) {
         JanetKeyword keyword = janet_getkeyword(argv, i);
@@ -248,6 +258,18 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
             expire_time = (uint32_t)janet_getinteger(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "is-ca")) {
             is_ca = janet_getboolean(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "locality")) {
+            locality = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "state")) {
+            state = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "email")) {
+            email = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "dns")) {
+            dns = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "uri")) {
+            uri = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "serial-number")) {
+            serial_number = janet_getcstring(argv, i + 1);
         } else {
             janet_panicf("unknown keyword %v", argv[i]);
         }
@@ -266,7 +288,8 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
 
     int ret = jbotan_x509_create_self_signed(
         &obj->x509_cert, key_obj->private_key, rng,
-        hash_fn, dn_spec, expire_time, is_ca);
+        hash_fn, dn_spec, expire_time, is_ca,
+        locality, state, email, dns, uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -275,7 +298,7 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
 }
 
 static Janet x509_cert_issue(int32_t argc, Janet *argv) {
-    janet_arity(argc, 5, 15);
+    janet_arity(argc, 5, 27);
 
     botan_private_key_obj_t *subject_key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
     botan_x509_cert_obj_t *ca_cert_obj = janet_getabstract(argv, 1, get_x509_cert_obj_type());
@@ -289,6 +312,12 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     const char *dn_spec = NULL;
     int is_ca = 0;
     int rng_created = 0;
+    const char *locality = NULL;
+    const char *state = NULL;
+    const char *email = NULL;
+    const char *dns = NULL;
+    const char *uri = NULL;
+    const char *serial_number = NULL;
 
     for (int i = 5; i < argc; i += 2) {
         JanetKeyword keyword = janet_getkeyword(argv, i);
@@ -300,6 +329,18 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
             dn_spec = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "is-ca")) {
             is_ca = janet_getboolean(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "locality")) {
+            locality = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "state")) {
+            state = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "email")) {
+            email = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "dns")) {
+            dns = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "uri")) {
+            uri = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "serial-number")) {
+            serial_number = janet_getcstring(argv, i + 1);
         } else {
             janet_panicf("unknown keyword %v", argv[i]);
         }
@@ -319,7 +360,8 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     int ret = jbotan_x509_cert_issue(
         &obj->x509_cert, subject_key_obj->private_key,
         ca_cert_obj->x509_cert, ca_key_obj->private_key,
-        rng, hash_fn, dn_spec, not_before, not_after, is_ca);
+        rng, hash_fn, dn_spec, not_before, not_after, is_ca,
+        locality, state, email, dns, uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -920,7 +962,9 @@ static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {
 static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/create-self-signed", x509_cert_create_self_signed,
      "(x509-cert/create-self-signed key &keys {:rng rng :hash hash "
-     ":dn dn :expire-time expire-time :is-ca is-ca})\n\n"
+     ":dn dn :expire-time expire-time :is-ca is-ca "
+     ":locality locality :state state :email email "
+     ":dns dns :uri uri :serial-number serial-number})\n\n"
      "Create a self-signed X.509 certificate.\n\n"
      "* `key` - A private key object.\n\n"
      "* `:rng` - A random number generator object. "
@@ -932,12 +976,19 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:expire-time` - Expiration time in seconds from now. "
      "Default is 365 days.\n\n"
      "* `:is-ca` - If true, mark certificate as a CA certificate. "
-     "Default is false."
+     "Default is false.\n\n"
+     "* `:locality` - Locality (L) field of the DN.\n\n"
+     "* `:state` - State (ST) field of the DN.\n\n"
+     "* `:email` - Email address for the certificate.\n\n"
+     "* `:dns` - DNS name for Subject Alternative Name.\n\n"
+     "* `:uri` - URI for Subject Alternative Name.\n\n"
+     "* `:serial-number` - Serial number field of the DN."
     },
     {"x509-cert/issue", x509_cert_issue,
      "(x509-cert/issue subject-key ca-cert ca-key "
      "not-before not-after &keys {:rng rng :hash hash :dn dn "
-     ":is-ca is-ca})\n\n"
+     ":is-ca is-ca :locality locality :state state "
+     ":email email :dns dns :uri uri :serial-number serial-number})\n\n"
      "Issue a new X.509 certificate signed by a CA.\n\n"
      "* `subject-key` - The subject's private key object.\n\n"
      "* `ca-cert` - The CA's certificate object.\n\n"
@@ -953,7 +1004,13 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:dn` - Distinguished name in \"CN/C/O/OU\" format. "
      "Default is empty.\n\n"
      "* `:is-ca` - If true, mark certificate as a CA certificate. "
-     "Default is false."
+     "Default is false.\n\n"
+     "* `:locality` - Locality (L) field of the DN.\n\n"
+     "* `:state` - State (ST) field of the DN.\n\n"
+     "* `:email` - Email address for the certificate.\n\n"
+     "* `:dns` - DNS name for Subject Alternative Name.\n\n"
+     "* `:uri` - URI for Subject Alternative Name.\n\n"
+     "* `:serial-number` - Serial number field of the DN."
     },
     {"x509-cert/load", x509_cert_load,
      "(x509-cert/load cert)\n\n"
