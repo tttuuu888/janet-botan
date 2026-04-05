@@ -19,9 +19,12 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
                                    botan_privkey_t key,
                                    botan_rng_t rng,
                                    const char* hash_fn,
-                                   const char* dn_spec,
                                    uint32_t expire_time,
                                    int is_ca,
+                                   const char* cn,
+                                   const char* country,
+                                   const char* org,
+                                   const char* org_unit,
                                    const char* locality,
                                    const char* state,
                                    const char* email,
@@ -32,8 +35,12 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
         return BOTAN_FFI_ERROR_NULL_POINTER;
 
     return ffi_guard_thunk(__func__, [=]() -> int {
-        Botan::X509_Cert_Options opts(dn_spec ? dn_spec : "", expire_time);
+        Botan::X509_Cert_Options opts("", expire_time);
         if(is_ca) opts.CA_key();
+        if(cn) opts.common_name = cn;
+        if(country) opts.country = country;
+        if(org) opts.organization = org;
+        if(org_unit) opts.org_unit = org_unit;
         if(locality) opts.locality = locality;
         if(state) opts.state = state;
         if(email) opts.email = email;
@@ -57,10 +64,13 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
                            botan_privkey_t ca_key,
                            botan_rng_t rng,
                            const char* hash_fn,
-                           const char* dn_spec,
                            uint64_t not_before,
                            uint64_t not_after,
                            int is_ca,
+                           const char* cn,
+                           const char* country,
+                           const char* org,
+                           const char* org_unit,
                            const char* locality,
                            const char* state,
                            const char* email,
@@ -71,8 +81,12 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
         return BOTAN_FFI_ERROR_NULL_POINTER;
 
     return ffi_guard_thunk(__func__, [=]() -> int {
-        Botan::X509_Cert_Options opts(dn_spec ? dn_spec : "");
+        Botan::X509_Cert_Options opts("");
         if(is_ca) opts.CA_key();
+        if(cn) opts.common_name = cn;
+        if(country) opts.country = country;
+        if(org) opts.organization = org;
+        if(org_unit) opts.org_unit = org_unit;
         if(locality) opts.locality = locality;
         if(state) opts.state = state;
         if(email) opts.email = email;

@@ -134,12 +134,15 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
 (let [ca-key (privkey/new "RSA" "2048")
       ca-cert (x509-cert/create-self-signed
                ca-key
-               :dn "Test CA/KR/Test Org"
+               :CN "Test CA" :C "KR" :O "Test Org"
+               :ST "Seoul" :L "Gangnam"
                :is-ca true)]
   (assert (:is-ca ca-cert))
   (assert (= (:subject-dn ca-cert "CN" 0) "Test CA"))
   (assert (= (:subject-dn ca-cert "C" 0) "KR"))
   (assert (= (:subject-dn ca-cert "O" 0) "Test Org"))
+  (assert (= (:subject-dn ca-cert "State" 0) "Seoul"))
+  (assert (= (:subject-dn ca-cert "Locality" 0) "Gangnam"))
   (assert (= (:issuer-dn ca-cert "CN" 0) "Test CA"))
   (assert (:hostname-match ca-cert "Test CA"))
 
@@ -148,7 +151,7 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
         server-cert (x509-cert/issue
                      server-key ca-cert ca-key
                      (- now 3600) (+ now (* 365 24 3600))
-                     :dn "server.example.com/KR/Test Org")]
+                     :CN "server.example.com" :C "KR" :O "Test Org")]
     (assert (not (:is-ca server-cert)))
     (assert (= (:subject-dn server-cert "CN" 0) "server.example.com"))
     (assert (= (:issuer-dn server-cert "CN" 0) "Test CA"))

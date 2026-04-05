@@ -35,14 +35,15 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out);
 /* External C++ functions for x509 cert creation */
 extern int jbotan_x509_create_self_signed(
     botan_x509_cert_t *cert_obj, botan_privkey_t key, botan_rng_t rng,
-    const char *hash_fn, const char *dn_spec, uint32_t expire_time, int is_ca,
+    const char *hash_fn, uint32_t expire_time, int is_ca,
+    const char *cn, const char *country, const char *org, const char *org_unit,
     const char *locality, const char *state, const char *email,
     const char *dns, const char *uri, const char *serial_number);
 extern int jbotan_x509_cert_issue(
     botan_x509_cert_t *cert_obj, botan_privkey_t subject_key,
     botan_x509_cert_t ca_cert, botan_privkey_t ca_key, botan_rng_t rng,
-    const char *hash_fn, const char *dn_spec,
-    uint64_t not_before, uint64_t not_after, int is_ca,
+    const char *hash_fn, uint64_t not_before, uint64_t not_after, int is_ca,
+    const char *cn, const char *country, const char *org, const char *org_unit,
     const char *locality, const char *state, const char *email,
     const char *dns, const char *uri, const char *serial_number);
 
@@ -228,17 +229,20 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
 
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
-    janet_arity(argc, 1, 23);
+    janet_arity(argc, 1, 25);
 
     botan_private_key_obj_t *key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
 
     botan_rng_t rng = 0;
     botan_rng_obj_t *rng_obj = NULL;
     const char *hash_fn = "SHA-256";
-    const char *dn_spec = NULL;
     uint32_t expire_time = 365 * 24 * 60 * 60;
     int is_ca = 0;
     int rng_created = 0;
+    const char *cn = NULL;
+    const char *country = NULL;
+    const char *org = NULL;
+    const char *org_unit = NULL;
     const char *locality = NULL;
     const char *state = NULL;
     const char *email = NULL;
@@ -252,15 +256,21 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
             rng_obj = janet_getabstract(argv, i + 1, get_rng_obj_type());
         } else if (!janet_cstrcmp(keyword, "hash")) {
             hash_fn = janet_getcstring(argv, i + 1);
-        } else if (!janet_cstrcmp(keyword, "dn")) {
-            dn_spec = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "expire-time")) {
             expire_time = (uint32_t)janet_getinteger(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "is-ca")) {
             is_ca = janet_getboolean(argv, i + 1);
-        } else if (!janet_cstrcmp(keyword, "locality")) {
+        } else if (!janet_cstrcmp(keyword, "CN")) {
+            cn = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "C")) {
+            country = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "O")) {
+            org = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "OU")) {
+            org_unit = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "L")) {
             locality = janet_getcstring(argv, i + 1);
-        } else if (!janet_cstrcmp(keyword, "state")) {
+        } else if (!janet_cstrcmp(keyword, "ST")) {
             state = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "email")) {
             email = janet_getcstring(argv, i + 1);
@@ -288,7 +298,8 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
 
     int ret = jbotan_x509_create_self_signed(
         &obj->x509_cert, key_obj->private_key, rng,
-        hash_fn, dn_spec, expire_time, is_ca,
+        hash_fn, expire_time, is_ca,
+        cn, country, org, org_unit,
         locality, state, email, dns, uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
@@ -298,7 +309,7 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
 }
 
 static Janet x509_cert_issue(int32_t argc, Janet *argv) {
-    janet_arity(argc, 5, 27);
+    janet_arity(argc, 5, 29);
 
     botan_private_key_obj_t *subject_key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
     botan_x509_cert_obj_t *ca_cert_obj = janet_getabstract(argv, 1, get_x509_cert_obj_type());
@@ -309,9 +320,12 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     botan_rng_t rng = 0;
     botan_rng_obj_t *rng_obj = NULL;
     const char *hash_fn = "SHA-256";
-    const char *dn_spec = NULL;
     int is_ca = 0;
     int rng_created = 0;
+    const char *cn = NULL;
+    const char *country = NULL;
+    const char *org = NULL;
+    const char *org_unit = NULL;
     const char *locality = NULL;
     const char *state = NULL;
     const char *email = NULL;
@@ -325,13 +339,19 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
             rng_obj = janet_getabstract(argv, i + 1, get_rng_obj_type());
         } else if (!janet_cstrcmp(keyword, "hash")) {
             hash_fn = janet_getcstring(argv, i + 1);
-        } else if (!janet_cstrcmp(keyword, "dn")) {
-            dn_spec = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "is-ca")) {
             is_ca = janet_getboolean(argv, i + 1);
-        } else if (!janet_cstrcmp(keyword, "locality")) {
+        } else if (!janet_cstrcmp(keyword, "CN")) {
+            cn = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "C")) {
+            country = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "O")) {
+            org = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "OU")) {
+            org_unit = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "L")) {
             locality = janet_getcstring(argv, i + 1);
-        } else if (!janet_cstrcmp(keyword, "state")) {
+        } else if (!janet_cstrcmp(keyword, "ST")) {
             state = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "email")) {
             email = janet_getcstring(argv, i + 1);
@@ -360,7 +380,8 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     int ret = jbotan_x509_cert_issue(
         &obj->x509_cert, subject_key_obj->private_key,
         ca_cert_obj->x509_cert, ca_key_obj->private_key,
-        rng, hash_fn, dn_spec, not_before, not_after, is_ca,
+        rng, hash_fn, not_before, not_after, is_ca,
+        cn, country, org, org_unit,
         locality, state, email, dns, uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
@@ -962,32 +983,34 @@ static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {
 static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/create-self-signed", x509_cert_create_self_signed,
      "(x509-cert/create-self-signed key &keys {:rng rng :hash hash "
-     ":dn dn :expire-time expire-time :is-ca is-ca "
-     ":locality locality :state state :email email "
-     ":dns dns :uri uri :serial-number serial-number})\n\n"
+     ":expire-time expire-time :is-ca is-ca "
+     ":CN cn :C c :O o :OU ou :ST st :L l "
+     ":email email :dns dns :uri uri :serial-number serial-number})\n\n"
      "Create a self-signed X.509 certificate.\n\n"
      "* `key` - A private key object.\n\n"
      "* `:rng` - A random number generator object. "
      "Default is system RNG.\n\n"
      "* `:hash` - Hash algorithm name, e.g. \"SHA-256\". "
      "Default is \"SHA-256\".\n\n"
-     "* `:dn` - Distinguished name in \"CN/C/O/OU\" format. "
-     "Default is empty.\n\n"
      "* `:expire-time` - Expiration time in seconds from now. "
      "Default is 365 days.\n\n"
      "* `:is-ca` - If true, mark certificate as a CA certificate. "
      "Default is false.\n\n"
-     "* `:locality` - Locality (L) field of the DN.\n\n"
-     "* `:state` - State (ST) field of the DN.\n\n"
-     "* `:email` - Email address for the certificate.\n\n"
+     "* `:CN` - Common Name.\n\n"
+     "* `:C` - Country.\n\n"
+     "* `:O` - Organization.\n\n"
+     "* `:OU` - Organizational Unit.\n\n"
+     "* `:ST` - State or Province.\n\n"
+     "* `:L` - Locality.\n\n"
+     "* `:email` - Email address.\n\n"
      "* `:dns` - DNS name for Subject Alternative Name.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN."
     },
     {"x509-cert/issue", x509_cert_issue,
      "(x509-cert/issue subject-key ca-cert ca-key "
-     "not-before not-after &keys {:rng rng :hash hash :dn dn "
-     ":is-ca is-ca :locality locality :state state "
+     "not-before not-after &keys {:rng rng :hash hash "
+     ":is-ca is-ca :CN cn :C c :O o :OU ou :ST st :L l "
      ":email email :dns dns :uri uri :serial-number serial-number})\n\n"
      "Issue a new X.509 certificate signed by a CA.\n\n"
      "* `subject-key` - The subject's private key object.\n\n"
@@ -1001,13 +1024,15 @@ static JanetReg x509_cert_cfuns[] = {
      "Default is system RNG.\n\n"
      "* `:hash` - Hash algorithm name, e.g. \"SHA-256\". "
      "Default is \"SHA-256\".\n\n"
-     "* `:dn` - Distinguished name in \"CN/C/O/OU\" format. "
-     "Default is empty.\n\n"
      "* `:is-ca` - If true, mark certificate as a CA certificate. "
      "Default is false.\n\n"
-     "* `:locality` - Locality (L) field of the DN.\n\n"
-     "* `:state` - State (ST) field of the DN.\n\n"
-     "* `:email` - Email address for the certificate.\n\n"
+     "* `:CN` - Common Name.\n\n"
+     "* `:C` - Country.\n\n"
+     "* `:O` - Organization.\n\n"
+     "* `:OU` - Organizational Unit.\n\n"
+     "* `:ST` - State or Province.\n\n"
+     "* `:L` - Locality.\n\n"
+     "* `:email` - Email address.\n\n"
      "* `:dns` - DNS name for Subject Alternative Name.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN."
