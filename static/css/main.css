@@ -503,10 +503,22 @@ footer {
 .prevnext-bar {
     padding: 40px 15px;
     margin: 10px 0;
+    overflow: hidden;
 }
 
-.prev, .next {
+.prev a, .next a {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 1px solid #076591;
+    border-radius: 4px;
     color: #076591;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.prev a:hover, .next a:hover {
+    background: #076591;
+    color: #fff;
 }
 
 .prev {
@@ -514,7 +526,7 @@ footer {
 }
 
 .prev .prevnext-text::before {
-    content: "< ";
+    content: "\2190  ";
 }
 
 .next {
@@ -523,7 +535,7 @@ footer {
 }
 
 .next .prevnext-text::after {
-    content: " >";
+    content: "  \2192";
 }
 
 /* Syntax highlighting */
