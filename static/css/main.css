@@ -342,6 +342,9 @@ footer {
     color: #888;
     padding: 40px;
     text-align: center;
+    background: white;
+    position: relative;
+    z-index: 1;
 }
 
 /* Syntax */
@@ -377,8 +380,37 @@ footer {
     .toc {
         position: sticky;
         top: 0;
+        height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .toc > ul {
         max-height: 100vh;
         overflow-y: auto;
+        padding-top: 72px;
+        padding-bottom: 45px;
+        box-sizing: border-box;
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+    .toc > ul:hover {
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+    .toc > ul::-webkit-scrollbar {
+        width: 4px;
+    }
+    .toc > ul::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .toc > ul::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 4px;
+    }
+    .toc > ul:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+    .toc > ul::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.4);
     }
 }
 
@@ -389,6 +421,11 @@ footer {
     .toc {
         position: fixed;
         top: 0;
+        height: auto;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .toc > ul {
         max-height: 100vh;
         overflow-y: auto;
     }
@@ -417,11 +454,21 @@ footer {
  */
 
 .toc {
+    box-sizing: border-box;
     padding-left: 30px;
     padding-right: 30px;
     padding-top: 72px;
     padding-bottom: 45px;
-    box-sizing: border-box;
+}
+
+@media (min-width: 801px) {
+    .toc {
+        padding: 0;
+    }
+    .toc > ul {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
 }
 
 @media (max-width: 800px) {
@@ -592,5 +639,21 @@ code {
 
     .toc {
         background: #333;
+    }
+
+    footer {
+        background: #222;
+    }
+
+    .toc:hover {
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    .toc:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .toc::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.4);
     }
 }
