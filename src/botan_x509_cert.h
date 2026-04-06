@@ -45,15 +45,19 @@ extern int jbotan_x509_create_self_signed(
     botan_x509_cert_t *cert_obj, botan_privkey_t key, botan_rng_t rng,
     const char *hash_fn, uint32_t expire_time, int is_ca,
     const char *cn, const char *country, const char *org, const char *org_unit,
+    const char **more_org_units, size_t more_org_units_count,
     const char *locality, const char *state, const char *email,
-    const char *dns, const char *uri, const char *serial_number);
+    const char *dns, const char **more_dns, size_t more_dns_count,
+    const char *uri, const char *serial_number);
 extern int jbotan_x509_cert_issue(
     botan_x509_cert_t *cert_obj, botan_privkey_t subject_key,
     botan_x509_cert_t ca_cert, botan_privkey_t ca_key, botan_rng_t rng,
     const char *hash_fn, uint64_t not_before, uint64_t not_after, int is_ca,
     const char *cn, const char *country, const char *org, const char *org_unit,
+    const char **more_org_units, size_t more_org_units_count,
     const char *locality, const char *state, const char *email,
-    const char *dns, const char *uri, const char *serial_number);
+    const char *dns, const char **more_dns, size_t more_dns_count,
+    const char *uri, const char *serial_number);
 
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv);
@@ -245,7 +249,7 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
 
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
-    janet_arity(argc, 1, 25);
+    janet_arity(argc, 1, -1);
 
     botan_private_key_obj_t *key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
 
@@ -265,6 +269,10 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
     const char *dns = NULL;
     const char *uri = NULL;
     const char *serial_number = NULL;
+    const char *more_org_units[32];
+    size_t more_org_units_count = 0;
+    const char *more_dns[32];
+    size_t more_dns_count = 0;
 
     for (int i = 1; i < argc; i += 2) {
         JanetKeyword keyword = janet_getkeyword(argv, i);
@@ -283,7 +291,19 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
         } else if (!janet_cstrcmp(keyword, "O")) {
             org = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "OU")) {
-            org_unit = janet_getcstring(argv, i + 1);
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                if (len > 0) {
+                    org_unit = janet_getcstring(items, 0);
+                    for (int32_t j = 1; j < len && more_org_units_count < 32; j++)
+                        more_org_units[more_org_units_count++] = janet_getcstring(items, j);
+                }
+            } else {
+                org_unit = janet_getcstring(argv, i + 1);
+            }
         } else if (!janet_cstrcmp(keyword, "L")) {
             locality = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "ST")) {
@@ -291,7 +311,19 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
         } else if (!janet_cstrcmp(keyword, "email")) {
             email = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "dns")) {
-            dns = janet_getcstring(argv, i + 1);
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                if (len > 0) {
+                    dns = janet_getcstring(items, 0);
+                    for (int32_t j = 1; j < len && more_dns_count < 32; j++)
+                        more_dns[more_dns_count++] = janet_getcstring(items, j);
+                }
+            } else {
+                dns = janet_getcstring(argv, i + 1);
+            }
         } else if (!janet_cstrcmp(keyword, "uri")) {
             uri = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "serial-number")) {
@@ -316,7 +348,10 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
         &obj->x509_cert, key_obj->private_key, rng,
         hash_fn, expire_time, is_ca,
         cn, country, org, org_unit,
-        locality, state, email, dns, uri, serial_number);
+        more_org_units, more_org_units_count,
+        locality, state, email, dns,
+        more_dns, more_dns_count,
+        uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -325,7 +360,7 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
 }
 
 static Janet x509_cert_issue(int32_t argc, Janet *argv) {
-    janet_arity(argc, 5, 29);
+    janet_arity(argc, 5, -1);
 
     botan_private_key_obj_t *subject_key_obj = janet_getabstract(argv, 0, get_private_key_obj_type());
     botan_x509_cert_obj_t *ca_cert_obj = janet_getabstract(argv, 1, get_x509_cert_obj_type());
@@ -348,6 +383,10 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     const char *dns = NULL;
     const char *uri = NULL;
     const char *serial_number = NULL;
+    const char *more_org_units[32];
+    size_t more_org_units_count = 0;
+    const char *more_dns[32];
+    size_t more_dns_count = 0;
 
     for (int i = 5; i < argc; i += 2) {
         JanetKeyword keyword = janet_getkeyword(argv, i);
@@ -364,7 +403,19 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
         } else if (!janet_cstrcmp(keyword, "O")) {
             org = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "OU")) {
-            org_unit = janet_getcstring(argv, i + 1);
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                if (len > 0) {
+                    org_unit = janet_getcstring(items, 0);
+                    for (int32_t j = 1; j < len && more_org_units_count < 32; j++)
+                        more_org_units[more_org_units_count++] = janet_getcstring(items, j);
+                }
+            } else {
+                org_unit = janet_getcstring(argv, i + 1);
+            }
         } else if (!janet_cstrcmp(keyword, "L")) {
             locality = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "ST")) {
@@ -372,7 +423,19 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
         } else if (!janet_cstrcmp(keyword, "email")) {
             email = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "dns")) {
-            dns = janet_getcstring(argv, i + 1);
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                if (len > 0) {
+                    dns = janet_getcstring(items, 0);
+                    for (int32_t j = 1; j < len && more_dns_count < 32; j++)
+                        more_dns[more_dns_count++] = janet_getcstring(items, j);
+                }
+            } else {
+                dns = janet_getcstring(argv, i + 1);
+            }
         } else if (!janet_cstrcmp(keyword, "uri")) {
             uri = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "serial-number")) {
@@ -398,7 +461,10 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
         ca_cert_obj->x509_cert, ca_key_obj->private_key,
         rng, hash_fn, not_before, not_after, is_ca,
         cn, country, org, org_unit,
-        locality, state, email, dns, uri, serial_number);
+        more_org_units, more_org_units_count,
+        locality, state, email, dns,
+        more_dns, more_dns_count,
+        uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -1067,11 +1133,13 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:CN` - Common Name.\n\n"
      "* `:C` - Country.\n\n"
      "* `:O` - Organization.\n\n"
-     "* `:OU` - Organizational Unit.\n\n"
+     "* `:OU` - Organizational Unit. "
+     "Can be a tuple/array of strings for multiple values.\n\n"
      "* `:ST` - State or Province.\n\n"
      "* `:L` - Locality.\n\n"
      "* `:email` - Email address.\n\n"
-     "* `:dns` - DNS name for Subject Alternative Name.\n\n"
+     "* `:dns` - DNS name for Subject Alternative Name. "
+     "Can be a tuple/array of strings for multiple values.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN."
     },
@@ -1097,11 +1165,13 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:CN` - Common Name.\n\n"
      "* `:C` - Country.\n\n"
      "* `:O` - Organization.\n\n"
-     "* `:OU` - Organizational Unit.\n\n"
+     "* `:OU` - Organizational Unit. "
+     "Can be a tuple/array of strings for multiple values.\n\n"
      "* `:ST` - State or Province.\n\n"
      "* `:L` - Locality.\n\n"
      "* `:email` - Email address.\n\n"
-     "* `:dns` - DNS name for Subject Alternative Name.\n\n"
+     "* `:dns` - DNS name for Subject Alternative Name. "
+     "Can be a tuple/array of strings for multiple values.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN."
     },
@@ -1180,8 +1250,9 @@ static JanetReg x509_cert_cfuns[] = {
     },
     {"x509-cert/hostname-match", x509_cert_hostname_match,
      "(x509-cert/hostname-match cert-obj hostname)\n\n"
-     "Return true if the Common Name (CN) field of the certificate matches "
-     "a given `hostname`."
+     "Return true if the certificate matches a given `hostname`. "
+     "If SAN DNS entries are present, only those are checked. "
+     "Otherwise falls back to Common Name (CN). Supports wildcard matching."
     },
     {"x509-cert/allowed-extended-usage", x509_cert_allowed_extended_usage,
      "(x509-cert/allowed-extended-usage cert-obj oid)\n\n"

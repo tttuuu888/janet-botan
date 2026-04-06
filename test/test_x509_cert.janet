@@ -108,6 +108,20 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
     (assert (> (:revocation-date entry) 0))
     (assert (= (:serial-number entry) (hex-decode "01")))))
 
+# Test multiple OU and DNS values
+(let [cert (x509-cert/create-self-signed
+            (privkey/new "ECDSA")
+            :CN "Multi Test" :C "KR" :O "Test Org"
+            :OU ["IT" "Engineering" "Security"]
+            :dns ["example.com" "*.example.com" "api.example.com"])]
+  (assert (= (:subject-dn cert "OU" 0) "IT"))
+  (assert (= (:subject-dn cert "OU" 1) "Engineering"))
+  (assert (= (:subject-dn cert "OU" 2) "Security"))
+  (assert (not (:hostname-match cert "Multi Test"))) # SAN present, CN ignored (RFC 6125)
+  (assert (:hostname-match cert "example.com"))
+  (assert (:hostname-match cert "www.example.com"))
+  (assert (:hostname-match cert "api.example.com")))
+
 # Test x509-cert/create-self-signed and x509-cert/issue
 (let [ca-key (privkey/new "RSA" "2048")
       ca-cert (x509-cert/create-self-signed
