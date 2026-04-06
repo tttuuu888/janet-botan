@@ -398,7 +398,11 @@ footer {
 }
 
 .toc span.selected {
-    background: #0765911a;
+    background: #07659130;
+    border-left: 3px solid #076591;
+    padding-left: 6px;
+    border-radius: 2px;
+    font-weight: bold;
 }
 
 .toc span:hover {
