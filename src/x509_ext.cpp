@@ -27,10 +27,14 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
                                    const char* country,
                                    const char* org,
                                    const char* org_unit,
+                                   const char** more_org_units,
+                                   size_t more_org_units_count,
                                    const char* locality,
                                    const char* state,
                                    const char* email,
                                    const char* dns,
+                                   const char** more_dns,
+                                   size_t more_dns_count,
                                    const char* uri,
                                    const char* serial_number) {
     if(Botan::any_null_pointers(cert_obj))
@@ -43,10 +47,14 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
         if(country) opts.country = country;
         if(org) opts.organization = org;
         if(org_unit) opts.org_unit = org_unit;
+        for(size_t i = 0; i < more_org_units_count; i++)
+            opts.more_org_units.push_back(more_org_units[i]);
         if(locality) opts.locality = locality;
         if(state) opts.state = state;
         if(email) opts.email = email;
         if(dns) opts.dns = dns;
+        for(size_t i = 0; i < more_dns_count; i++)
+            opts.more_dns.push_back(more_dns[i]);
         if(uri) opts.uri = uri;
         if(serial_number) opts.serial_number = serial_number;
 
@@ -73,10 +81,14 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
                            const char* country,
                            const char* org,
                            const char* org_unit,
+                           const char** more_org_units,
+                           size_t more_org_units_count,
                            const char* locality,
                            const char* state,
                            const char* email,
                            const char* dns,
+                           const char** more_dns,
+                           size_t more_dns_count,
                            const char* uri,
                            const char* serial_number) {
     if(Botan::any_null_pointers(cert_obj))
@@ -89,10 +101,14 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
         if(country) opts.country = country;
         if(org) opts.organization = org;
         if(org_unit) opts.org_unit = org_unit;
+        for(size_t i = 0; i < more_org_units_count; i++)
+            opts.more_org_units.push_back(more_org_units[i]);
         if(locality) opts.locality = locality;
         if(state) opts.state = state;
         if(email) opts.email = email;
         if(dns) opts.dns = dns;
+        for(size_t i = 0; i < more_dns_count; i++)
+            opts.more_dns.push_back(more_dns[i]);
         if(uri) opts.uri = uri;
         if(serial_number) opts.serial_number = serial_number;
 
