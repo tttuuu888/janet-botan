@@ -554,14 +554,6 @@ code {
     white-space: nowrap;
 }
 
-.mendoza-codeblock {
-    color: white;
-    padding: 14px;
-    background: #333;
-    border-radius: 5px;
-    margin: 15px;
-    line-height: 1.2;
-}
 
 @media (prefers-color-scheme: dark) {
     body {
@@ -595,6 +587,7 @@ code {
 
     .mendoza-codeblock {
         background: #333;
+        color: #f8f8f2;
     }
 
     .toc {
