@@ -435,6 +435,7 @@ footer {
     width: 28px;
     border-radius: 2px;
     background: #CCC;
+    transition: transform 0.3s;
 }
 
 #toc-toggle.open .topbar {
