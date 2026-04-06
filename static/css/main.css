@@ -340,11 +340,12 @@ code, pre {
 
 footer {
     color: #888;
-    padding: 40px;
+    padding: 10px;
     text-align: center;
     background: white;
     position: relative;
     z-index: 1;
+    border-top: 1px solid #ddd;
 }
 
 /* Syntax */
@@ -643,6 +644,7 @@ code {
 
     footer {
         background: #222;
+        border-top-color: #444;
     }
 
     .toc:hover {
