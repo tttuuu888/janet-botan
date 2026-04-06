@@ -238,6 +238,27 @@ code, pre {
 
 .docstring {
     border-bottom: solid 2px steelblue;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.docstring > .binding-wrap {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.docstring > p {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.docstring > .mendoza-codeblock {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.docstring > li {
+    list-style-position: inside;
 }
 
 /* Tables */
