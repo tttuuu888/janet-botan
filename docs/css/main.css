@@ -208,6 +208,32 @@ code, pre {
     padding: 10px;
     background: #f8f8f8;
     color: #111;
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: transparent;
+    border: 1px solid #888;
+    border-radius: 4px;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.mendoza-codeblock:hover .copy-btn {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    background: #555;
+    color: #fff;
+    border-color: #555;
 }
 
 /* Docstrings */
@@ -238,6 +264,27 @@ code, pre {
 
 .docstring {
     border-bottom: solid 2px steelblue;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.docstring > .binding-wrap {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.docstring > p {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.docstring > .mendoza-codeblock {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.docstring > li {
+    list-style-position: inside;
 }
 
 /* Tables */
@@ -293,8 +340,12 @@ code, pre {
 
 footer {
     color: #888;
-    padding: 40px;
+    padding: 10px;
     text-align: center;
+    background: white;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid #ddd;
 }
 
 /* Syntax */
@@ -326,12 +377,58 @@ footer {
     align-items: flex-start;
 }
 
+@media (min-width: 801px) {
+    .toc {
+        position: sticky;
+        top: 0;
+        height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .toc > ul {
+        max-height: 100vh;
+        overflow-y: auto;
+        padding-top: 72px;
+        padding-bottom: 45px;
+        box-sizing: border-box;
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+    .toc > ul:hover {
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+    .toc > ul::-webkit-scrollbar {
+        width: 4px;
+    }
+    .toc > ul::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .toc > ul::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 4px;
+    }
+    .toc > ul:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+    .toc > ul::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+}
+
 @media (min-width: 1400px) {
     .twocol {
         display: block;
     }
     .toc {
-        position: absolute;
+        position: fixed;
+        top: 0;
+        height: auto;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .toc > ul {
+        max-height: 100vh;
+        overflow-y: auto;
     }
 }
 
@@ -357,15 +454,28 @@ footer {
  * Table of Contents
  */
 
-.toc-hidden {
-    display: none;
-}
-
 .toc {
+    box-sizing: border-box;
     padding-left: 30px;
     padding-right: 30px;
     padding-top: 72px;
     padding-bottom: 45px;
+}
+
+@media (min-width: 801px) {
+    .toc {
+        padding: 0;
+    }
+    .toc > ul {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+@media (max-width: 800px) {
+    .toc-hidden {
+        display: none;
+    }
 }
 
 .toc a {
@@ -377,7 +487,11 @@ footer {
 }
 
 .toc span.selected {
-    background: #0765911a;
+    background: #07659130;
+    border-left: 3px solid #076591;
+    padding-left: 6px;
+    border-radius: 2px;
+    font-weight: bold;
 }
 
 .toc span:hover {
@@ -400,6 +514,7 @@ footer {
 /* Toc Toggle */
 
 #toc-toggle {
+    display: none;
     text-align: center;
     padding: 6px;
     position: absolute;
@@ -408,12 +523,19 @@ footer {
     z-index: 2;
 }
 
+@media (max-width: 800px) {
+    #toc-toggle {
+        display: block;
+    }
+}
+
 #toc-toggle .bar {
     margin: 7px;
     height: 4px;
     width: 28px;
     border-radius: 2px;
     background: #CCC;
+    transition: transform 0.3s;
 }
 
 #toc-toggle.open .topbar {
@@ -429,10 +551,22 @@ footer {
 .prevnext-bar {
     padding: 40px 15px;
     margin: 10px 0;
+    overflow: hidden;
 }
 
-.prev, .next {
+.prev a, .next a {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 1px solid #076591;
+    border-radius: 4px;
     color: #076591;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.prev a:hover, .next a:hover {
+    background: #076591;
+    color: #fff;
 }
 
 .prev {
@@ -440,7 +574,7 @@ footer {
 }
 
 .prev .prevnext-text::before {
-    content: "< ";
+    content: "\2190  ";
 }
 
 .next {
@@ -449,7 +583,7 @@ footer {
 }
 
 .next .prevnext-text::after {
-    content: " >";
+    content: "  \2192";
 }
 
 /* Syntax highlighting */
@@ -468,14 +602,6 @@ code {
     white-space: nowrap;
 }
 
-.mendoza-codeblock {
-    color: white;
-    padding: 14px;
-    background: #333;
-    border-radius: 5px;
-    margin: 15px;
-    line-height: 1.2;
-}
 
 @media (prefers-color-scheme: dark) {
     body {
@@ -509,9 +635,27 @@ code {
 
     .mendoza-codeblock {
         background: #333;
+        color: #f8f8f2;
     }
 
     .toc {
         background: #333;
+    }
+
+    footer {
+        background: #222;
+        border-top-color: #444;
+    }
+
+    .toc:hover {
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
+
+    .toc:hover::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .toc::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.4);
     }
 }
