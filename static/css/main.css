@@ -208,6 +208,32 @@ code, pre {
     padding: 10px;
     background: #f8f8f8;
     color: #111;
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: transparent;
+    border: 1px solid #888;
+    border-radius: 4px;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.mendoza-codeblock:hover .copy-btn {
+    opacity: 1;
+}
+
+.copy-btn:hover {
+    background: #555;
+    color: #fff;
+    border-color: #555;
 }
 
 /* Docstrings */
