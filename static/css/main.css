@@ -373,6 +373,15 @@ footer {
     align-items: flex-start;
 }
 
+@media (min-width: 801px) {
+    .toc {
+        position: sticky;
+        top: 0;
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+}
+
 @media (min-width: 1400px) {
     .twocol {
         display: block;
@@ -404,15 +413,17 @@ footer {
  * Table of Contents
  */
 
-.toc-hidden {
-    display: none;
-}
-
 .toc {
     padding-left: 30px;
     padding-right: 30px;
     padding-top: 72px;
     padding-bottom: 45px;
+}
+
+@media (max-width: 800px) {
+    .toc-hidden {
+        display: none;
+    }
 }
 
 .toc a {
@@ -451,12 +462,19 @@ footer {
 /* Toc Toggle */
 
 #toc-toggle {
+    display: none;
     text-align: center;
     padding: 6px;
     position: absolute;
     top: 10px;
     left: 10px;
     z-index: 2;
+}
+
+@media (max-width: 800px) {
+    #toc-toggle {
+        display: block;
+    }
 }
 
 #toc-toggle .bar {
