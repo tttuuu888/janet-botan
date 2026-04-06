@@ -117,6 +117,7 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (= (:subject-dn cert "OU" 0) "IT"))
   (assert (= (:subject-dn cert "OU" 1) "Engineering"))
   (assert (= (:subject-dn cert "OU" 2) "Security"))
+  (assert (not (:hostname-match cert "Multi Test"))) # SAN present, CN ignored (RFC 6125)
   (assert (:hostname-match cert "example.com"))
   (assert (:hostname-match cert "www.example.com"))
   (assert (:hostname-match cert "api.example.com")))

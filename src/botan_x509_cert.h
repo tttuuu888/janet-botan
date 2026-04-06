@@ -1250,8 +1250,9 @@ static JanetReg x509_cert_cfuns[] = {
     },
     {"x509-cert/hostname-match", x509_cert_hostname_match,
      "(x509-cert/hostname-match cert-obj hostname)\n\n"
-     "Return true if the Common Name (CN) field of the certificate matches "
-     "a given `hostname`."
+     "Return true if the certificate matches a given `hostname`. "
+     "If SAN DNS entries are present, only those are checked. "
+     "Otherwise falls back to Common Name (CN). Supports wildcard matching."
     },
     {"x509-cert/allowed-extended-usage", x509_cert_allowed_extended_usage,
      "(x509-cert/allowed-extended-usage cert-obj oid)\n\n"
