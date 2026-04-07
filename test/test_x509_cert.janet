@@ -69,10 +69,10 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (= (:fingerprint cert1) (:fingerprint cert1-dup)))
   (assert (<= now (:not-before cert1) (+ now 1)))
   (assert (<= a-year-later (:not-after cert1) (+ a-year-later 1)))
-  (assert (= (:subject-dn cert1 "ST" 0) "Seoul"))
-  (assert (= (:issuer-dn cert1 "State" 0) "Seoul"))
-  (assert (= (:subject-dn cert1 "L" 0) "Gangnam-gu"))
-  (assert (= (:issuer-dn cert1 "Locality" 0) "Gangnam-gu"))
+  (assert (= (:subject-dn cert1 :ST 0) "Seoul"))
+  (assert (= (:issuer-dn cert1 :ST 0) "Seoul"))
+  (assert (= (:subject-dn cert1 :L 0) "Gangnam-gu"))
+  (assert (= (:issuer-dn cert1 :L 0) "Gangnam-gu"))
   (assert (:hostname-match cert1 "root.example.com"))
   (assert (:allowed-usage cert1 :NO-CONSTRAINTS))
   (assert (:allowed-usage cert1 :DIGITAL-SIGNATURE))
@@ -113,29 +113,39 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
             (privkey/new "ECDSA")
             :CN "Multi Test" :C "KR" :O "Test Org"
             :OU ["IT" "Engineering" "Security"]
-            :dns ["example.com" "*.example.com" "api.example.com"])]
-  (assert (= (:subject-dn cert "OU" 0) "IT"))
-  (assert (= (:subject-dn cert "OU" 1) "Engineering"))
-  (assert (= (:subject-dn cert "OU" 2) "Security"))
+            :dns ["example.com" "*.example.com" "api.example.com"]
+            :email "admin@example.com")]
+  (assert (= (:subject-dn cert :OU 0) "IT"))
+  (assert (= (:subject-dn cert :OU 1) "Engineering"))
+  (assert (= (:subject-dn cert :OU 2) "Security"))
+  (assert (= (:subject-dn cert :OU) ["IT" "Engineering" "Security"]))
+  (assert (= (:subject-dn cert :CN) ["Multi Test"]))
   (assert (not (:hostname-match cert "Multi Test"))) # SAN present, CN ignored (RFC 6125)
   (assert (:hostname-match cert "example.com"))
   (assert (:hostname-match cert "www.example.com"))
-  (assert (:hostname-match cert "api.example.com")))
+  (assert (:hostname-match cert "api.example.com"))
+  # Botan may reorder SAN entries, so sort before comparing
+  (assert (= [;(sorted (:san cert :dns))]
+             [;(sorted ["*.example.com" "api.example.com" "example.com"])]))
+  (assert (nil? (:san cert :dns 3)))
+  (assert (= (:san cert :email) ["admin@example.com"]))
+  (assert (= (:san cert :uri) []))
+  (assert (nil? (:san cert :email 1))))
 
 # Test x509-cert/create-self-signed and x509-cert/issue
 (let [ca-key (privkey/new "RSA" "2048")
       ca-cert (x509-cert/create-self-signed
                ca-key
-               :CN "Test CA" :C "KR" :O "Test Org"
-               :ST "Seoul" :L "Gangnam"
+               :CN "Test CA" :C "KR" :O "Test Org" :ST "Seoul" :L "Gangnam"
                :is-ca true)]
   (assert (:is-ca ca-cert))
-  (assert (= (:subject-dn ca-cert "CN" 0) "Test CA"))
-  (assert (= (:subject-dn ca-cert "C" 0) "KR"))
-  (assert (= (:subject-dn ca-cert "O" 0) "Test Org"))
-  (assert (= (:subject-dn ca-cert "State" 0) "Seoul"))
-  (assert (= (:subject-dn ca-cert "Locality" 0) "Gangnam"))
-  (assert (= (:issuer-dn ca-cert "CN" 0) "Test CA"))
+  (assert (= (:subject-dn ca-cert :CN 0) "Test CA"))
+  (assert (= (:subject-dn ca-cert :C  0) "KR"))
+  (assert (= (:subject-dn ca-cert :O  0) "Test Org"))
+  (assert (= (:subject-dn ca-cert :ST 0) "Seoul"))
+  (assert (= (:subject-dn ca-cert :L  0) "Gangnam"))
+  (assert (= (:issuer-dn  ca-cert :CN 0) "Test CA"))
+  (assert (= (:issuer-dn ca-cert :CN) ["Test CA"]))
   (assert (:hostname-match ca-cert "Test CA"))
 
   (let [server-key (privkey/new "RSA" "2048")
@@ -145,8 +155,8 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
                      (- now 3600) (+ now (* 365 24 3600))
                      :CN "server.example.com" :C "KR" :O "Test Org")]
     (assert (not (:is-ca server-cert)))
-    (assert (= (:subject-dn server-cert "CN" 0) "server.example.com"))
-    (assert (= (:issuer-dn server-cert "CN" 0) "Test CA"))
+    (assert (= (:subject-dn server-cert :CN 0) "server.example.com"))
+    (assert (= (:issuer-dn  server-cert :CN 0) "Test CA"))
     (assert (= (x509-cert/verify server-cert :trusted [ca-cert]) 0))))
 
 (end-suite)
