@@ -48,7 +48,7 @@ extern int jbotan_x509_create_self_signed(
     const char **more_org_units, size_t more_org_units_count,
     const char *locality, const char *state, const char *email,
     const char *dns, const char **more_dns, size_t more_dns_count,
-    const char *uri, const char *serial_number);
+    const char *ip, const char *uri, const char *serial_number);
 extern int jbotan_x509_cert_issue(
     botan_x509_cert_t *cert_obj, botan_privkey_t subject_key,
     botan_x509_cert_t ca_cert, botan_privkey_t ca_key, botan_rng_t rng,
@@ -57,7 +57,7 @@ extern int jbotan_x509_cert_issue(
     const char **more_org_units, size_t more_org_units_count,
     const char *locality, const char *state, const char *email,
     const char *dns, const char **more_dns, size_t more_dns_count,
-    const char *uri, const char *serial_number);
+    const char *ip, const char *uri, const char *serial_number);
 
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv);
@@ -308,6 +308,7 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
     const char *state = NULL;
     const char *email = NULL;
     const char *dns = NULL;
+    const char *ip = NULL;
     const char *uri = NULL;
     const char *serial_number = NULL;
     const char *more_org_units[32];
@@ -365,6 +366,8 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
             } else {
                 dns = janet_getcstring(argv, i + 1);
             }
+        } else if (!janet_cstrcmp(keyword, "ip")) {
+            ip = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "uri")) {
             uri = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "serial-number")) {
@@ -392,7 +395,7 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
         more_org_units, more_org_units_count,
         locality, state, email, dns,
         more_dns, more_dns_count,
-        uri, serial_number);
+        ip, uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -422,6 +425,7 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     const char *state = NULL;
     const char *email = NULL;
     const char *dns = NULL;
+    const char *ip = NULL;
     const char *uri = NULL;
     const char *serial_number = NULL;
     const char *more_org_units[32];
@@ -477,6 +481,8 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
             } else {
                 dns = janet_getcstring(argv, i + 1);
             }
+        } else if (!janet_cstrcmp(keyword, "ip")) {
+            ip = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "uri")) {
             uri = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "serial-number")) {
@@ -505,7 +511,7 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
         more_org_units, more_org_units_count,
         locality, state, email, dns,
         more_dns, more_dns_count,
-        uri, serial_number);
+        ip, uri, serial_number);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -1233,6 +1239,7 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:email` - Email address.\n\n"
      "* `:dns` - DNS name for Subject Alternative Name. "
      "Can be a tuple/array of strings for multiple values.\n\n"
+     "* `:ip` - IP address for Subject Alternative Name.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN."
     },
@@ -1265,6 +1272,7 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:email` - Email address.\n\n"
      "* `:dns` - DNS name for Subject Alternative Name. "
      "Can be a tuple/array of strings for multiple values.\n\n"
+     "* `:ip` - IP address for Subject Alternative Name.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN."
     },

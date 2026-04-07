@@ -35,6 +35,7 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
                                    const char* dns,
                                    const char** more_dns,
                                    size_t more_dns_count,
+                                   const char* ip,
                                    const char* uri,
                                    const char* serial_number) {
     if(Botan::any_null_pointers(cert_obj))
@@ -55,6 +56,7 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
         if(dns) opts.dns = dns;
         for(size_t i = 0; i < more_dns_count; i++)
             opts.more_dns.push_back(more_dns[i]);
+        if(ip) opts.ip = ip;
         if(uri) opts.uri = uri;
         if(serial_number) opts.serial_number = serial_number;
 
@@ -89,6 +91,7 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
                            const char* dns,
                            const char** more_dns,
                            size_t more_dns_count,
+                           const char* ip,
                            const char* uri,
                            const char* serial_number) {
     if(Botan::any_null_pointers(cert_obj))
@@ -109,6 +112,7 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
         if(dns) opts.dns = dns;
         for(size_t i = 0; i < more_dns_count; i++)
             opts.more_dns.push_back(more_dns[i]);
+        if(ip) opts.ip = ip;
         if(uri) opts.uri = uri;
         if(serial_number) opts.serial_number = serial_number;
 
