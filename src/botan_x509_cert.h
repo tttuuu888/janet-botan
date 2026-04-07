@@ -202,25 +202,22 @@ static int x509_cert_get_fn(void *data, Janet key, Janet *out) {
 
 static const char *x509_general_name_type_str(unsigned int type) {
     switch (type) {
-        case BOTAN_X509_EMAIL_ADDRESS: return "Email";
-        case BOTAN_X509_DNS_NAME: return "DNS";
-        case BOTAN_X509_URI: return "URI";
-        case BOTAN_X509_IP_ADDRESS: return "IP";
+        case BOTAN_X509_EMAIL_ADDRESS:  return "Email";
+        case BOTAN_X509_DNS_NAME:       return "DNS";
+        case BOTAN_X509_URI:            return "URI";
+        case BOTAN_X509_IP_ADDRESS:     return "IP";
         case BOTAN_X509_DIRECTORY_NAME: return "DirName";
-        case BOTAN_X509_OTHER_NAME: return "OtherName";
+        case BOTAN_X509_OTHER_NAME:     return "OtherName";
         default: return "Unknown";
     }
 }
 
-static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer) {
-    botan_x509_cert_obj_t *obj = (botan_x509_cert_obj_t *)p;
-    botan_x509_cert_t cert = obj->x509_cert;
-
+static void x509_cert_describe(botan_x509_cert_t cert, JanetBuffer *buffer) {
     view_data_t data;
     int ret = botan_x509_cert_view_as_string(cert, &data, (botan_view_str_fn)view_str_func);
     JANET_BOTAN_ASSERT(ret);
 
-    janet_formatb(buffer, "\n%s", janet_string(data.data, data.len));
+    janet_buffer_push_bytes(buffer, data.data, data.len);
 
     size_t san_count = 0;
     ret = botan_x509_cert_subject_alternative_names_count(cert, &san_count);
@@ -245,6 +242,12 @@ static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer) {
             botan_x509_general_name_destroy(name);
         }
     }
+}
+
+static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer) {
+    botan_x509_cert_obj_t *obj = (botan_x509_cert_obj_t *)p;
+    janet_buffer_push_u8(buffer, '\n');
+    x509_cert_describe(obj->x509_cert, buffer);
 }
 
 /* Abstract Object functions x509-crl */
@@ -609,13 +612,11 @@ static Janet x509_cert_to_string(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
-    botan_x509_cert_t cert = obj->x509_cert;
 
-    view_data_t data;
-    int ret = botan_x509_cert_view_as_string(cert, &data, (botan_view_str_fn)view_str_func);
-    JANET_BOTAN_ASSERT(ret);
+    JanetBuffer *buffer = janet_buffer(1024);
+    x509_cert_describe(obj->x509_cert, buffer);
 
-    return janet_wrap_string(janet_string(data.data, data.len));
+    return janet_wrap_string(janet_string(buffer->data, buffer->count));
 }
 
 static Janet x509_cert_fingerprint(int32_t argc, Janet *argv) {
