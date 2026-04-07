@@ -113,14 +113,21 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
             (privkey/new "ECDSA")
             :CN "Multi Test" :C "KR" :O "Test Org"
             :OU ["IT" "Engineering" "Security"]
-            :dns ["example.com" "*.example.com" "api.example.com"])]
+            :dns ["example.com" "*.example.com" "api.example.com"]
+            :email "admin@example.com")]
   (assert (= (:subject-dn cert "OU" 0) "IT"))
   (assert (= (:subject-dn cert "OU" 1) "Engineering"))
   (assert (= (:subject-dn cert "OU" 2) "Security"))
   (assert (not (:hostname-match cert "Multi Test"))) # SAN present, CN ignored (RFC 6125)
   (assert (:hostname-match cert "example.com"))
   (assert (:hostname-match cert "www.example.com"))
-  (assert (:hostname-match cert "api.example.com")))
+  (assert (:hostname-match cert "api.example.com"))
+  # Botan may reorder SAN entries, so sort before comparing
+  (def dns-sans (sorted (seq [i :range [0 3]] (:san cert "DNS" i))))
+  (assert (deep= dns-sans @["*.example.com" "api.example.com" "example.com"]))
+  (assert (nil? (:san cert "DNS" 3)))
+  (assert (= (:san cert "Email" 0) "admin@example.com"))
+  (assert (nil? (:san cert "Email" 1))))
 
 # Test x509-cert/create-self-signed and x509-cert/issue
 (let [ca-key (privkey/new "RSA" "2048")

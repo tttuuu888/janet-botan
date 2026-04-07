@@ -75,6 +75,7 @@ static Janet x509_cert_subject_key_id(int32_t argc, Janet *argv);
 static Janet x509_cert_subject_public_key_bits(int32_t argc, Janet *argv);
 static Janet x509_cert_subject_public_key(int32_t argc, Janet *argv);
 static Janet x509_cert_subject_dn(int32_t argc, Janet *argv);
+static Janet x509_cert_san(int32_t argc, Janet *argv);
 static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_is_ca(int32_t argc, Janet *argv);
 static Janet x509_cert_hostname_match(int32_t argc, Janet *argv);
@@ -139,6 +140,7 @@ static JanetMethod x509_cert_methods[] = {
     {"subject-public-key-bits", x509_cert_subject_public_key_bits},
     {"subject-public-key", x509_cert_subject_public_key},
     {"subject-dn", x509_cert_subject_dn},
+    {"san", x509_cert_san},
     {"issuer-dn", x509_cert_issuer_dn},
     {"is-ca", x509_cert_is_ca},
     {"hostname-match", x509_cert_hostname_match},
@@ -198,6 +200,18 @@ static int x509_cert_get_fn(void *data, Janet key, Janet *out) {
     return janet_getmethod(janet_unwrap_keyword(key), x509_cert_methods, out);
 }
 
+static const char *x509_general_name_type_str(unsigned int type) {
+    switch (type) {
+        case BOTAN_X509_EMAIL_ADDRESS: return "Email";
+        case BOTAN_X509_DNS_NAME: return "DNS";
+        case BOTAN_X509_URI: return "URI";
+        case BOTAN_X509_IP_ADDRESS: return "IP";
+        case BOTAN_X509_DIRECTORY_NAME: return "DirName";
+        case BOTAN_X509_OTHER_NAME: return "OtherName";
+        default: return "Unknown";
+    }
+}
+
 static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer) {
     botan_x509_cert_obj_t *obj = (botan_x509_cert_obj_t *)p;
     botan_x509_cert_t cert = obj->x509_cert;
@@ -207,6 +221,30 @@ static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer) {
     JANET_BOTAN_ASSERT(ret);
 
     janet_formatb(buffer, "\n%s", janet_string(data.data, data.len));
+
+    size_t san_count = 0;
+    ret = botan_x509_cert_subject_alternative_names_count(cert, &san_count);
+    if (ret == 0 && san_count > 0) {
+        janet_formatb(buffer, "Subject Alternative Names:\n");
+        for (size_t i = 0; i < san_count; i++) {
+            botan_x509_general_name_t name = NULL;
+            ret = botan_x509_cert_subject_alternative_names(cert, i, &name);
+            if (ret != 0) continue;
+
+            unsigned int type = 0;
+            ret = botan_x509_general_name_get_type(name, &type);
+            if (ret == 0) {
+                view_data_t val;
+                ret = botan_x509_general_name_view_string_value(name, &val, (botan_view_str_fn)view_str_func);
+                if (ret == 0) {
+                    janet_formatb(buffer, "  %s: %s\n",
+                        x509_general_name_type_str(type),
+                        janet_string(val.data, val.len));
+                }
+            }
+            botan_x509_general_name_destroy(name);
+        }
+    }
 }
 
 /* Abstract Object functions x509-crl */
@@ -759,6 +797,58 @@ static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(out->data, out_len));
 }
 
+static unsigned int x509_san_type_from_string(const char *type_str) {
+    if (!strcmp(type_str, "DNS")) return BOTAN_X509_DNS_NAME;
+    if (!strcmp(type_str, "Email")) return BOTAN_X509_EMAIL_ADDRESS;
+    if (!strcmp(type_str, "URI")) return BOTAN_X509_URI;
+    if (!strcmp(type_str, "IP")) return BOTAN_X509_IP_ADDRESS;
+    if (!strcmp(type_str, "DirName")) return BOTAN_X509_DIRECTORY_NAME;
+    return (unsigned int)-1;
+}
+
+static Janet x509_cert_san(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+    const char *type_str = janet_getcstring(argv, 1);
+    size_t target_index = janet_getsize(argv, 2);
+
+    unsigned int target_type = x509_san_type_from_string(type_str);
+    if (target_type == (unsigned int)-1) {
+        janet_panicf("unknown SAN type %s, expected one of: DNS, Email, URI, IP, DirName", type_str);
+    }
+
+    size_t san_count = 0;
+    int ret = botan_x509_cert_subject_alternative_names_count(cert, &san_count);
+    if (ret != 0) return janet_wrap_nil();
+
+    size_t match_index = 0;
+    for (size_t i = 0; i < san_count; i++) {
+        botan_x509_general_name_t name = NULL;
+        ret = botan_x509_cert_subject_alternative_names(cert, i, &name);
+        if (ret != 0) continue;
+
+        unsigned int type = 0;
+        ret = botan_x509_general_name_get_type(name, &type);
+        if (ret == 0 && type == target_type) {
+            if (match_index == target_index) {
+                view_data_t val;
+                ret = botan_x509_general_name_view_string_value(name, &val, (botan_view_str_fn)view_str_func);
+                if (ret == 0) {
+                    Janet result = janet_wrap_string(janet_string(val.data, val.len));
+                    botan_x509_general_name_destroy(name);
+                    return result;
+                }
+            }
+            match_index++;
+        }
+        botan_x509_general_name_destroy(name);
+    }
+
+    return janet_wrap_nil();
+}
+
 static Janet x509_cert_is_ca(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
@@ -1243,6 +1333,13 @@ static JanetReg x509_cert_cfuns[] = {
      "(x509-cert/issuer-dn cert-obj key index)\n\n"
      "Get a value from the issuer DN field. `key` specifies a value to get, "
      "for instance \"Name\" or \"Country\"."
+    },
+    {"x509-cert/san", x509_cert_san,
+     "(x509-cert/san cert-obj type index)\n\n"
+     "Get a value from the Subject Alternative Name extension. "
+     "`type` is one of \"DNS\", \"Email\", \"URI\", \"IP\", \"DirName\". "
+     "`index` is the zero-based index among entries of that type. "
+     "Returns nil if no matching entry exists."
     },
     {"x509-cert/is-ca", x509_cert_is_ca,
      "(x509-cert/is-ca cert-obj)\n\n"
