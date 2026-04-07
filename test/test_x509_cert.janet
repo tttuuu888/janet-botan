@@ -118,15 +118,18 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (= (:subject-dn cert :OU 0) "IT"))
   (assert (= (:subject-dn cert :OU 1) "Engineering"))
   (assert (= (:subject-dn cert :OU 2) "Security"))
+  (assert (= (:subject-dn cert :OU) ["IT" "Engineering" "Security"]))
+  (assert (= (:subject-dn cert :CN) ["Multi Test"]))
   (assert (not (:hostname-match cert "Multi Test"))) # SAN present, CN ignored (RFC 6125)
   (assert (:hostname-match cert "example.com"))
   (assert (:hostname-match cert "www.example.com"))
   (assert (:hostname-match cert "api.example.com"))
   # Botan may reorder SAN entries, so sort before comparing
-  (def dns-sans (sorted (seq [i :range [0 3]] (:san cert :dns i))))
-  (assert (deep= dns-sans @["*.example.com" "api.example.com" "example.com"]))
+  (assert (= [;(sorted (:san cert :dns))]
+             [;(sorted ["*.example.com" "api.example.com" "example.com"])]))
   (assert (nil? (:san cert :dns 3)))
-  (assert (= (:san cert :email 0) "admin@example.com"))
+  (assert (= (:san cert :email) ["admin@example.com"]))
+  (assert (= (:san cert :uri) []))
   (assert (nil? (:san cert :email 1))))
 
 # Test x509-cert/create-self-signed and x509-cert/issue
@@ -142,6 +145,7 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (= (:subject-dn ca-cert :ST 0) "Seoul"))
   (assert (= (:subject-dn ca-cert :L  0) "Gangnam"))
   (assert (= (:issuer-dn  ca-cert :CN 0) "Test CA"))
+  (assert (= (:issuer-dn ca-cert :CN) ["Test CA"]))
   (assert (:hostname-match ca-cert "Test CA"))
 
   (let [server-key (privkey/new "RSA" "2048")

@@ -761,8 +761,8 @@ static const char *x509_dn_key_from_keyword(JanetKeyword kw) {
     return NULL;
 }
 
-static Janet x509_cert_get_dn(botan_x509_cert_t cert, const char *key, size_t index,
-                              int (*get_fn)(botan_x509_cert_t, const char *, size_t, uint8_t *, size_t *)) {
+static Janet x509_cert_get_dn_one(botan_x509_cert_t cert, const char *key, size_t index,
+    int (*get_fn)(botan_x509_cert_t, const char *, size_t, uint8_t *, size_t *)) {
     size_t out_len = 0;
 
     int ret = get_fn(cert, key, index, NULL, &out_len);
@@ -781,30 +781,54 @@ static Janet x509_cert_get_dn(botan_x509_cert_t cert, const char *key, size_t in
     return janet_wrap_string(janet_string(out->data, out_len));
 }
 
+static Janet x509_cert_get_dn_all(botan_x509_cert_t cert, const char *key,
+    int (*get_fn)(botan_x509_cert_t, const char *, size_t, uint8_t *, size_t *)) {
+    JanetArray *arr = janet_array(4);
+    for (size_t i = 0; ; i++) {
+        size_t out_len = 0;
+        int ret = get_fn(cert, key, i, NULL, &out_len);
+        if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) break;
+
+        JanetBuffer *out = janet_buffer(out_len);
+        ret = get_fn(cert, key, i, out->data, &out_len);
+        if (ret != 0) break;
+
+        if (out_len > 0 && out->data[out_len - 1] == 0) out_len -= 1;
+        janet_array_push(arr, janet_wrap_string(janet_string(out->data, out_len)));
+    }
+    return janet_wrap_tuple(janet_tuple_n(arr->data, arr->count));
+}
+
 static Janet x509_cert_subject_dn(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 3);
+    janet_arity(argc, 2, 3);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     JanetKeyword kw = janet_getkeyword(argv, 1);
-    size_t index = janet_getsize(argv, 2);
 
     const char *key = x509_dn_key_from_keyword(kw);
     if (!key) janet_panicf("unknown DN keyword :%s, expected one of: :CN, :C, :O, :OU, :ST, :L, :serial-number", kw);
 
-    return x509_cert_get_dn(obj->x509_cert, key, index, botan_x509_cert_get_subject_dn);
+    if (argc == 3) {
+        size_t index = janet_getsize(argv, 2);
+        return x509_cert_get_dn_one(obj->x509_cert, key, index, botan_x509_cert_get_subject_dn);
+    }
+    return x509_cert_get_dn_all(obj->x509_cert, key, botan_x509_cert_get_subject_dn);
 }
 
 static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 3);
+    janet_arity(argc, 2, 3);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     JanetKeyword kw = janet_getkeyword(argv, 1);
-    size_t index = janet_getsize(argv, 2);
 
     const char *key = x509_dn_key_from_keyword(kw);
     if (!key) janet_panicf("unknown DN keyword :%s, expected one of: :CN, :C, :O, :OU, :ST, :L, :serial-number", kw);
 
-    return x509_cert_get_dn(obj->x509_cert, key, index, botan_x509_cert_get_issuer_dn);
+    if (argc == 3) {
+        size_t index = janet_getsize(argv, 2);
+        return x509_cert_get_dn_one(obj->x509_cert, key, index, botan_x509_cert_get_issuer_dn);
+    }
+    return x509_cert_get_dn_all(obj->x509_cert, key, botan_x509_cert_get_issuer_dn);
 }
 
 static unsigned int x509_san_type_from_keyword(JanetKeyword kw) {
@@ -816,12 +840,13 @@ static unsigned int x509_san_type_from_keyword(JanetKeyword kw) {
 }
 
 static Janet x509_cert_san(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 3);
+    janet_arity(argc, 2, 3);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     botan_x509_cert_t cert = obj->x509_cert;
     JanetKeyword kw = janet_getkeyword(argv, 1);
-    size_t target_index = janet_getsize(argv, 2);
+    int has_index = (argc == 3);
+    size_t target_index = has_index ? janet_getsize(argv, 2) : 0;
 
     unsigned int target_type = x509_san_type_from_keyword(kw);
     if (target_type == (unsigned int)-1) {
@@ -830,8 +855,11 @@ static Janet x509_cert_san(int32_t argc, Janet *argv) {
 
     size_t san_count = 0;
     int ret = botan_x509_cert_subject_alternative_names_count(cert, &san_count);
-    if (ret != 0) return janet_wrap_nil();
+    if (ret != 0) {
+        return has_index ? janet_wrap_nil() : janet_wrap_tuple(janet_tuple_n(NULL, 0));
+    }
 
+    JanetArray *arr = has_index ? NULL : janet_array(4);
     size_t match_index = 0;
     for (size_t i = 0; i < san_count; i++) {
         botan_x509_general_name_t name = NULL;
@@ -841,13 +869,17 @@ static Janet x509_cert_san(int32_t argc, Janet *argv) {
         unsigned int type = 0;
         ret = botan_x509_general_name_get_type(name, &type);
         if (ret == 0 && type == target_type) {
-            if (match_index == target_index) {
-                view_data_t val;
-                ret = botan_x509_general_name_view_string_value(name, &val, (botan_view_str_fn)view_str_func);
-                if (ret == 0) {
-                    Janet result = janet_wrap_string(janet_string(val.data, val.len));
-                    botan_x509_general_name_destroy(name);
-                    return result;
+            view_data_t val;
+            ret = botan_x509_general_name_view_string_value(name, &val, (botan_view_str_fn)view_str_func);
+            if (ret == 0) {
+                Janet str = janet_wrap_string(janet_string(val.data, val.len));
+                if (has_index) {
+                    if (match_index == target_index) {
+                        botan_x509_general_name_destroy(name);
+                        return str;
+                    }
+                } else {
+                    janet_array_push(arr, str);
                 }
             }
             match_index++;
@@ -855,7 +887,8 @@ static Janet x509_cert_san(int32_t argc, Janet *argv) {
         botan_x509_general_name_destroy(name);
     }
 
-    return janet_wrap_nil();
+    if (has_index) return janet_wrap_nil();
+    return janet_wrap_tuple(janet_tuple_n(arr->data, arr->count));
 }
 
 static Janet x509_cert_is_ca(int32_t argc, Janet *argv) {
@@ -1336,23 +1369,26 @@ static JanetReg x509_cert_cfuns[] = {
      "Get the public key included in this certificate as an object of `pubkey`."
     },
     {"x509-cert/subject-dn", x509_cert_subject_dn,
-     "(x509-cert/subject-dn cert-obj key index)\n\n"
+     "(x509-cert/subject-dn cert-obj key &opt index)\n\n"
      "Get a value from the subject DN field. "
      "`key` is one of :CN, :C, :O, :OU, :ST, :L, :serial-number. "
-     "`index` is the zero-based index for fields with multiple values."
+     "If `index` is given, returns the value at that zero-based index. "
+     "If omitted, returns a tuple of all values for that field."
     },
     {"x509-cert/issuer-dn", x509_cert_issuer_dn,
-     "(x509-cert/issuer-dn cert-obj key index)\n\n"
+     "(x509-cert/issuer-dn cert-obj key &opt index)\n\n"
      "Get a value from the issuer DN field. "
      "`key` is one of :CN, :C, :O, :OU, :ST, :L, :serial-number. "
-     "`index` is the zero-based index for fields with multiple values."
+     "If `index` is given, returns the value at that zero-based index. "
+     "If omitted, returns a tuple of all values for that field."
     },
     {"x509-cert/san", x509_cert_san,
-     "(x509-cert/san cert-obj type index)\n\n"
+     "(x509-cert/san cert-obj type &opt index)\n\n"
      "Get a value from the Subject Alternative Name extension. "
      "`type` is one of :dns, :email, :uri, :ip. "
-     "`index` is the zero-based index among entries of that type. "
-     "Returns nil if no matching entry exists."
+     "If `index` is given, returns the value at that zero-based index "
+     "(nil if not found). "
+     "If omitted, returns a tuple of all values for that type."
     },
     {"x509-cert/is-ca", x509_cert_is_ca,
      "(x509-cert/is-ca cert-obj)\n\n"
