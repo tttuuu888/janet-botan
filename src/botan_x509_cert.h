@@ -1304,7 +1304,10 @@ static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {
     botan_x509_cert_t cert = obj2->x509_cert;
 
     int ret = botan_x509_is_revoked(crl, cert);
-    JANET_BOTAN_ASSERT(ret);
+    /* ret: 0 = revoked, -1 = not revoked */
+    if (ret != 0 && ret != -1) {
+        JANET_BOTAN_ASSERT(ret);
+    }
 
     return janet_wrap_boolean(ret == 0);
 }
