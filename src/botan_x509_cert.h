@@ -48,7 +48,9 @@ extern int jbotan_x509_create_self_signed(
     const char **more_org_units, size_t more_org_units_count,
     const char *locality, const char *state, const char *email,
     const char *dns, const char **more_dns, size_t more_dns_count,
-    const char *ip, const char *uri, const char *serial_number);
+    const char *ip, const char *uri, const char *serial_number,
+    const unsigned int *constraints, size_t constraints_count,
+    const char **ex_constraints, size_t ex_constraints_count);
 extern int jbotan_x509_cert_issue(
     botan_x509_cert_t *cert_obj, botan_privkey_t subject_key,
     botan_x509_cert_t ca_cert, botan_privkey_t ca_key, botan_rng_t rng,
@@ -57,7 +59,9 @@ extern int jbotan_x509_cert_issue(
     const char **more_org_units, size_t more_org_units_count,
     const char *locality, const char *state, const char *email,
     const char *dns, const char **more_dns, size_t more_dns_count,
-    const char *ip, const char *uri, const char *serial_number);
+    const char *ip, const char *uri, const char *serial_number,
+    const unsigned int *constraints, size_t constraints_count,
+    const char **ex_constraints, size_t ex_constraints_count);
 
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv);
@@ -80,7 +84,7 @@ static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_is_ca(int32_t argc, Janet *argv);
 static Janet x509_cert_hostname_match(int32_t argc, Janet *argv);
 static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv);
-static Janet x509_cert_allowed_extended_usage(int32_t argc, Janet *argv);
+static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv);
 static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
@@ -145,7 +149,7 @@ static JanetMethod x509_cert_methods[] = {
     {"is-ca", x509_cert_is_ca},
     {"hostname-match", x509_cert_hostname_match},
     {"allowed-usage", x509_cert_allowed_usage},
-    {"allowed-extended-usage", x509_cert_allowed_extended_usage},
+    {"allowed-ext-usage", x509_cert_allowed_ext_usage},
     {"verify", x509_cert_verify},
     {"validation-status", x509_cert_validation_status},
     {NULL, NULL},
@@ -288,6 +292,37 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
     return janet_getmethod(janet_unwrap_keyword(key), x509_crl_entry_methods, out);
 }
 
+struct key_usage_pair {
+    const char *name;
+    unsigned int value;
+};
+
+static struct key_usage_pair key_usage_table[] = {
+    {"NO-CONSTRAINTS",    0},
+    {"DIGITAL-SIGNATURE", 32768},
+    {"NON-REPUDIATION",   16384},
+    {"KEY-ENCIPHERMENT",  8192},
+    {"DATA-ENCIPHERMENT", 4096},
+    {"KEY-AGREEMENT",     2048},
+    {"KEY-CERT-SIGN",     1024},
+    {"CRL-SIGN",          512},
+    {"ENCIPHER-ONLY",     256},
+    {"DECIPHER-ONLY",     128}
+};
+static const size_t key_usage_table_len = sizeof(key_usage_table)/sizeof(key_usage_table[0]);
+
+static unsigned int key_usage_from_keyword(JanetKeyword kw) {
+    for (size_t i = 0; i < key_usage_table_len; i++) {
+        if (!janet_cstrcmp(kw, key_usage_table[i].name))
+            return key_usage_table[i].value;
+    }
+    janet_panicf("unknown key-usage keyword :%s, expected one of: "
+                 ":NO-CONSTRAINTS, :DIGITAL-SIGNATURE, :NON-REPUDIATION, "
+                 ":KEY-ENCIPHERMENT, :DATA-ENCIPHERMENT, :KEY-AGREEMENT, "
+                 ":KEY-CERT-SIGN, :CRL-SIGN, :ENCIPHER-ONLY, :DECIPHER-ONLY", kw);
+    return 0;
+}
+
 /* Janet functions x509-cert */
 static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
     janet_arity(argc, 1, -1);
@@ -315,6 +350,10 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
     size_t more_org_units_count = 0;
     const char *more_dns[32];
     size_t more_dns_count = 0;
+    unsigned int constraints[16];
+    size_t constraints_count = 0;
+    const char *ex_constraints[16];
+    size_t ex_constraints_count = 0;
 
     for (int i = 1; i < argc; i += 2) {
         JanetKeyword keyword = janet_getkeyword(argv, i);
@@ -372,6 +411,28 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
             uri = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "serial-number")) {
             serial_number = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "key-usage")) {
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                for (int32_t j = 0; j < len && constraints_count < 16; j++)
+                    constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(items, j));
+            } else {
+                constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(argv, i + 1));
+            }
+        } else if (!janet_cstrcmp(keyword, "ext-key-usage")) {
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                for (int32_t j = 0; j < len && ex_constraints_count < 16; j++)
+                    ex_constraints[ex_constraints_count++] = janet_getcstring(items, j);
+            } else {
+                ex_constraints[ex_constraints_count++] = janet_getcstring(argv, i + 1);
+            }
         } else {
             janet_panicf("unknown keyword %v", argv[i]);
         }
@@ -395,7 +456,9 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
         more_org_units, more_org_units_count,
         locality, state, email, dns,
         more_dns, more_dns_count,
-        ip, uri, serial_number);
+        ip, uri, serial_number,
+        constraints, constraints_count,
+        ex_constraints, ex_constraints_count);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -432,6 +495,10 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
     size_t more_org_units_count = 0;
     const char *more_dns[32];
     size_t more_dns_count = 0;
+    unsigned int constraints[16];
+    size_t constraints_count = 0;
+    const char *ex_constraints[16];
+    size_t ex_constraints_count = 0;
 
     for (int i = 5; i < argc; i += 2) {
         JanetKeyword keyword = janet_getkeyword(argv, i);
@@ -487,6 +554,28 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
             uri = janet_getcstring(argv, i + 1);
         } else if (!janet_cstrcmp(keyword, "serial-number")) {
             serial_number = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "key-usage")) {
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                for (int32_t j = 0; j < len && constraints_count < 16; j++)
+                    constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(items, j));
+            } else {
+                constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(argv, i + 1));
+            }
+        } else if (!janet_cstrcmp(keyword, "ext-key-usage")) {
+            Janet val = argv[i + 1];
+            if (janet_checktype(val, JANET_TUPLE) || janet_checktype(val, JANET_ARRAY)) {
+                const Janet *items;
+                int32_t len;
+                janet_indexed_view(val, &items, &len);
+                for (int32_t j = 0; j < len && ex_constraints_count < 16; j++)
+                    ex_constraints[ex_constraints_count++] = janet_getcstring(items, j);
+            } else {
+                ex_constraints[ex_constraints_count++] = janet_getcstring(argv, i + 1);
+            }
         } else {
             janet_panicf("unknown keyword %v", argv[i]);
         }
@@ -511,7 +600,9 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
         more_org_units, more_org_units_count,
         locality, state, email, dns,
         more_dns, more_dns_count,
-        ip, uri, serial_number);
+        ip, uri, serial_number,
+        constraints, constraints_count,
+        ex_constraints, ex_constraints_count);
 
     if (rng_created) botan_rng_destroy(rng);
     JANET_BOTAN_ASSERT(ret);
@@ -923,35 +1014,7 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     botan_x509_cert_t cert = obj->x509_cert;
     JanetKeyword usage = janet_getkeyword(argv, 1);
-
-    struct usage_key_pair {
-        const char *usuage;
-        unsigned int key;
-    };
-    static struct usage_key_pair pair_list[] = {
-        {"NO-CONSTRAINTS",    0},
-        {"DIGITAL-SIGNATURE", 32768},
-        {"NON-REPUDIATION",   16384},
-        {"KEY-ENCIPHERMENT",  8192},
-        {"DATA-ENCIPHERMENT", 4096},
-        {"KEY-AGREEMENT",     2048},
-        {"KEY-CERT-SIGN",     1024},
-        {"CRL-SIGN",          512},
-        {"ENCIPHER-ONLY",     256},
-        {"DECIPHER-ONLY",     128}
-    };
-
-    unsigned int key = 1;
-    for(int i=0; i<(sizeof(pair_list)/sizeof(struct usage_key_pair)); i++) {
-        if (janet_cstrcmp(usage, pair_list[i].usuage) == 0) {
-            key = pair_list[i].key;
-            break;
-        }
-    }
-
-    if (key == 1) {
-        janet_panic("Invalid argument.");
-    }
+    unsigned int key = key_usage_from_keyword(usage);
 
     int ret = botan_x509_cert_allowed_usage(cert, key);
     JANET_BOTAN_ASSERT(ret);
@@ -959,7 +1022,7 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
-static Janet x509_cert_allowed_extended_usage(int32_t argc, Janet *argv) {
+static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
@@ -1251,7 +1314,8 @@ static JanetReg x509_cert_cfuns[] = {
      "(x509-cert/create-self-signed key &keys {:rng rng :hash hash "
      ":expire-time expire-time :is-ca is-ca "
      ":CN cn :C c :O o :OU ou :ST st :L l "
-     ":email email :dns dns :uri uri :serial-number serial-number})\n\n"
+     ":email email :dns dns :ip ip :uri uri :serial-number serial-number "
+     ":key-usage key-usage :ext-key-usage ext-key-usage})\n\n"
      "Create a self-signed X.509 certificate.\n\n"
      "* `key` - A private key object.\n\n"
      "* `:rng` - A random number generator object. "
@@ -1274,13 +1338,21 @@ static JanetReg x509_cert_cfuns[] = {
      "Can be a tuple/array of strings for multiple values.\n\n"
      "* `:ip` - IP address for Subject Alternative Name.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
-     "* `:serial-number` - Serial number field of the DN."
+     "* `:serial-number` - Serial number field of the DN.\n\n"
+     "* `:key-usage` - KeyUsage constraint. A keyword or tuple/array of keywords. "
+     "Possible values: :DIGITAL-SIGNATURE, :NON-REPUDIATION, :KEY-ENCIPHERMENT, "
+     ":DATA-ENCIPHERMENT, :KEY-AGREEMENT, :KEY-CERT-SIGN, :CRL-SIGN, "
+     ":ENCIPHER-ONLY, :DECIPHER-ONLY.\n\n"
+     "* `:ext-key-usage` - ExtendedKeyUsage constraint. A string or tuple/array of strings. "
+     "e.g. \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
+     "\"PKIX.EmailProtection\", \"PKIX.TimeStamping\", \"PKIX.OCSPSigning\"."
     },
     {"x509-cert/issue", x509_cert_issue,
      "(x509-cert/issue subject-key ca-cert ca-key "
      "not-before not-after &keys {:rng rng :hash hash "
      ":is-ca is-ca :CN cn :C c :O o :OU ou :ST st :L l "
-     ":email email :dns dns :uri uri :serial-number serial-number})\n\n"
+     ":email email :dns dns :ip ip :uri uri :serial-number serial-number "
+     ":key-usage key-usage :ext-key-usage ext-key-usage})\n\n"
      "Issue a new X.509 certificate signed by a CA.\n\n"
      "* `subject-key` - The subject's private key object.\n\n"
      "* `ca-cert` - The CA's certificate object.\n\n"
@@ -1307,7 +1379,14 @@ static JanetReg x509_cert_cfuns[] = {
      "Can be a tuple/array of strings for multiple values.\n\n"
      "* `:ip` - IP address for Subject Alternative Name.\n\n"
      "* `:uri` - URI for Subject Alternative Name.\n\n"
-     "* `:serial-number` - Serial number field of the DN."
+     "* `:serial-number` - Serial number field of the DN.\n\n"
+     "* `:key-usage` - KeyUsage constraint. A keyword or tuple/array of keywords. "
+     "Possible values: :DIGITAL-SIGNATURE, :NON-REPUDIATION, :KEY-ENCIPHERMENT, "
+     ":DATA-ENCIPHERMENT, :KEY-AGREEMENT, :KEY-CERT-SIGN, :CRL-SIGN, "
+     ":ENCIPHER-ONLY, :DECIPHER-ONLY.\n\n"
+     "* `:ext-key-usage` - ExtendedKeyUsage constraint. A string or tuple/array of strings. "
+     "e.g. \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
+     "\"PKIX.EmailProtection\", \"PKIX.TimeStamping\", \"PKIX.OCSPSigning\"."
     },
     {"x509-cert/to-pem", x509_cert_to_pem,
      "(x509-cert/to-pem cert)\n\n"
@@ -1400,8 +1479,8 @@ static JanetReg x509_cert_cfuns[] = {
      "If SAN DNS entries are present, only those are checked. "
      "Otherwise falls back to Common Name (CN). Supports wildcard matching."
     },
-    {"x509-cert/allowed-extended-usage", x509_cert_allowed_extended_usage,
-     "(x509-cert/allowed-extended-usage cert-obj oid)\n\n"
+    {"x509-cert/allowed-ext-usage", x509_cert_allowed_ext_usage,
+     "(x509-cert/allowed-ext-usage cert-obj oid)\n\n"
      "Check if the certificate allows the specified extended usage OID. "
      "The `oid` parameter can be either a canonical OID string or identifiers "
      "like \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
