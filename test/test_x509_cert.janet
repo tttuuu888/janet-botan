@@ -91,9 +91,9 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
 
 (let [cert2 (x509-cert/load cert-pem2)]
   (assert (not (:is-ca cert2)))
-  (assert (:allowed-extended-usage cert2 "PKIX.ServerAuth"))
-  (assert (not (:allowed-extended-usage cert2 "PKIX.ClientAuth")))
-  (assert (not (:allowed-extended-usage cert2 "PKIX.CodeSigning"))))
+  (assert (:allowed-ext-usage cert2 "PKIX.ServerAuth"))
+  (assert (not (:allowed-ext-usage cert2 "PKIX.ClientAuth")))
+  (assert (not (:allowed-ext-usage cert2 "PKIX.CodeSigning"))))
 
 (let [crl (x509-crl/load crl-pem)
      cert (x509-cert/load cert-pem2)]
@@ -138,8 +138,8 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
     (assert (:allowed-usage server-cert :DIGITAL-SIGNATURE))
     (assert (:allowed-usage server-cert :KEY-ENCIPHERMENT))
     (assert (not (:allowed-usage server-cert :CRL-SIGN)))
-    (assert (:allowed-extended-usage server-cert "PKIX.ServerAuth"))
-    (assert (not (:allowed-extended-usage server-cert "PKIX.ClientAuth")))
+    (assert (:allowed-ext-usage server-cert "PKIX.ServerAuth"))
+    (assert (not (:allowed-ext-usage server-cert "PKIX.ClientAuth")))
     (assert (= (x509-cert/verify server-cert :trusted [ca-cert]) 0))))
 
 # Test multiple OU and DNS values
@@ -176,9 +176,9 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (:allowed-usage cert :KEY-ENCIPHERMENT))
   (assert (not (:allowed-usage cert :CRL-SIGN)))
   (assert (not (:allowed-usage cert :KEY-CERT-SIGN)))
-  (assert (:allowed-extended-usage cert "PKIX.ServerAuth"))
-  (assert (:allowed-extended-usage cert "PKIX.ClientAuth"))
-  (assert (not (:allowed-extended-usage cert "PKIX.CodeSigning"))))
+  (assert (:allowed-ext-usage cert "PKIX.ServerAuth"))
+  (assert (:allowed-ext-usage cert "PKIX.ClientAuth"))
+  (assert (not (:allowed-ext-usage cert "PKIX.CodeSigning"))))
 
 # Test single keyword key-usage
 (let [cert (x509-cert/create-self-signed
@@ -188,7 +188,7 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
             :ext-key-usage "PKIX.ServerAuth")]
   (assert (:allowed-usage cert :DIGITAL-SIGNATURE))
   (assert (not (:allowed-usage cert :KEY-ENCIPHERMENT)))
-  (assert (:allowed-extended-usage cert "PKIX.ServerAuth"))
-  (assert (not (:allowed-extended-usage cert "PKIX.ClientAuth"))))
+  (assert (:allowed-ext-usage cert "PKIX.ServerAuth"))
+  (assert (not (:allowed-ext-usage cert "PKIX.ClientAuth"))))
 
 (end-suite)

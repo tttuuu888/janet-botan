@@ -84,7 +84,7 @@ static Janet x509_cert_issuer_dn(int32_t argc, Janet *argv);
 static Janet x509_cert_is_ca(int32_t argc, Janet *argv);
 static Janet x509_cert_hostname_match(int32_t argc, Janet *argv);
 static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv);
-static Janet x509_cert_allowed_extended_usage(int32_t argc, Janet *argv);
+static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv);
 static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
@@ -149,7 +149,7 @@ static JanetMethod x509_cert_methods[] = {
     {"is-ca", x509_cert_is_ca},
     {"hostname-match", x509_cert_hostname_match},
     {"allowed-usage", x509_cert_allowed_usage},
-    {"allowed-extended-usage", x509_cert_allowed_extended_usage},
+    {"allowed-ext-usage", x509_cert_allowed_ext_usage},
     {"verify", x509_cert_verify},
     {"validation-status", x509_cert_validation_status},
     {NULL, NULL},
@@ -1022,7 +1022,7 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
-static Janet x509_cert_allowed_extended_usage(int32_t argc, Janet *argv) {
+static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
 
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
@@ -1479,8 +1479,8 @@ static JanetReg x509_cert_cfuns[] = {
      "If SAN DNS entries are present, only those are checked. "
      "Otherwise falls back to Common Name (CN). Supports wildcard matching."
     },
-    {"x509-cert/allowed-extended-usage", x509_cert_allowed_extended_usage,
-     "(x509-cert/allowed-extended-usage cert-obj oid)\n\n"
+    {"x509-cert/allowed-ext-usage", x509_cert_allowed_ext_usage,
+     "(x509-cert/allowed-ext-usage cert-obj oid)\n\n"
      "Check if the certificate allows the specified extended usage OID. "
      "The `oid` parameter can be either a canonical OID string or identifiers "
      "like \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
