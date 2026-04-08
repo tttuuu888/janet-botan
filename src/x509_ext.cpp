@@ -37,7 +37,11 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
                                    size_t more_dns_count,
                                    const char* ip,
                                    const char* uri,
-                                   const char* serial_number) {
+                                   const char* serial_number,
+                                   const unsigned int* constraints,
+                                   size_t constraints_count,
+                                   const char** ex_constraints,
+                                   size_t ex_constraints_count) {
     if(Botan::any_null_pointers(cert_obj))
         return BOTAN_FFI_ERROR_NULL_POINTER;
 
@@ -59,6 +63,13 @@ int jbotan_x509_create_self_signed(botan_x509_cert_t* cert_obj,
         if(ip) opts.ip = ip;
         if(uri) opts.uri = uri;
         if(serial_number) opts.serial_number = serial_number;
+        uint32_t combined = 0;
+        for(size_t i = 0; i < constraints_count; i++)
+            combined |= constraints[i];
+        if(combined)
+            opts.add_constraints(Botan::Key_Constraints(combined));
+        for(size_t i = 0; i < ex_constraints_count; i++)
+            opts.add_ex_constraint(ex_constraints[i]);
 
         auto cert = std::make_unique<Botan::X509_Certificate>(
             Botan::X509::create_self_signed_cert(
@@ -93,7 +104,11 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
                            size_t more_dns_count,
                            const char* ip,
                            const char* uri,
-                           const char* serial_number) {
+                           const char* serial_number,
+                           const unsigned int* constraints,
+                           size_t constraints_count,
+                           const char** ex_constraints,
+                           size_t ex_constraints_count) {
     if(Botan::any_null_pointers(cert_obj))
         return BOTAN_FFI_ERROR_NULL_POINTER;
 
@@ -115,6 +130,13 @@ int jbotan_x509_cert_issue(botan_x509_cert_t* cert_obj,
         if(ip) opts.ip = ip;
         if(uri) opts.uri = uri;
         if(serial_number) opts.serial_number = serial_number;
+        uint32_t combined = 0;
+        for(size_t i = 0; i < constraints_count; i++)
+            combined |= constraints[i];
+        if(combined)
+            opts.add_constraints(Botan::Key_Constraints(combined));
+        for(size_t i = 0; i < ex_constraints_count; i++)
+            opts.add_ex_constraint(ex_constraints[i]);
 
         auto req = Botan::X509::create_cert_req(
             opts, safe_get(subject_key),

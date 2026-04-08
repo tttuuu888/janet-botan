@@ -132,6 +132,31 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (= (:san cert :uri) []))
   (assert (nil? (:san cert :email 1))))
 
+# Test KeyUsage and ExtendedKeyUsage constraints
+(let [cert (x509-cert/create-self-signed
+            (privkey/new "RSA" "2048")
+            :CN "Constrained Cert" :C "KR"
+            :key-usage [:DIGITAL-SIGNATURE :KEY-ENCIPHERMENT]
+            :ext-key-usage ["PKIX.ServerAuth" "PKIX.ClientAuth"])]
+  (assert (:allowed-usage cert :DIGITAL-SIGNATURE))
+  (assert (:allowed-usage cert :KEY-ENCIPHERMENT))
+  (assert (not (:allowed-usage cert :CRL-SIGN)))
+  (assert (not (:allowed-usage cert :KEY-CERT-SIGN)))
+  (assert (:allowed-extended-usage cert "PKIX.ServerAuth"))
+  (assert (:allowed-extended-usage cert "PKIX.ClientAuth"))
+  (assert (not (:allowed-extended-usage cert "PKIX.CodeSigning"))))
+
+# Test single keyword key-usage
+(let [cert (x509-cert/create-self-signed
+            (privkey/new "ECDSA")
+            :CN "Single Usage" :C "KR"
+            :key-usage :DIGITAL-SIGNATURE
+            :ext-key-usage "PKIX.ServerAuth")]
+  (assert (:allowed-usage cert :DIGITAL-SIGNATURE))
+  (assert (not (:allowed-usage cert :KEY-ENCIPHERMENT)))
+  (assert (:allowed-extended-usage cert "PKIX.ServerAuth"))
+  (assert (not (:allowed-extended-usage cert "PKIX.ClientAuth"))))
+
 # Test x509-cert/create-self-signed and x509-cert/issue
 (let [ca-key (privkey/new "RSA" "2048")
       ca-cert (x509-cert/create-self-signed
@@ -153,10 +178,17 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
         server-cert (x509-cert/issue
                      server-key ca-cert ca-key
                      (- now 3600) (+ now (* 365 24 3600))
-                     :CN "server.example.com" :C "KR" :O "Test Org")]
+                     :CN "server.example.com" :C "KR" :O "Test Org"
+                     :key-usage [:DIGITAL-SIGNATURE :KEY-ENCIPHERMENT]
+                     :ext-key-usage ["PKIX.ServerAuth"])]
     (assert (not (:is-ca server-cert)))
     (assert (= (:subject-dn server-cert :CN 0) "server.example.com"))
     (assert (= (:issuer-dn  server-cert :CN 0) "Test CA"))
+    (assert (:allowed-usage server-cert :DIGITAL-SIGNATURE))
+    (assert (:allowed-usage server-cert :KEY-ENCIPHERMENT))
+    (assert (not (:allowed-usage server-cert :CRL-SIGN)))
+    (assert (:allowed-extended-usage server-cert "PKIX.ServerAuth"))
+    (assert (not (:allowed-extended-usage server-cert "PKIX.ClientAuth")))
     (assert (= (x509-cert/verify server-cert :trusted [ca-cert]) 0))))
 
 (end-suite)
