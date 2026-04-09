@@ -343,16 +343,16 @@ struct key_usage_pair {
 };
 
 static struct key_usage_pair key_usage_table[] = {
-    {"NO-CONSTRAINTS",    0},
-    {"DIGITAL-SIGNATURE", 32768},
-    {"NON-REPUDIATION",   16384},
-    {"KEY-ENCIPHERMENT",  8192},
-    {"DATA-ENCIPHERMENT", 4096},
-    {"KEY-AGREEMENT",     2048},
-    {"KEY-CERT-SIGN",     1024},
-    {"CRL-SIGN",          512},
-    {"ENCIPHER-ONLY",     256},
-    {"DECIPHER-ONLY",     128}
+    {"no-constraints",    0},
+    {"digital-signature", 32768},
+    {"non-repudiation",   16384},
+    {"key-encipherment",  8192},
+    {"data-encipherment", 4096},
+    {"key-agreement",     2048},
+    {"key-cert-sign",     1024},
+    {"crl-sign",          512},
+    {"encipher-only",     256},
+    {"decipher-only",     128}
 };
 static const size_t key_usage_table_len = sizeof(key_usage_table)/sizeof(key_usage_table[0]);
 
@@ -362,9 +362,9 @@ static unsigned int key_usage_from_keyword(JanetKeyword kw) {
             return key_usage_table[i].value;
     }
     janet_panicf("unknown key-usage keyword :%s, expected one of: "
-                 ":NO-CONSTRAINTS, :DIGITAL-SIGNATURE, :NON-REPUDIATION, "
-                 ":KEY-ENCIPHERMENT, :DATA-ENCIPHERMENT, :KEY-AGREEMENT, "
-                 ":KEY-CERT-SIGN, :CRL-SIGN, :ENCIPHER-ONLY, :DECIPHER-ONLY", kw);
+                 ":no-constraints, :digital-signature, :non-repudiation, "
+                 ":key-encipherment, :data-encipherment, :key-agreement, "
+                 ":key-cert-sign, :crl-sign, :encipher-only, :decipher-only", kw);
     return 0;
 }
 
@@ -1524,9 +1524,9 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN.\n\n"
      "* `:key-usage` - KeyUsage constraint. A keyword or tuple/array of keywords. "
-     "Possible values: :DIGITAL-SIGNATURE, :NON-REPUDIATION, :KEY-ENCIPHERMENT, "
-     ":DATA-ENCIPHERMENT, :KEY-AGREEMENT, :KEY-CERT-SIGN, :CRL-SIGN, "
-     ":ENCIPHER-ONLY, :DECIPHER-ONLY.\n\n"
+     "Possible values: :digital-signature, :non-repudiation, :key-encipherment, "
+     ":data-encipherment, :key-agreement, :key-cert-sign, :crl-sign, "
+     ":encipher-only, :decipher-only.\n\n"
      "* `:ext-key-usage` - ExtendedKeyUsage constraint. A string or tuple/array of strings. "
      "e.g. \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
      "\"PKIX.EmailProtection\", \"PKIX.TimeStamping\", \"PKIX.OCSPSigning\"."
@@ -1565,9 +1565,9 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN.\n\n"
      "* `:key-usage` - KeyUsage constraint. A keyword or tuple/array of keywords. "
-     "Possible values: :DIGITAL-SIGNATURE, :NON-REPUDIATION, :KEY-ENCIPHERMENT, "
-     ":DATA-ENCIPHERMENT, :KEY-AGREEMENT, :KEY-CERT-SIGN, :CRL-SIGN, "
-     ":ENCIPHER-ONLY, :DECIPHER-ONLY.\n\n"
+     "Possible values: :digital-signature, :non-repudiation, :key-encipherment, "
+     ":data-encipherment, :key-agreement, :key-cert-sign, :crl-sign, "
+     ":encipher-only, :decipher-only.\n\n"
      "* `:ext-key-usage` - ExtendedKeyUsage constraint. A string or tuple/array of strings. "
      "e.g. \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
      "\"PKIX.EmailProtection\", \"PKIX.TimeStamping\", \"PKIX.OCSPSigning\"."
@@ -1674,16 +1674,16 @@ static JanetReg x509_cert_cfuns[] = {
      "(x509-cert/allowed-usage cert-obj cert-usage)\n\n"
      "Test if the certificate is allowed for a particular usage. "
      "The cert-usage argument should be one of the following keywords:\n\n"
-     "* :NO-CONSTRAINTS\n\n"
-     "* :DIGITAL-SIGNATURE\n\n"
-     "* :NON-REPUDIATION\n\n"
-     "* :KEY-ENCIPHERMENT\n\n"
-     "* :DATA-ENCIPHERMENT\n\n"
-     "* :KEY-AGREEMENT\n\n"
-     "* :KEY-CERT-SIGN\n\n"
-     "* :CRL-SIGN\n\n"
-     "* :ENCIPHER-ONLY\n\n"
-     "* :DECIPHER-ONLY\n\n"
+     "* :no-constraints\n\n"
+     "* :digital-signature\n\n"
+     "* :non-repudiation\n\n"
+     "* :key-encipherment\n\n"
+     "* :data-encipherment\n\n"
+     "* :key-agreement\n\n"
+     "* :key-cert-sign\n\n"
+     "* :crl-sign\n\n"
+     "* :encipher-only\n\n"
+     "* :decipher-only\n\n"
      "Returns true if the given X.509 certificate `cert-obj` is allowed for "
      "the specified cert-usage."
     },
