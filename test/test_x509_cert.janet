@@ -74,16 +74,16 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (= (:subject-dn cert1 :L 0) "Gangnam-gu"))
   (assert (= (:issuer-dn cert1 :L 0) "Gangnam-gu"))
   (assert (:hostname-match cert1 "root.example.com"))
-  (assert (:allowed-usage cert1 :NO-CONSTRAINTS))
-  (assert (:allowed-usage cert1 :DIGITAL-SIGNATURE))
-  (assert (:allowed-usage cert1 :NON-REPUDIATION))
-  (assert (:allowed-usage cert1 :KEY-ENCIPHERMENT))
-  (assert (:allowed-usage cert1 :DATA-ENCIPHERMENT))
-  (assert (:allowed-usage cert1 :KEY-AGREEMENT))
-  (assert (:allowed-usage cert1 :KEY-CERT-SIGN))
-  (assert (:allowed-usage cert1 :CRL-SIGN))
-  (assert (:allowed-usage cert1 :ENCIPHER-ONLY))
-  (assert (:allowed-usage cert1 :DECIPHER-ONLY))
+  (assert (:allowed-usage cert1 :no-constraints))
+  (assert (:allowed-usage cert1 :digital-signature))
+  (assert (:allowed-usage cert1 :non-repudiation))
+  (assert (:allowed-usage cert1 :key-encipherment))
+  (assert (:allowed-usage cert1 :data-encipherment))
+  (assert (:allowed-usage cert1 :key-agreement))
+  (assert (:allowed-usage cert1 :key-cert-sign))
+  (assert (:allowed-usage cert1 :crl-sign))
+  (assert (:allowed-usage cert1 :encipher-only))
+  (assert (:allowed-usage cert1 :decipher-only))
   (assert (not (:is-ca cert1)))
   (assert (= (x509-cert/verify cert1) 3001))
   (assert (= (x509-cert/validation-status 3001) "Cannot establish trust"))
@@ -130,14 +130,14 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
                      server-key ca-cert ca-key
                      (- now 3600) (+ now (* 365 24 3600))
                      :CN "server.example.com" :C "KR" :O "Test Org"
-                     :key-usage [:DIGITAL-SIGNATURE :KEY-ENCIPHERMENT]
+                     :key-usage [:digital-signature :key-encipherment]
                      :ext-key-usage ["PKIX.ServerAuth"])]
     (assert (not (:is-ca server-cert)))
     (assert (= (:subject-dn server-cert :CN 0) "server.example.com"))
     (assert (= (:issuer-dn  server-cert :CN 0) "Test CA"))
-    (assert (:allowed-usage server-cert :DIGITAL-SIGNATURE))
-    (assert (:allowed-usage server-cert :KEY-ENCIPHERMENT))
-    (assert (not (:allowed-usage server-cert :CRL-SIGN)))
+    (assert (:allowed-usage server-cert :digital-signature))
+    (assert (:allowed-usage server-cert :key-encipherment))
+    (assert (not (:allowed-usage server-cert :crl-sign)))
     (assert (:allowed-ext-usage server-cert "PKIX.ServerAuth"))
     (assert (not (:allowed-ext-usage server-cert "PKIX.ClientAuth")))
     (assert (= (x509-cert/verify server-cert :trusted [ca-cert]) 0))))
@@ -170,12 +170,12 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
 (let [cert (x509-cert/create-self-signed
             (privkey/new "RSA" "2048")
             :CN "Constrained Cert" :C "KR"
-            :key-usage [:DIGITAL-SIGNATURE :KEY-ENCIPHERMENT]
+            :key-usage [:digital-signature :key-encipherment]
             :ext-key-usage ["PKIX.ServerAuth" "PKIX.ClientAuth"])]
-  (assert (:allowed-usage cert :DIGITAL-SIGNATURE))
-  (assert (:allowed-usage cert :KEY-ENCIPHERMENT))
-  (assert (not (:allowed-usage cert :CRL-SIGN)))
-  (assert (not (:allowed-usage cert :KEY-CERT-SIGN)))
+  (assert (:allowed-usage cert :digital-signature))
+  (assert (:allowed-usage cert :key-encipherment))
+  (assert (not (:allowed-usage cert :crl-sign)))
+  (assert (not (:allowed-usage cert :key-cert-sign)))
   (assert (:allowed-ext-usage cert "PKIX.ServerAuth"))
   (assert (:allowed-ext-usage cert "PKIX.ClientAuth"))
   (assert (not (:allowed-ext-usage cert "PKIX.CodeSigning"))))
@@ -184,11 +184,59 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
 (let [cert (x509-cert/create-self-signed
             (privkey/new "ECDSA")
             :CN "Single Usage" :C "KR"
-            :key-usage :DIGITAL-SIGNATURE
+            :key-usage :digital-signature
             :ext-key-usage "PKIX.ServerAuth")]
-  (assert (:allowed-usage cert :DIGITAL-SIGNATURE))
-  (assert (not (:allowed-usage cert :KEY-ENCIPHERMENT)))
+  (assert (:allowed-usage cert :digital-signature))
+  (assert (not (:allowed-usage cert :key-encipherment)))
   (assert (:allowed-ext-usage cert "PKIX.ServerAuth"))
   (assert (not (:allowed-ext-usage cert "PKIX.ClientAuth"))))
+
+# Test CRL creation, revocation, and verification
+(let [ca-key (privkey/new "RSA" "2048")
+      ca-cert (x509-cert/create-self-signed
+               ca-key
+               :CN "CRL Test CA" :C "KR" :O "Test Org"
+               :is-ca true
+               :key-usage [:key-cert-sign :crl-sign])
+      server-key (privkey/new "RSA" "2048")
+      now (os/time)
+      server-cert (x509-cert/issue
+                   server-key ca-cert ca-key
+                   (- now 3600) (+ now (* 365 24 3600))
+                   :CN "server.example.com")
+      ca-pubkey (x509-cert/subject-public-key ca-cert)]
+
+  # Create empty CRL
+  (let [crl (x509-crl/create ca-cert ca-key now (* 30 24 3600))]
+    (assert (= (:entries-count crl) 0))
+    (assert (>= (:this-update crl) now))
+    (assert (:verify crl ca-pubkey))
+    (assert (not (:is-revoked crl server-cert)))
+
+    # Create CRL entry with keyword reason
+    (let [entry (x509-crl-entry/create server-cert :key-compromise)]
+      (assert (= (:reason entry) 1))
+
+      # Revoke: add entry to CRL
+      (let [updated-crl (:revoke crl ca-cert ca-key now (* 30 24 3600) [entry])]
+        (assert (= (:entries-count updated-crl) 1))
+        (assert (:is-revoked updated-crl server-cert))
+        (assert (:verify updated-crl ca-pubkey))
+
+        (let [e (:get-entry updated-crl 0)]
+          (assert (= (:reason e) 1))
+          (assert (> (:revocation-date e) 0))
+          (assert (= (:serial-number e)
+                     (x509-cert/serial-number server-cert)))))))
+
+  # Create CRL entry with integer reason
+  (let [entry (x509-crl-entry/create server-cert 4)]
+    (assert (= (:reason entry) 4)))
+
+  # Verify with wrong key should fail
+  (let [crl (x509-crl/create ca-cert ca-key now (* 30 24 3600))
+        other-key (privkey/new "RSA" "2048")
+        other-pubkey (privkey/get-pubkey other-key)]
+    (assert (not (:verify crl other-pubkey)))))
 
 (end-suite)

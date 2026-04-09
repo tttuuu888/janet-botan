@@ -89,6 +89,9 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
 /* Janet functions x509-crl */
+static Janet x509_crl_create(int32_t argc, Janet *argv);
+static Janet x509_crl_revoke(int32_t argc, Janet *argv);
+static Janet x509_crl_verify(int32_t argc, Janet *argv);
 static Janet x509_crl_to_pem(int32_t argc, Janet *argv);
 static Janet x509_crl_to_der(int32_t argc, Janet *argv);
 static Janet x509_crl_this_update(int32_t argc, Janet *argv);
@@ -98,6 +101,7 @@ static Janet x509_crl_get_entry(int32_t argc, Janet *argv);
 static Janet x509_crl_is_revoked(int32_t argc, Janet *argv);
 
 /* Janet functions x509-crl-entry */
+static Janet x509_crl_entry_create(int32_t argc, Janet *argv);
 static Janet x509_crl_entry_reason(int32_t argc, Janet *argv);
 static Janet x509_crl_entry_revocation_date(int32_t argc, Janet *argv);
 static Janet x509_crl_entry_serial_number(int32_t argc, Janet *argv);
@@ -170,6 +174,8 @@ static JanetMethod x509_crl_methods[] = {
     {"entries-count", x509_crl_entries_count},
     {"get-entry", x509_crl_get_entry},
     {"is-revoked", x509_crl_is_revoked},
+    {"revoke", x509_crl_revoke},
+    {"verify", x509_crl_verify},
     {NULL, NULL},
 };
 
@@ -292,22 +298,61 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
     return janet_getmethod(janet_unwrap_keyword(key), x509_crl_entry_methods, out);
 }
 
+struct crl_reason_pair {
+    const char *name;
+    int value;
+};
+
+static struct crl_reason_pair crl_reason_table[] = {
+    {"unspecified",            0},
+    {"key-compromise",         1},
+    {"ca-compromise",          2},
+    {"affiliation-changed",    3},
+    {"superseded",             4},
+    {"cessation-of-operation", 5},
+    {"certificate-hold",       6},
+    {"remove-from-crl",        8},
+    {"privilege-withdrawn",    9},
+    {"aa-compromise",          10}
+};
+static const size_t crl_reason_table_len = sizeof(crl_reason_table)/sizeof(crl_reason_table[0]);
+
+static int crl_reason_from_janet(Janet val) {
+    if (janet_checktype(val, JANET_NUMBER)) {
+        return (int)janet_unwrap_number(val);
+    }
+    if (janet_checktype(val, JANET_KEYWORD)) {
+        JanetKeyword kw = janet_unwrap_keyword(val);
+        for (size_t i = 0; i < crl_reason_table_len; i++) {
+            if (!janet_cstrcmp(kw, crl_reason_table[i].name))
+                return crl_reason_table[i].value;
+        }
+        janet_panicf("unknown CRL reason keyword :%s, expected one of: "
+                     ":unspecified, :key-compromise, :ca-compromise, "
+                     ":affiliation-changed, :superseded, :cessation-of-operation, "
+                     ":certificate-hold, :remove-from-crl, :privilege-withdrawn, "
+                     ":aa-compromise", kw);
+    }
+    janet_panic("CRL reason must be a keyword or integer");
+    return 0;
+}
+
 struct key_usage_pair {
     const char *name;
     unsigned int value;
 };
 
 static struct key_usage_pair key_usage_table[] = {
-    {"NO-CONSTRAINTS",    0},
-    {"DIGITAL-SIGNATURE", 32768},
-    {"NON-REPUDIATION",   16384},
-    {"KEY-ENCIPHERMENT",  8192},
-    {"DATA-ENCIPHERMENT", 4096},
-    {"KEY-AGREEMENT",     2048},
-    {"KEY-CERT-SIGN",     1024},
-    {"CRL-SIGN",          512},
-    {"ENCIPHER-ONLY",     256},
-    {"DECIPHER-ONLY",     128}
+    {"no-constraints",    0},
+    {"digital-signature", 32768},
+    {"non-repudiation",   16384},
+    {"key-encipherment",  8192},
+    {"data-encipherment", 4096},
+    {"key-agreement",     2048},
+    {"key-cert-sign",     1024},
+    {"crl-sign",          512},
+    {"encipher-only",     256},
+    {"decipher-only",     128}
 };
 static const size_t key_usage_table_len = sizeof(key_usage_table)/sizeof(key_usage_table[0]);
 
@@ -317,9 +362,9 @@ static unsigned int key_usage_from_keyword(JanetKeyword kw) {
             return key_usage_table[i].value;
     }
     janet_panicf("unknown key-usage keyword :%s, expected one of: "
-                 ":NO-CONSTRAINTS, :DIGITAL-SIGNATURE, :NON-REPUDIATION, "
-                 ":KEY-ENCIPHERMENT, :DATA-ENCIPHERMENT, :KEY-AGREEMENT, "
-                 ":KEY-CERT-SIGN, :CRL-SIGN, :ENCIPHER-ONLY, :DECIPHER-ONLY", kw);
+                 ":no-constraints, :digital-signature, :non-repudiation, "
+                 ":key-encipherment, :data-encipherment, :key-agreement, "
+                 ":key-cert-sign, :crl-sign, :encipher-only, :decipher-only", kw);
     return 0;
 }
 
@@ -1312,6 +1357,142 @@ static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
+static Janet x509_crl_entry_create(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_x509_cert_obj_t *cert_obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    int reason_code = crl_reason_from_janet(argv[1]);
+
+    botan_x509_crl_entry_obj_t *entry_obj = janet_abstract(&x509_crl_entry_obj_type, sizeof(botan_x509_crl_entry_obj_t));
+    memset(entry_obj, 0, sizeof(botan_x509_crl_entry_obj_t));
+
+    int ret = botan_x509_crl_entry_create(&entry_obj->entry, cert_obj->x509_cert, reason_code);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(entry_obj);
+}
+
+static Janet x509_crl_create(int32_t argc, Janet *argv) {
+    janet_arity(argc, 4, -1);
+
+    botan_x509_cert_obj_t *ca_cert_obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_private_key_obj_t *ca_key_obj = janet_getabstract(argv, 1, get_private_key_obj_type());
+    uint64_t issue_time = (uint64_t)janet_getnumber(argv, 2);
+    uint32_t next_update = (uint32_t)janet_getnumber(argv, 3);
+
+    botan_rng_t rng = 0;
+    botan_rng_obj_t *rng_obj = NULL;
+    const char *hash_fn = NULL;
+    const char *padding = NULL;
+    int rng_created = 0;
+
+    for (int i = 4; i < argc; i += 2) {
+        JanetKeyword keyword = janet_getkeyword(argv, i);
+        if (!janet_cstrcmp(keyword, "rng")) {
+            rng_obj = janet_getabstract(argv, i + 1, get_rng_obj_type());
+        } else if (!janet_cstrcmp(keyword, "hash")) {
+            hash_fn = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "padding")) {
+            padding = janet_getcstring(argv, i + 1);
+        } else {
+            janet_panicf("unknown keyword :%s", keyword);
+        }
+    }
+
+    if (rng_obj) {
+        rng = rng_obj->rng;
+    } else {
+        int ret = botan_rng_init(&rng, "system");
+        JANET_BOTAN_ASSERT(ret);
+        rng_created = 1;
+    }
+
+    botan_x509_crl_obj_t *obj = janet_abstract(&x509_crl_obj_type, sizeof(botan_x509_crl_obj_t));
+    memset(obj, 0, sizeof(botan_x509_crl_obj_t));
+
+    int ret = botan_x509_crl_create(&obj->x509_crl, rng,
+                                    ca_cert_obj->x509_cert, ca_key_obj->private_key,
+                                    issue_time, next_update,
+                                    hash_fn, padding);
+
+    if (rng_created) botan_rng_destroy(rng);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet x509_crl_revoke(int32_t argc, Janet *argv) {
+    janet_arity(argc, 6, -1);
+
+    botan_x509_crl_obj_t *crl_obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_cert_obj_t *ca_cert_obj = janet_getabstract(argv, 1, get_x509_cert_obj_type());
+    botan_private_key_obj_t *ca_key_obj = janet_getabstract(argv, 2, get_private_key_obj_type());
+    uint64_t issue_time = (uint64_t)janet_getnumber(argv, 3);
+    uint32_t next_update = (uint32_t)janet_getnumber(argv, 4);
+
+    /* entries: tuple of crl-entry objects */
+    JanetView entries = janet_getindexed(argv, 5);
+
+    botan_rng_t rng = 0;
+    botan_rng_obj_t *rng_obj = NULL;
+    const char *hash_fn = NULL;
+    const char *padding = NULL;
+    int rng_created = 0;
+
+    for (int i = 6; i < argc; i += 2) {
+        JanetKeyword keyword = janet_getkeyword(argv, i);
+        if (!janet_cstrcmp(keyword, "rng")) {
+            rng_obj = janet_getabstract(argv, i + 1, get_rng_obj_type());
+        } else if (!janet_cstrcmp(keyword, "hash")) {
+            hash_fn = janet_getcstring(argv, i + 1);
+        } else if (!janet_cstrcmp(keyword, "padding")) {
+            padding = janet_getcstring(argv, i + 1);
+        } else {
+            janet_panicf("unknown keyword :%s", keyword);
+        }
+    }
+
+    botan_x509_crl_entry_t *entry_arr = janet_smalloc(sizeof(botan_x509_crl_entry_t) * entries.len);
+    for (int32_t j = 0; j < entries.len; j++) {
+        botan_x509_crl_entry_obj_t *e = janet_getabstract(entries.items, j, get_x509_crl_entry_obj_type());
+        entry_arr[j] = e->entry;
+    }
+
+    if (rng_obj) {
+        rng = rng_obj->rng;
+    } else {
+        int ret = botan_rng_init(&rng, "system");
+        JANET_BOTAN_ASSERT(ret);
+        rng_created = 1;
+    }
+
+    botan_x509_crl_obj_t *obj = janet_abstract(&x509_crl_obj_type, sizeof(botan_x509_crl_obj_t));
+    memset(obj, 0, sizeof(botan_x509_crl_obj_t));
+
+    int ret = botan_x509_crl_update(&obj->x509_crl, crl_obj->x509_crl, rng,
+                                    ca_cert_obj->x509_cert, ca_key_obj->private_key,
+                                    issue_time, next_update,
+                                    entry_arr, (size_t)entries.len,
+                                    hash_fn, padding);
+
+    janet_sfree(entry_arr);
+    if (rng_created) botan_rng_destroy(rng);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet x509_crl_verify(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_public_key_obj_t *key_obj = janet_getabstract(argv, 1, get_public_key_obj_type());
+
+    int ret = botan_x509_crl_verify_signature(obj->x509_crl, key_obj->public_key);
+
+    return janet_wrap_boolean(ret == 1);
+}
+
 static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/create-self-signed", x509_cert_create_self_signed,
      "(x509-cert/create-self-signed key &keys {:rng rng :hash hash "
@@ -1343,9 +1524,9 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN.\n\n"
      "* `:key-usage` - KeyUsage constraint. A keyword or tuple/array of keywords. "
-     "Possible values: :DIGITAL-SIGNATURE, :NON-REPUDIATION, :KEY-ENCIPHERMENT, "
-     ":DATA-ENCIPHERMENT, :KEY-AGREEMENT, :KEY-CERT-SIGN, :CRL-SIGN, "
-     ":ENCIPHER-ONLY, :DECIPHER-ONLY.\n\n"
+     "Possible values: :digital-signature, :non-repudiation, :key-encipherment, "
+     ":data-encipherment, :key-agreement, :key-cert-sign, :crl-sign, "
+     ":encipher-only, :decipher-only.\n\n"
      "* `:ext-key-usage` - ExtendedKeyUsage constraint. A string or tuple/array of strings. "
      "e.g. \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
      "\"PKIX.EmailProtection\", \"PKIX.TimeStamping\", \"PKIX.OCSPSigning\"."
@@ -1384,9 +1565,9 @@ static JanetReg x509_cert_cfuns[] = {
      "* `:uri` - URI for Subject Alternative Name.\n\n"
      "* `:serial-number` - Serial number field of the DN.\n\n"
      "* `:key-usage` - KeyUsage constraint. A keyword or tuple/array of keywords. "
-     "Possible values: :DIGITAL-SIGNATURE, :NON-REPUDIATION, :KEY-ENCIPHERMENT, "
-     ":DATA-ENCIPHERMENT, :KEY-AGREEMENT, :KEY-CERT-SIGN, :CRL-SIGN, "
-     ":ENCIPHER-ONLY, :DECIPHER-ONLY.\n\n"
+     "Possible values: :digital-signature, :non-repudiation, :key-encipherment, "
+     ":data-encipherment, :key-agreement, :key-cert-sign, :crl-sign, "
+     ":encipher-only, :decipher-only.\n\n"
      "* `:ext-key-usage` - ExtendedKeyUsage constraint. A string or tuple/array of strings. "
      "e.g. \"PKIX.ServerAuth\", \"PKIX.ClientAuth\", \"PKIX.CodeSigning\", "
      "\"PKIX.EmailProtection\", \"PKIX.TimeStamping\", \"PKIX.OCSPSigning\"."
@@ -1493,16 +1674,16 @@ static JanetReg x509_cert_cfuns[] = {
      "(x509-cert/allowed-usage cert-obj cert-usage)\n\n"
      "Test if the certificate is allowed for a particular usage. "
      "The cert-usage argument should be one of the following keywords:\n\n"
-     "* :NO-CONSTRAINTS\n\n"
-     "* :DIGITAL-SIGNATURE\n\n"
-     "* :NON-REPUDIATION\n\n"
-     "* :KEY-ENCIPHERMENT\n\n"
-     "* :DATA-ENCIPHERMENT\n\n"
-     "* :KEY-AGREEMENT\n\n"
-     "* :KEY-CERT-SIGN\n\n"
-     "* :CRL-SIGN\n\n"
-     "* :ENCIPHER-ONLY\n\n"
-     "* :DECIPHER-ONLY\n\n"
+     "* :no-constraints\n\n"
+     "* :digital-signature\n\n"
+     "* :non-repudiation\n\n"
+     "* :key-encipherment\n\n"
+     "* :data-encipherment\n\n"
+     "* :key-agreement\n\n"
+     "* :key-cert-sign\n\n"
+     "* :crl-sign\n\n"
+     "* :encipher-only\n\n"
+     "* :decipher-only\n\n"
      "Returns true if the given X.509 certificate `cert-obj` is allowed for "
      "the specified cert-usage."
     },
@@ -1573,10 +1754,65 @@ static JanetReg x509_crl_cfuns[] = {
      "Check whether a given `crl` contains a given `cert`. Return true when "
      "the certificate is revoked."
     },
+    {"x509-crl/create", x509_crl_create,
+     "(x509-crl/create ca-cert ca-key issue-time next-update "
+     "&keys {:rng rng :hash hash :padding padding})\n\n"
+     "Create a new empty CRL signed by the given CA.\n\n"
+     "* `ca-cert` - The CA certificate object.\n\n"
+     "* `ca-key` - The CA's private key object.\n\n"
+     "* `issue-time` - The time when the CRL becomes valid, as seconds "
+     "since epoch.\n\n"
+     "* `next-update` - The number of seconds after issue-time until the "
+     "CRL expires.\n\n"
+     "* `:rng` - A random number generator object. Default is system RNG.\n\n"
+     "* `:hash` - Hash algorithm name. Default is \"SHA-256\".\n\n"
+     "* `:padding` - Padding scheme. Default depends on key type: "
+     "\"PKCS1v15\" for RSA, hash name for DSA/ECDSA, \"Pure\" for Ed25519/Ed448."
+    },
+    {"x509-crl/revoke", x509_crl_revoke,
+     "(x509-crl/revoke crl ca-cert ca-key issue-time next-update entries "
+     "&keys {:rng rng :hash hash :padding padding})\n\n"
+     "Update a CRL with new revoked entries, creating a new CRL. "
+     "The original CRL is not modified.\n\n"
+     "* `crl` - The existing CRL to update.\n\n"
+     "* `ca-cert` - The CA certificate object.\n\n"
+     "* `ca-key` - The CA's private key object.\n\n"
+     "* `issue-time` - The time when the new CRL becomes valid, as seconds "
+     "since epoch.\n\n"
+     "* `next-update` - The number of seconds after issue-time until the "
+     "CRL expires.\n\n"
+     "* `entries` - A tuple/array of CRL entry objects created with "
+     "`x509-crl-entry/create`.\n\n"
+     "* `:rng` - A random number generator object. Default is system RNG.\n\n"
+     "* `:hash` - Hash algorithm name. Default is \"SHA-256\".\n\n"
+     "* `:padding` - Padding scheme. Default depends on key type: "
+     "\"PKCS1v15\" for RSA, hash name for DSA/ECDSA, \"Pure\" for Ed25519/Ed448."
+    },
+    {"x509-crl/verify", x509_crl_verify,
+     "(x509-crl/verify crl pubkey)\n\n"
+     "Verify the CRL signature against the given public key. "
+     "Returns true if the signature is valid."
+    },
     {NULL, NULL, NULL}
 };
 
 static JanetReg x509_crl_entry_cfuns[] = {
+    {"x509-crl-entry/create", x509_crl_entry_create,
+     "(x509-crl-entry/create cert reason)\n\n"
+     "Create a CRL entry for the given certificate with a revocation reason.\n\n"
+     "* `cert` - The certificate to mark as revoked.\n\n"
+     "* `reason` - The revocation reason, either an integer or a keyword:\n\n"
+     "  0: :unspecified\n\n"
+     "  1: :key-compromise\n\n"
+     "  2: :ca-compromise\n\n"
+     "  3: :affiliation-changed\n\n"
+     "  4: :superseded\n\n"
+     "  5: :cessation-of-operation\n\n"
+     "  6: :certificate-hold\n\n"
+     "  8: :remove-from-crl\n\n"
+     "  9: :privilege-withdrawn\n\n"
+     "  10: :aa-compromise"
+    },
     {"x509-crl-entry/reason", x509_crl_entry_reason,
      "(x509-crl-entry/reason crl-entry)\n\n"
      "Return the revocation reason code for the CRL entry.\n\n"
