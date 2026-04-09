@@ -191,4 +191,52 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (:allowed-ext-usage cert "PKIX.ServerAuth"))
   (assert (not (:allowed-ext-usage cert "PKIX.ClientAuth"))))
 
+# Test CRL creation, revocation, and verification
+(let [ca-key (privkey/new "RSA" "2048")
+      ca-cert (x509-cert/create-self-signed
+               ca-key
+               :CN "CRL Test CA" :C "KR" :O "Test Org"
+               :is-ca true
+               :key-usage [:KEY-CERT-SIGN :CRL-SIGN])
+      server-key (privkey/new "RSA" "2048")
+      now (os/time)
+      server-cert (x509-cert/issue
+                   server-key ca-cert ca-key
+                   (- now 3600) (+ now (* 365 24 3600))
+                   :CN "server.example.com")
+      ca-pubkey (x509-cert/subject-public-key ca-cert)]
+
+  # Create empty CRL
+  (let [crl (x509-crl/create ca-cert ca-key now (* 30 24 3600))]
+    (assert (= (:entries-count crl) 0))
+    (assert (>= (:this-update crl) now))
+    (assert (:verify crl ca-pubkey))
+    (assert (not (:is-revoked crl server-cert)))
+
+    # Create CRL entry with keyword reason
+    (let [entry (x509-crl-entry/create server-cert :key-compromise)]
+      (assert (= (:reason entry) 1))
+
+      # Revoke: add entry to CRL
+      (let [updated-crl (:revoke crl ca-cert ca-key now (* 30 24 3600) [entry])]
+        (assert (= (:entries-count updated-crl) 1))
+        (assert (:is-revoked updated-crl server-cert))
+        (assert (:verify updated-crl ca-pubkey))
+
+        (let [e (:get-entry updated-crl 0)]
+          (assert (= (:reason e) 1))
+          (assert (> (:revocation-date e) 0))
+          (assert (= (:serial-number e)
+                     (x509-cert/serial-number server-cert)))))))
+
+  # Create CRL entry with integer reason
+  (let [entry (x509-crl-entry/create server-cert 4)]
+    (assert (= (:reason entry) 4)))
+
+  # Verify with wrong key should fail
+  (let [crl (x509-crl/create ca-cert ca-key now (* 30 24 3600))
+        other-key (privkey/new "RSA" "2048")
+        other-pubkey (privkey/get-pubkey other-key)]
+    (assert (not (:verify crl other-pubkey)))))
+
 (end-suite)
