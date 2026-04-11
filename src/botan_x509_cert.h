@@ -1417,6 +1417,10 @@ static Janet x509_crl_next_update(int32_t argc, Janet *argv) {
 
     uint64_t time_since_epoch;
     int ret = botan_x509_crl_next_update(crl, &time_since_epoch);
+    if (ret == BOTAN_FFI_ERROR_NO_VALUE) {
+        return janet_wrap_nil();
+    }
+
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_number((double)time_since_epoch);
@@ -1886,7 +1890,8 @@ static JanetReg x509_crl_cfuns[] = {
     },
     {"x509-crl/next-update", x509_crl_next_update,
      "(x509-crl/next-update crl-obj)\n\n"
-     "Return the time the next CRL update is expected, as seconds since epoch."
+     "Return the time the next CRL update is expected, as seconds since epoch. "
+     "Return `nil` if the CRL has no nextUpdate field, which is optional."
     },
     {"x509-crl/entries-count", x509_crl_entries_count,
      "(x509-crl/entries-count crl-obj)\n\n"
