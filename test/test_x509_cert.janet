@@ -59,6 +59,25 @@ Y7wGfXPSUXOIN/kwdGObaQspbiSFewV7HBRH7J74BnK3RUjdtruA9hFBQ/Ga/nMq
 knl2gdOvpiIRf3P4HjNPPYgDiqE=
 -----END CERTIFICATE-----`)
 
+(let [cert2 (x509-cert/load cert-pem2)]
+  (assert (not (:is-ca cert2)))
+  (assert (:allowed-ext-usage cert2 "PKIX.ServerAuth"))
+  (assert (not (:allowed-ext-usage cert2 "PKIX.ClientAuth")))
+  (assert (not (:allowed-ext-usage cert2 "PKIX.CodeSigning"))))
+
+(let [crl (x509-crl/load crl-pem)
+     cert (x509-cert/load cert-pem2)]
+  (assert (:is-revoked crl cert))
+  (assert (> (:this-update crl) 0))
+  (assert (> (:next-update crl) (:this-update crl)))
+  (assert (= (:entries-count crl) 1))
+
+  # Test CRL entry inspection
+  (let [entry (:get-entry crl 0)]
+    (assert (>= (:reason entry) 0))
+    (assert (> (:revocation-date entry) 0))
+    (assert (= (:serial-number entry) (hex-decode "01")))))
+
 (let [now (os/time)
       a-year-later (+ now (* 60 60 24 365))
       cert1 (x509-cert/create-self-signed
@@ -88,25 +107,6 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
   (assert (= (x509-cert/verify cert1) 3001))
   (assert (= (x509-cert/validation-status 3001) "Cannot establish trust"))
   (assert (= (x509-cert/validation-status 0) "Verified")))
-
-(let [cert2 (x509-cert/load cert-pem2)]
-  (assert (not (:is-ca cert2)))
-  (assert (:allowed-ext-usage cert2 "PKIX.ServerAuth"))
-  (assert (not (:allowed-ext-usage cert2 "PKIX.ClientAuth")))
-  (assert (not (:allowed-ext-usage cert2 "PKIX.CodeSigning"))))
-
-(let [crl (x509-crl/load crl-pem)
-     cert (x509-cert/load cert-pem2)]
-  (assert (:is-revoked crl cert))
-  (assert (> (:this-update crl) 0))
-  (assert (> (:next-update crl) (:this-update crl)))
-  (assert (= (:entries-count crl) 1))
-
-  # Test CRL entry inspection
-  (let [entry (:get-entry crl 0)]
-    (assert (>= (:reason entry) 0))
-    (assert (> (:revocation-date entry) 0))
-    (assert (= (:serial-number entry) (hex-decode "01")))))
 
 # Test x509-cert/create-self-signed and x509-cert/issue
 (let [ca-key (privkey/new "RSA" "2048")
