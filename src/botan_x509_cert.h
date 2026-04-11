@@ -254,7 +254,8 @@ static void x509_cert_describe(botan_x509_cert_t cert, JanetBuffer *buffer) {
                                   janet_string(val.data, val.len));
                 }
             }
-            botan_x509_general_name_destroy(name);
+            ret = botan_x509_general_name_destroy(name);
+            JANET_BOTAN_ASSERT(ret);
         }
     }
 }
@@ -1159,7 +1160,8 @@ static Janet x509_cert_san(int32_t argc, Janet *argv) {
                 Janet str = janet_wrap_string(janet_string(val.data, val.len));
                 if (has_index) {
                     if (match_index == target_index) {
-                        botan_x509_general_name_destroy(name);
+                        ret = botan_x509_general_name_destroy(name);
+                        JANET_BOTAN_ASSERT(ret);
                         return str;
                     }
                 } else {
@@ -1168,7 +1170,8 @@ static Janet x509_cert_san(int32_t argc, Janet *argv) {
             }
             match_index++;
         }
-        botan_x509_general_name_destroy(name);
+        ret = botan_x509_general_name_destroy(name);
+        JANET_BOTAN_ASSERT(ret);
     }
 
     if (has_index) return janet_wrap_nil();
@@ -1182,6 +1185,9 @@ static Janet x509_cert_is_ca(int32_t argc, Janet *argv) {
     botan_x509_cert_t cert = obj->x509_cert;
 
     int ret = botan_x509_cert_is_ca(cert);
+    if (ret != 0 && ret != 1) {
+        JANET_BOTAN_ASSERT(ret);
+    }
 
     return janet_wrap_boolean(ret == 1);
 }
@@ -1223,7 +1229,7 @@ static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv) {
     const char *oid = janet_getcstring(argv, 1);
 
     int ret = botan_x509_cert_allowed_extended_usage_str(cert, oid);
-    if (ret < 0) {
+    if (ret != 0 && ret != 1) {
         JANET_BOTAN_ASSERT(ret);
     }
 
@@ -1326,7 +1332,9 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv) {
                                               required_strength,
                                               hostname,
                                               reference_time);
-    JANET_BOTAN_ASSERT(ret);
+    if (ret != 0 && ret != 1) {
+        JANET_BOTAN_ASSERT(ret);
+    }
 
     return janet_wrap_number((double)err_code);
 }
@@ -1641,6 +1649,9 @@ static Janet x509_crl_verify(int32_t argc, Janet *argv) {
     botan_public_key_obj_t *key_obj = janet_getabstract(argv, 1, get_public_key_obj_type());
 
     int ret = botan_x509_crl_verify_signature(obj->x509_crl, key_obj->public_key);
+    if (ret != 0 && ret != 1) {
+        JANET_BOTAN_ASSERT(ret);
+    }
 
     return janet_wrap_boolean(ret == 1);
 }
