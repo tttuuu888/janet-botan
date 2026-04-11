@@ -1751,8 +1751,8 @@ static JanetReg x509_crl_cfuns[] = {
     },
     {"x509-crl/is-revoked", x509_crl_is_revoked,
      "(x509-crl/is-revoked crl cert)\n\n"
-     "Check whether a given `crl` contains a given `cert`. Return true when "
-     "the certificate is revoked."
+     "Check if the given `cert` is revoked on the given `crl`. "
+     "Return true when the certificate is revoked."
     },
     {"x509-crl/create", x509_crl_create,
      "(x509-crl/create ca-cert ca-key issue-time next-update "
