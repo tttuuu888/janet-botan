@@ -33,11 +33,13 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        SOURCE_MSG=$(git -C "$GITHUB_WORKSPACE" log -1 --pretty=%s)
+        SOURCE_SHA=$(git -C "$GITHUB_WORKSPACE" rev-parse --short HEAD)
         cd gh-pages-worktree
         git config user.name github-actions
         git config user.email github-actions@github.com
         rm -rf docs
         cp -r ../docs docs
         git add docs
-        git commit -m "Auto-generate site" || echo "nothing to commit"
+        git commit -m "Site: ${SOURCE_MSG} (${SOURCE_SHA})" || echo "nothing to commit"
         git push https://${GITHUB_ACTOR}:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git gh-pages
