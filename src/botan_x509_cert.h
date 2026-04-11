@@ -27,6 +27,7 @@ static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer);
 /* Abstract Object functions x509-crl */
 static int x509_crl_gc_fn(void *data, size_t len);
 static int x509_crl_get_fn(void *data, Janet key, Janet *out);
+static void x509_crl_tostring_fn(void *p, JanetBuffer *buffer);
 
 /* Abstract Object functions x509-crl-entry */
 static int x509_crl_entry_gc_fn(void *data, size_t len);
@@ -123,7 +124,11 @@ static JanetAbstractType x509_crl_obj_type = {
     x509_crl_gc_fn,
     NULL,
     x509_crl_get_fn,
-    JANET_ATEND_GET
+    NULL,                       /* put */
+    NULL,                       /* marshal */
+    NULL,                       /* unmarshal */
+    x509_crl_tostring_fn,
+    JANET_ATEND_TOSTRING
 };
 
 static JanetAbstractType x509_crl_entry_obj_type = {
@@ -277,6 +282,149 @@ static int x509_crl_get_fn(void *data, Janet key, Janet *out) {
     }
 
     return janet_getmethod(janet_unwrap_keyword(key), x509_crl_methods, out);
+}
+
+static const char *x509_crl_reason_str(int code) {
+    switch (code) {
+        case 0:  return "Unspecified";
+        case 1:  return "Key Compromise";
+        case 2:  return "CA Compromise";
+        case 3:  return "Affiliation Changed";
+        case 4:  return "Superseded";
+        case 5:  return "Cessation of Operation";
+        case 6:  return "Certificate Hold";
+        case 8:  return "Remove from CRL";
+        case 9:  return "Privilege Withdrawn";
+        case 10: return "AA Compromise";
+        default: return "Unknown";
+    }
+}
+
+static void x509_crl_format_time(uint64_t epoch, char *out, size_t out_len) {
+    time_t t = (time_t)epoch;
+    struct tm *tm_ptr = gmtime(&t);
+    if (tm_ptr) {
+        strftime(out, out_len, "%Y-%m-%d %H:%M:%S UTC", tm_ptr);
+    } else {
+        out[0] = '\0';
+    }
+}
+
+static void x509_crl_format_hex_bytes(JanetBuffer *buffer, const uint8_t *bytes,
+                                      size_t len, const char *indent,
+                                      size_t bytes_per_line) {
+    char hex[4];
+    for (size_t i = 0; i < len; i++) {
+        if (i % bytes_per_line == 0) {
+            if (i > 0) janet_buffer_push_u8(buffer, '\n');
+            janet_buffer_push_cstring(buffer, indent);
+        } else {
+            janet_buffer_push_u8(buffer, ':');
+        }
+        snprintf(hex, sizeof(hex), "%02x", bytes[i]);
+        janet_buffer_push_cstring(buffer, hex);
+    }
+    janet_buffer_push_u8(buffer, '\n');
+}
+
+static void x509_crl_describe(botan_x509_crl_t crl, JanetBuffer *buffer) {
+    char timebuf[32];
+    char numbuf[32];
+    char hex[4];
+    int ret;
+    int reason_code;
+    uint64_t epoch;
+    size_t count;
+    view_data_t data;
+
+    janet_buffer_push_cstring(buffer, "X.509 CRL\n");
+
+    /* This Update */
+    ret = botan_x509_crl_this_update(crl, &epoch);
+    JANET_BOTAN_ASSERT(ret);
+
+    x509_crl_format_time(epoch, timebuf, sizeof(timebuf));
+    janet_formatb(buffer, "    This Update: %s\n", timebuf);
+
+    /* Next Update (optional in spec) */
+    ret = botan_x509_crl_next_update(crl, &epoch);
+    if (ret == 0) {
+        x509_crl_format_time(epoch, timebuf, sizeof(timebuf));
+        janet_formatb(buffer, "    Next Update: %s\n", timebuf);
+    }
+
+    /* CRL Number (optional, big-endian integer) */
+    ret = botan_x509_crl_view_binary_values(crl, BOTAN_X509_SERIAL_NUMBER, 0, &data,
+                                            (botan_view_bin_fn)view_bin_func);
+    if (ret == 0 && data.len > 0) {
+        uint64_t n = 0;
+        for (size_t i = 0; i < data.len && i < 8; i++) {
+            n = (n << 8) | data.data[i];
+        }
+        snprintf(numbuf, sizeof(numbuf), "%llu", (unsigned long long)n);
+        janet_buffer_push_cstring(buffer, "    CRL Number: ");
+        janet_buffer_push_cstring(buffer, numbuf);
+        janet_buffer_push_u8(buffer, '\n');
+    }
+
+    /* Authority Key Identifier (optional) */
+    ret = botan_x509_crl_view_binary_values(crl, BOTAN_X509_AUTHORITY_KEY_IDENTIFIER, 0,
+                                            &data, (botan_view_bin_fn)view_bin_func);
+    if (ret == 0 && data.len > 0) {
+        janet_buffer_push_cstring(buffer, "    Authority Key Identifier:\n");
+        x509_crl_format_hex_bytes(buffer, data.data, data.len, "        ", 16);
+    }
+
+    /* Revoked Certificates */
+    ret = botan_x509_crl_entries_count(crl, &count);
+    JANET_BOTAN_ASSERT(ret);
+
+    snprintf(numbuf, sizeof(numbuf), "%llu", (unsigned long long)count);
+    janet_buffer_push_cstring(buffer, "Revoked Certificates: ");
+    janet_buffer_push_cstring(buffer, numbuf);
+    janet_buffer_push_u8(buffer, '\n');
+    for (size_t i = 0; i < count; i++) {
+        botan_x509_crl_entry_t entry = NULL;
+        ret = botan_x509_crl_entries(crl, i, &entry);
+        JANET_BOTAN_ASSERT(ret);
+
+        ret = botan_x509_crl_entry_view_serial_number(entry, &data, (botan_view_bin_fn)view_bin_func);
+        JANET_BOTAN_ASSERT(ret);
+
+        janet_buffer_push_cstring(buffer, "    Serial Number: ");
+        for (size_t j = 0; j < data.len; j++) {
+            snprintf(hex, sizeof(hex), "%02x", data.data[j]);
+            janet_buffer_push_cstring(buffer, hex);
+        }
+        janet_buffer_push_u8(buffer, '\n');
+
+        ret = botan_x509_crl_entry_revocation_date(entry, &epoch);
+        JANET_BOTAN_ASSERT(ret);
+
+        x509_crl_format_time(epoch, timebuf, sizeof(timebuf));
+        janet_formatb(buffer, "        Revocation Date: %s\n", timebuf);
+
+        ret = botan_x509_crl_entry_reason(entry, &reason_code);
+        JANET_BOTAN_ASSERT(ret);
+        janet_formatb(buffer, "        Reason: %s\n", x509_crl_reason_str(reason_code));
+
+        ret = botan_x509_crl_entry_destroy(entry);
+        JANET_BOTAN_ASSERT(ret);
+    }
+
+    /* Signature */
+    ret = botan_x509_crl_view_binary_values(crl, BOTAN_X509_SIGNATURE_BITS, 0, &data,
+                                            (botan_view_bin_fn)view_bin_func);
+    JANET_BOTAN_ASSERT(ret);
+
+    janet_buffer_push_cstring(buffer, "Signature:\n");
+    x509_crl_format_hex_bytes(buffer, data.data, data.len, "    ", 16);
+}
+
+static void x509_crl_tostring_fn(void *p, JanetBuffer *buffer) {
+    botan_x509_crl_obj_t *obj = (botan_x509_crl_obj_t *)p;
+    janet_buffer_push_u8(buffer, '\n');
+    x509_crl_describe(obj->x509_crl, buffer);
 }
 
 /* Abstract Object functions x509-crl-entry */
