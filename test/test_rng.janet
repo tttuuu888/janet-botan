@@ -43,4 +43,36 @@
 (assert-error "Error expected"
               (rng/new-drbg "Not_A_DRBG" (string/from-bytes ;(range 64))))
 
+# get-with-input: same DRBG state + same addl-input -> same output
+(let [seed (string/from-bytes ;(range 64))
+      addl (string/from-bytes ;(range 16))
+      drbg1 (rng/new-drbg "HMAC_DRBG(SHA-256)" seed)
+      drbg2 (rng/new-drbg "HMAC_DRBG(SHA-256)" seed)]
+  (assert (deep= (:get-with-input drbg1 32 addl)
+                 (:get-with-input drbg2 32 addl))))
+
+# get-with-input: same DRBG state + different addl-input -> different output
+(let [seed (string/from-bytes ;(range 64))
+      addl-a (string/from-bytes ;(range  0 16))
+      addl-b (string/from-bytes ;(range 16 32))
+      drbg1 (rng/new-drbg "HMAC_DRBG(SHA-256)" seed)
+      drbg2 (rng/new-drbg "HMAC_DRBG(SHA-256)" seed)]
+  (assert (deep-not= (:get-with-input drbg1 32 addl-a)
+                     (:get-with-input drbg2 32 addl-b))))
+
+# get-with-input: empty addl-input is equivalent to plain get
+(let [seed (string/from-bytes ;(range 64))
+      drbg1 (rng/new-drbg "HMAC_DRBG(SHA-256)" seed)
+      drbg2 (rng/new-drbg "HMAC_DRBG(SHA-256)" seed)]
+  (assert (deep= (:get drbg1 32)
+                 (:get-with-input drbg2 32 ""))))
+
+# get-with-input on non-DRBG (system RNG): addl is accepted (and ignored)
+(let [sys-rng (rng/new :system)
+      addl (string/from-bytes ;(range 16))
+      out1 (:get-with-input sys-rng 32 addl)
+      out2 (:get-with-input sys-rng 32 addl)]
+  (assert (= 32 (length out1)))
+  (assert (deep-not= out1 out2)))
+
 (end-suite)

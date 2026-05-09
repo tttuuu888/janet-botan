@@ -19,6 +19,7 @@ static int rng_get_fn(void *data, Janet key, Janet *out);
 static Janet rng_new(int32_t argc, Janet *argv);
 static Janet rng_new_drbg(int32_t argc, Janet *argv);
 static Janet rng_get(int32_t argc, Janet *argv);
+static Janet rng_get_with_input(int32_t argc, Janet *argv);
 static Janet rng_reseed(int32_t argc, Janet *argv);
 static Janet rng_reseed_from_rng(int32_t argc, Janet *argv);
 static Janet rng_add_entropy(int32_t argc, Janet *argv);
@@ -33,6 +34,7 @@ static JanetAbstractType rng_obj_type = {
 
 static JanetMethod rng_methods[] = {
     {"get", rng_get},
+    {"get-with-input", rng_get_with_input},
     {"reseed", rng_reseed},
     {"reseed-from-rng", rng_reseed_from_rng},
     {"add-entropy", rng_add_entropy},
@@ -115,6 +117,23 @@ static Janet rng_get(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(out->data, out->count));
 }
 
+static Janet rng_get_with_input(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 3);
+    botan_rng_obj_t *obj = janet_getabstract(argv, 0, get_rng_obj_type());
+    botan_rng_t rng = obj->rng;
+    size_t len = janet_getsize(argv, 1);
+    JanetByteView addl = janet_getbytes(argv, 2);
+
+    JanetBuffer *out = janet_buffer(len);
+
+    int ret = botan_rng_generate_with_input(rng, out->data, len,
+                                            (const uint8_t *)addl.bytes, addl.len);
+    JANET_BOTAN_ASSERT(ret);
+
+    out->count = len;
+    return janet_wrap_string(janet_string(out->data, out->count));
+}
+
 static Janet rng_reseed(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 2);
     botan_rng_obj_t *obj = janet_getabstract(argv, 0, get_rng_obj_type());
@@ -171,6 +190,12 @@ static JanetReg rng_cfuns[] = {
     },
     {"rng/get", rng_get, "(rng/get rng-obj len)\n\n"
      "Returns random bytes of length `len` from a random number generator `rng-obj`."
+    },
+    {"rng/get-with-input", rng_get_with_input,
+     "(rng/get-with-input rng-obj len addl-input)\n\n"
+     "Returns `len` random bytes from `rng-obj`. For a DRBG, the additional input "
+     "is mixed in before generating. Other RNG types (e.g. system RNG, "
+     "RDRAND) ignore `addl-input`."
     },
     {"rng/reseed", rng_reseed, "(rng/reseed rng-obj bits)\n\n"
      "Reseeds the random number generator `rng` with bits number of `bits` "
