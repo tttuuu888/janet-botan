@@ -28,6 +28,8 @@
 #include "botan_mpi.h"
 #include "botan_oid.h"
 #include "botan_ec_group.h"
+#include "botan_ec_scalar.h"
+#include "botan_ec_point.h"
 #include "botan_public_key.h"
 #include "botan_private_key.h"
 #include "botan_pk_encrypt.h"
@@ -61,6 +63,8 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_mpi(env);
     submod_oid(env);
     submod_ec_group(env);
+    submod_ec_scalar(env);
+    submod_ec_point(env);
     submod_public_key(env);
     submod_private_key(env);
     submod_pk_encrypt(env);
