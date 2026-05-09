@@ -12,8 +12,9 @@
       (hex-decode (string "03" x))
       (hex-decode (string "02" x)))))
 
-(let [n (mpi/new "1090660992520643446103273789680343")
-      e (mpi/new "65537")
+(let [src-pub (:get-pubkey (privkey/new "RSA" "1024"))
+      n (:get-field src-pub "n")
+      e (:get-field src-pub "e")
       rsa-pub-key (pubkey/load-rsa n e)]
   (assert (= (:get-field rsa-pub-key "n") n))
   (assert (= (:get-field rsa-pub-key "e") e)))

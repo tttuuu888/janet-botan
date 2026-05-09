@@ -22,9 +22,10 @@
   (assert (= (:stateful-operation prikey) true))
   (assert (= (:remaining-operations prikey) 1024)))
 
-(let [p (mpi/new "1090660992520643446103273789680343")
-      q (mpi/new "1162435056374824133712043309728653")
-      e (mpi/new "65537")
+(let [src (privkey/new "RSA" "1024")
+      p (:get-field src "p")
+      q (:get-field src "q")
+      e (:get-field src "e")
       rsa-priv-key (privkey/load-rsa p q e)]
   (assert (= (:get-field rsa-priv-key "p") p))
   (assert (= (:get-field rsa-priv-key "q") q))
