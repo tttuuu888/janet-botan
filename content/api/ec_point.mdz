@@ -1,14 +1,14 @@
-{:title "Private Key"
+{:title "EC Points"
  :author "Seungki Kim"
  :license "MIT license"
  :template "docpage.html"
- :order 16}
+ :order 15}
 ---
 
 ## Index
 
-@api-index[/build/botan][privkey/]
+@api-index[/build/botan][ec-point/]
 
 ## Reference
 
-@api-docs[/build/botan][privkey/]
+@api-docs[/build/botan][ec-point/]

@@ -1,0 +1,14 @@
+{:title "EC Scalars"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "docpage.html"
+ :order 14}
+---
+
+## Index
+
+@api-index[/build/botan][ec-scalar/]
+
+## Reference
+
+@api-docs[/build/botan][ec-scalar/]
