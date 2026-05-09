@@ -17,6 +17,7 @@ static int rng_get_fn(void *data, Janet key, Janet *out);
 
 /* Janet functions */
 static Janet rng_new(int32_t argc, Janet *argv);
+static Janet rng_new_drbg(int32_t argc, Janet *argv);
 static Janet rng_get(int32_t argc, Janet *argv);
 static Janet rng_reseed(int32_t argc, Janet *argv);
 static Janet rng_reseed_from_rng(int32_t argc, Janet *argv);
@@ -78,6 +79,21 @@ static Janet rng_new(int32_t argc, Janet *argv) {
     }
 
     int ret = botan_rng_init(&obj->rng, (const char *)type);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(obj);
+}
+
+static Janet rng_new_drbg(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+    botan_rng_obj_t *obj = janet_abstract(&rng_obj_type, sizeof(botan_rng_obj_t));
+    memset(obj, 0, sizeof(botan_rng_obj_t));
+
+    const char *name = janet_getcstring(argv, 0);
+    JanetByteView seed = janet_getbytes(argv, 1);
+
+    int ret = botan_rng_init_drbg(&obj->rng, name,
+                                  (const uint8_t *)seed.bytes, seed.len);
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
@@ -145,6 +161,12 @@ static JanetReg rng_cfuns[] = {
      "* :user-threadsafe - serialized AutoSeeded-RNG\n\n"
      "* :null - Null-RNG (always fails)\n\n"
      "* :hwrnd or :rdrand - Processor-RNG (if available)\n\n"
+     "Returns `rng-obj`."
+    },
+    {"rng/new-drbg", rng_new_drbg, "(rng/new-drbg name seed)\n\n"
+     "Initialize a deterministic random bit generator (DRBG) of the given "
+     "`name` (e.g. \"HMAC_DRBG(SHA-256)\") seeded with `seed`. The seed is "
+     "interpreted as `entropy || nonce || personalization_string`. "
      "Returns `rng-obj`."
     },
     {"rng/get", rng_get, "(rng/get rng-obj len)\n\n"
