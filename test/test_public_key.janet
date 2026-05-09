@@ -109,4 +109,15 @@
   (assert (= (:algo-name pub2) "X448"))
   (assert (= pub-raw pub-raw2)))
 
+# get-ec-group on an EC public key
+(let [grp (ec-group/from-name "secp256r1")
+      pri (privkey/new-ec "ECDSA" grp)
+      pub (:get-pubkey pri)]
+  (assert (= grp (:get-ec-group pub)))
+  (assert (= (:get-ec-group pri) (:get-ec-group pub))))
+
+# get-ec-group on a non-EC public key must fail
+(let [rsa-pub (:get-pubkey (privkey/new "RSA" "1024"))]
+  (assert-error "Error expected" (:get-ec-group rsa-pub)))
+
 (end-suite)

@@ -27,6 +27,7 @@ static Janet public_key_get_public_point(int32_t argc, Janet *argv);
 static Janet public_key_fingerprint(int32_t argc, Janet *argv);
 static Janet public_key_estimated_strength(int32_t argc, Janet *argv);
 static Janet public_key_oid(int32_t argc, Janet *argv);
+static Janet public_key_get_ec_group(int32_t argc, Janet *argv);
 
 static JanetAbstractType public_key_obj_type = {
     "botan/public-key",
@@ -48,6 +49,7 @@ static JanetMethod public_key_methods[] = {
     {"fingerprint", public_key_fingerprint},
     {"estimated-strength", public_key_estimated_strength},
     {"oid", public_key_oid},
+    {"get-ec-group", public_key_get_ec_group},
 
     {NULL, NULL},
 };
@@ -609,6 +611,21 @@ static Janet public_key_oid(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj1);
 }
 
+static Janet public_key_get_ec_group(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_public_key_obj_t *obj = janet_getabstract(argv, 0, get_public_key_obj_type());
+    botan_pubkey_t key = obj->public_key;
+
+    botan_ec_group_obj_t *out = janet_abstract(&ec_group_obj_type, sizeof(botan_ec_group_obj_t));
+    memset(out, 0, sizeof(botan_ec_group_obj_t));
+
+    int ret = botan_ec_pubkey_get_group(key, &out->ec_group);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(out);
+}
+
 static JanetReg public_key_cfuns[] = {
     {"pubkey/load", public_key_load,
      "(pubkey/load value)\n\n"
@@ -751,6 +768,11 @@ static JanetReg public_key_cfuns[] = {
     {"pubkey/oid", public_key_oid,
      "(pubkey/oid pubkey)\n\n"
      "Return the key's associated OID."
+    },
+    {"pubkey/get-ec-group", public_key_get_ec_group,
+     "(pubkey/get-ec-group pubkey)\n\n"
+     "Return the EC Group object of an EC public key. "
+     "Fails if `pubkey` is not an EC key."
     },
     {NULL, NULL, NULL}
 };

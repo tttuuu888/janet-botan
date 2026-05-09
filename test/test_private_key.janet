@@ -117,4 +117,21 @@
   (assert (= (:algo-name pri2) "X448"))
   (assert (= raw raw2)))
 
+# get-ec-group / get-ec-private-key on an EC private key
+(let [grp (ec-group/from-name "secp256r1")
+      pri (privkey/new-ec "ECDSA" grp)
+      grp-from-pri (:get-ec-group pri)
+      scalar (:get-ec-private-key pri)]
+  (assert (= grp grp-from-pri))
+  # The returned scalar's MPI must equal the privkey's "x" field
+  (assert (= (:get-field pri "x") (:to-mp scalar)))
+  # Round-trip: build a new privkey from the extracted scalar; same field
+  (let [pri2 (privkey/load-ecdsa "secp256r1" (:to-mp scalar))]
+    (assert (= (:get-field pri "x") (:get-field pri2 "x")))))
+
+# get-ec-* on a non-EC private key must fail
+(let [rsa (privkey/new "RSA" "1024")]
+  (assert-error "Error expected" (:get-ec-group rsa))
+  (assert-error "Error expected" (:get-ec-private-key rsa)))
+
 (end-suite)

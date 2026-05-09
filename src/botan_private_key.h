@@ -30,6 +30,8 @@ static Janet private_key_get_field(int32_t argc, Janet *argv);
 static Janet private_key_stateful_operation(int32_t argc, Janet *argv);
 static Janet private_key_remaining_operations(int32_t argc, Janet *argv);
 static Janet private_key_oid(int32_t argc, Janet *argv);
+static Janet private_key_get_ec_group(int32_t argc, Janet *argv);
+static Janet private_key_get_ec_private_key(int32_t argc, Janet *argv);
 
 static JanetAbstractType private_key_obj_type = {
     "botan/private-key",
@@ -53,6 +55,8 @@ static JanetMethod private_key_methods[] = {
     {"stateful-operation", private_key_stateful_operation},
     {"remaining-operations", private_key_remaining_operations},
     {"oid", private_key_oid},
+    {"get-ec-group", private_key_get_ec_group},
+    {"get-ec-private-key", private_key_get_ec_private_key},
 
     {NULL, NULL},
 };
@@ -657,6 +661,36 @@ static Janet private_key_oid(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(obj1);
 }
 
+static Janet private_key_get_ec_group(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    botan_ec_group_obj_t *out = janet_abstract(&ec_group_obj_type, sizeof(botan_ec_group_obj_t));
+    memset(out, 0, sizeof(botan_ec_group_obj_t));
+
+    int ret = botan_ec_privkey_get_group(key, &out->ec_group);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(out);
+}
+
+static Janet private_key_get_ec_private_key(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_private_key_obj_t *obj = janet_getabstract(argv, 0, get_private_key_obj_type());
+    botan_privkey_t key = obj->private_key;
+
+    botan_ec_scalar_obj_t *out = janet_abstract(&ec_scalar_obj_type, sizeof(botan_ec_scalar_obj_t));
+    memset(out, 0, sizeof(botan_ec_scalar_obj_t));
+
+    int ret = botan_ec_privkey_get_private_key(key, &out->ec_scalar);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(out);
+}
+
 static JanetReg private_key_cfuns[] = {
     {"privkey/new", private_key_new,
      "(privkey/new algo &opt param rng)\n\n"
@@ -807,6 +841,16 @@ static JanetReg private_key_cfuns[] = {
     {"privkey/oid", private_key_oid,
      "(privkey/oid pubkey)\n\n"
      "Return the key's associated OID."
+    },
+    {"privkey/get-ec-group", private_key_get_ec_group,
+     "(privkey/get-ec-group privkey)\n\n"
+     "Return the EC Group object of an EC private key. "
+     "Fails if `privkey` is not an EC key."
+    },
+    {"privkey/get-ec-private-key", private_key_get_ec_private_key,
+     "(privkey/get-ec-private-key privkey)\n\n"
+     "Return the EC scalar object representing the private key value of an "
+     "EC private key. Fails if `privkey` is not an EC key."
     },
 
     {NULL, NULL, NULL}
