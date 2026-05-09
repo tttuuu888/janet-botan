@@ -1,0 +1,98 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="../css/main.css" type="text/css" charset="utf-8">
+    <title>EC Scalars</title>
+    <meta name="description" content="">
+  </head>
+  <body>
+    <!-- Toggles Navigation -->
+    <div id="toc-toggle" class="">
+      <div class="bar topbar"></div>
+      <div class="bar"></div>
+      <div class="bar botbar"></div>
+    </div>
+    <div class="twocol">
+      <div class="toc toc-hidden">
+        <ul>
+          <li><span><a href="../index.html">Janet-botan</a></span></li><li class="caret"><span><a href="index.html">API</a></span><ul><li><span><a href="versioning.html">Versioning</a></span></li><li><span><a href="utiltity.html">Utility</a></span></li><li><span><a href="rng.html">Random Number Generators</a></span></li><li><span><a href="block_cipher.html">Block Ciphers</a></span></li><li><span><a href="hash.html">Hash Functions</a></span></li><li><span><a href="xof.html">eXtendable Output Functions</a></span></li><li><span><a href="mac.html">Message Authentication Codes</a></span></li><li><span><a href="cipher.html">Symmetric Ciphers</a></span></li><li><span><a href="pbkdf.html">PBKDF</a></span></li><li><span><a href="kdf.html">KDF</a></span></li><li><span><a href="mpi.html">Multiple Precision Integers</a></span></li><li><span><a href="bcrypt.html">Bcrypt</a></span></li><li><span><a href="oid.html">Object Identifiers</a></span></li><li><span><a href="ec_group.html">EC Groups</a></span></li><li><span class="selected"><a href="ec_scalar.html">EC Scalars</a></span></li><li><span><a href="ec_point.html">EC Points</a></span></li><li><span><a href="private_key.html">Private Key</a></span></li><li><span><a href="public_key.html">Public Key</a></span></li><li><span><a href="pk_operations.html">Public Key Operations</a></span></li><li><span><a href="x509_cert.html">X509 Certificate</a></span></li><li><span><a href="x509_crl.html">X509 CRL</a></span></li><li><span><a href="nist_key_wrapping.html">NIST Key Wrapping</a></span></li><li><span><a href="script.html">Scrypt</a></span></li><li><span><a href="hotp.html">HOTP</a></span></li><li><span><a href="totp.html">TOTP</a></span></li><li><span><a href="fpe.html">Format Preserving Encryption</a></span></li><li><span><a href="srp6.html">SRP6 Server Session</a></span></li><li><span><a href="zfec.html">ZFEC Forward Error Correction</a></span></li></ul></li>
+        </ul>
+      </div>
+      <div class="content-wrapper">
+        <h1>EC Scalars</h1>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="ec_group.html"><span class="prevnext-text">EC Groups</span></a></span>
+          <span class="next"><a href="ec_point.html"><span class="prevnext-text">EC Points</span></a></span>
+        </div>
+        
+
+<h2 id="Index-4">Index
+</h2>
+<p><a href="#ec-scalar/from-mp">ec-scalar/from-mp</a><span class="divider"> </span><a href="#ec-scalar/random">ec-scalar/random</a><span class="divider"> </span><a href="#ec-scalar/to-mp">ec-scalar/to-mp</a></p><h2 id="Reference-4">Reference
+</h2>
+<div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-scalar/from-mp">ec-scalar/from-mp</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-scalar/from-mp</span> <span class="mdzsyn-symbol">ec-group-obj</span> <span class="mdzsyn-symbol">mp-obj</span>)</code></pre><p>Returns a new scalar in `ec-group-obj` from the given MPI `mp-obj`. `mp-obj` must satisfy `0 &lt; mp-obj &lt; order`.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-scalar/random">ec-scalar/random</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-scalar/random</span> <span class="mdzsyn-symbol">ec-group-obj</span> <span class="mdzsyn-symbol">rng-obj</span>)</code></pre><p>Returns a new random scalar in `ec-group-obj` drawn from `rng-obj`.</p></div><div class="docstring"><div class="binding-wrap"><span class="binding"><a id="ec-scalar/to-mp">ec-scalar/to-mp</a></span><span class="binding-type">cfunction</span></div><pre class="mendoza-codeblock"><code data-language="janet">(<span class="mdzsyn-symbol">ec-scalar/to-mp</span> <span class="mdzsyn-symbol">ec-scalar-obj</span>)</code></pre><p>Returns the MPI object representing the value of `ec-scalar-obj`.</p></div>
+        <div class="prevnext-bar">
+          <span class="prev"><a href="ec_group.html"><span class="prevnext-text">EC Groups</span></a></span>
+          <span class="next"><a href="ec_point.html"><span class="prevnext-text">EC Points</span></a></span>
+        </div>
+      </div>
+    </div>
+    <script charset="utf-8">
+      function toggleToc() {
+        var toggler = document.getElementById('toc-toggle');
+        var wrapper = document.querySelector('.toc');
+        wrapper.classList.toggle('toc-hidden');
+        toggler.classList.toggle('open');
+        window.localStorage.setItem('show-toc', toggler.classList.contains('open'));
+      }
+      function addTocToggle() {
+        var el = document.getElementById('toc-toggle');
+        el.addEventListener('click', toggleToc);
+      }
+      function addCopyButtons() {
+        document.querySelectorAll('.mendoza-codeblock').forEach(function(block) {
+          var btn = document.createElement('button');
+          btn.className = 'copy-btn';
+          btn.textContent = 'Copy';
+          btn.addEventListener('click', function() {
+            var text = block.querySelector('code').textContent;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(function() {
+                btn.textContent = 'Copied!';
+                setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+              });
+            } else {
+              var ta = document.createElement('textarea');
+              ta.value = text;
+              ta.style.position = 'fixed';
+              ta.style.opacity = '0';
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              btn.textContent = 'Copied!';
+              setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+            }
+          });
+          block.appendChild(btn);
+        });
+      }
+      window.addEventListener('DOMContentLoaded', addTocToggle);
+      window.addEventListener('DOMContentLoaded', addCopyButtons);
+      if (window.localStorage.getItem('show-toc') === 'true') {
+        toggleToc()
+      }
+    </script>
+    <footer>
+      <div class="content-wrapper">
+        Copyright &copy; Seungki Kim 2026
+      </div>
+    </footer>
+  </body>
+</html>
