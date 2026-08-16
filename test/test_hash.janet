@@ -8,6 +8,9 @@
 (let [hash (assert (hash/new "SHA-256"))]
   (assert (= (hash/name hash) "SHA-256"))
   (assert (= (hash/output-length hash) 32))
+  (assert (= (:output-length hash) 32))
+  (assert (= (hash/security-level hash) 128))
+  (assert (= (:security-level hash) 128))
   (assert (= (hash/block-size hash) 64))
   (assert (= (:block-size hash) 64))
 
