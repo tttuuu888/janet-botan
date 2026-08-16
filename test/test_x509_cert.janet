@@ -112,17 +112,17 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
 (let [ca-key (privkey/new "RSA" "2048")
       ca-cert (x509-cert/create-self-signed
                ca-key
-               :CN "Test CA" :C "KR" :O "Test Org" :ST "Seoul" :L "Gangnam"
+               :CN "Test-CA" :C "KR" :O "Test Org" :ST "Seoul" :L "Gangnam"
                :is-ca true)]
   (assert (:is-ca ca-cert))
-  (assert (= (:subject-dn ca-cert :CN 0) "Test CA"))
+  (assert (= (:subject-dn ca-cert :CN 0) "Test-CA"))
   (assert (= (:subject-dn ca-cert :C  0) "KR"))
   (assert (= (:subject-dn ca-cert :O  0) "Test Org"))
   (assert (= (:subject-dn ca-cert :ST 0) "Seoul"))
   (assert (= (:subject-dn ca-cert :L  0) "Gangnam"))
-  (assert (= (:issuer-dn  ca-cert :CN 0) "Test CA"))
-  (assert (= (:issuer-dn ca-cert :CN) ["Test CA"]))
-  (assert (:hostname-match ca-cert "Test CA"))
+  (assert (= (:issuer-dn  ca-cert :CN 0) "Test-CA"))
+  (assert (= (:issuer-dn ca-cert :CN) ["Test-CA"]))
+  (assert (:hostname-match ca-cert "Test-CA"))
 
   (let [server-key (privkey/new "RSA" "2048")
         now (os/time)
@@ -134,7 +134,7 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
                      :ext-key-usage ["PKIX.ServerAuth"])]
     (assert (not (:is-ca server-cert)))
     (assert (= (:subject-dn server-cert :CN 0) "server.example.com"))
-    (assert (= (:issuer-dn  server-cert :CN 0) "Test CA"))
+    (assert (= (:issuer-dn  server-cert :CN 0) "Test-CA"))
     (assert (:allowed-usage server-cert :digital-signature))
     (assert (:allowed-usage server-cert :key-encipherment))
     (assert (not (:allowed-usage server-cert :crl-sign)))
