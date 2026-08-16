@@ -3,13 +3,13 @@
 
 (start-suite "Versioning")
 
-(let [ver-str   "Botan 3.12.0"
-      ver-ffi   20260506
+(let [ver-str   "Botan 3.13.0"
+      ver-ffi   20260811
       ver-major 3
-      ver-minor 12
+      ver-minor 13
       ver-patch 0
       ver-date  0]
-  (assert (= (string/slice (version-string) 0 12) ver-str))
+  (assert (= (string/slice (version-string) 0 13) ver-str))
   (assert (= (ffi-api-version) ver-ffi))
   (assert (ffi-supports-api (ffi-api-version)))
   (assert (= (version-major) ver-major))
