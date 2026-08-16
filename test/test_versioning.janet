@@ -9,7 +9,7 @@
       ver-minor 13
       ver-patch 0
       ver-date  0]
-  (assert (= (string/slice (version-string) 0 13) ver-str))
+  (assert (string/has-prefix? ver-str (version-string)))
   (assert (= (ffi-api-version) ver-ffi))
   (assert (ffi-supports-api (ffi-api-version)))
   (assert (= (version-major) ver-major))
