@@ -28,7 +28,7 @@ static Janet ec_group_get_gy(int32_t argc, Janet *argv);
 static Janet ec_group_get_order(int32_t argc, Janet *argv);
 
 static JanetAbstractType ec_group_obj_type = {
-    "botan/ec_group",
+    "botan/ec-group",
     ec_group_gc_fn,
     NULL,
     ec_group_get_fn,

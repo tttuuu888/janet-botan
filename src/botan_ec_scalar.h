@@ -21,7 +21,7 @@ static Janet ec_scalar_from_mp(int32_t argc, Janet *argv);
 static Janet ec_scalar_to_mp(int32_t argc, Janet *argv);
 
 static JanetAbstractType ec_scalar_obj_type = {
-    "botan/ec_scalar",
+    "botan/ec-scalar",
     ec_scalar_gc_fn,
     NULL,
     ec_scalar_get_fn,

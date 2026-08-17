@@ -32,7 +32,7 @@ static Janet ec_point_add(int32_t argc, Janet *argv);
 static Janet ec_point_mul(int32_t argc, Janet *argv);
 
 static JanetAbstractType ec_point_obj_type = {
-    "botan/ec_point",
+    "botan/ec-point",
     ec_point_gc_fn,
     NULL,
     ec_point_get_fn,

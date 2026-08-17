@@ -34,7 +34,7 @@ static int x509_crl_entry_gc_fn(void *data, size_t len);
 static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out);
 
 static JanetAbstractType x509_cert_obj_type = {
-    "botan/x509_cert",
+    "botan/x509-cert",
     x509_cert_gc_fn,
     NULL,
     x509_cert_get_fn,
@@ -46,7 +46,7 @@ static JanetAbstractType x509_cert_obj_type = {
 };
 
 static JanetAbstractType x509_crl_obj_type = {
-    "botan/x509_crl",
+    "botan/x509-crl",
     x509_crl_gc_fn,
     NULL,
     x509_crl_get_fn,
@@ -58,7 +58,7 @@ static JanetAbstractType x509_crl_obj_type = {
 };
 
 static JanetAbstractType x509_crl_entry_obj_type = {
-    "botan/x509_crl_entry",
+    "botan/x509-crl-entry",
     x509_crl_entry_gc_fn,
     NULL,
     x509_crl_entry_get_fn,

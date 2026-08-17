@@ -22,7 +22,7 @@ static Janet srp6_server_session_step1(int32_t argc, Janet *argv);
 static Janet srp6_server_session_step2(int32_t argc, Janet *argv);
 
 static JanetAbstractType srp6_server_session_obj_type = {
-    "botan/srp6_server_session",
+    "botan/srp6-server-session",
     srp6_server_session_gc_fn,
     NULL,
     srp6_server_session_get_fn,
