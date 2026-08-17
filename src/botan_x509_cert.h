@@ -937,7 +937,7 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv) {
 
             JanetTuple tup = janet_gettuple(argv, i+1);
             int32_t tup_len = janet_tuple_length(tup);
-            intermediates = janet_smalloc(sizeof(botan_x509_cert_obj_t) * tup_len);
+            intermediates = janet_smalloc(sizeof(botan_x509_cert_t) * tup_len);
             intermediates_len = tup_len;
             for (int j=0; j<tup_len; j++) {
                 botan_x509_cert_obj_t *p = janet_getabstract(tup, j, get_x509_cert_obj_type());
@@ -952,7 +952,7 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv) {
             JanetTuple tup = janet_gettuple(argv, i+1);
             int32_t tup_len = janet_tuple_length(tup);
 
-            trusted = janet_smalloc(sizeof(botan_x509_cert_obj_t) * tup_len);
+            trusted = janet_smalloc(sizeof(botan_x509_cert_t) * tup_len);
             trusted_len = tup_len;
             for (int j=0; j<tup_len; j++) {
                 botan_x509_cert_obj_t *p = janet_getabstract(tup, j, get_x509_cert_obj_type());
@@ -979,7 +979,7 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv) {
             JanetTuple tup = janet_gettuple(argv, i+1);
             int32_t tup_len = janet_tuple_length(tup);
 
-            crls = janet_smalloc(sizeof(botan_x509_cert_obj_t) * tup_len);
+            crls = janet_smalloc(sizeof(botan_x509_crl_t) * tup_len);
             crls_len = tup_len;
             for (int j=0; j<tup_len; j++) {
                 botan_x509_crl_obj_t *p = janet_getabstract(tup, j, get_x509_crl_obj_type());
@@ -1000,6 +1000,9 @@ static Janet x509_cert_verify(int32_t argc, Janet *argv) {
                                               required_strength,
                                               hostname,
                                               reference_time);
+    janet_sfree(intermediates);
+    janet_sfree(trusted);
+    janet_sfree(crls);
     if (ret != 0 && ret != 1) {
         JANET_BOTAN_ASSERT(ret);
     }
