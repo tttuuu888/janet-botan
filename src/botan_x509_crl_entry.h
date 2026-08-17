@@ -39,7 +39,61 @@ static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
     return janet_getmethod(janet_unwrap_keyword(key), x509_crl_entry_methods, out);
 }
 
+struct crl_reason_pair {
+    const char *name;
+    int value;
+};
+
+static struct crl_reason_pair crl_reason_table[] = {
+    {"unspecified",            0},
+    {"key-compromise",         1},
+    {"ca-compromise",          2},
+    {"affiliation-changed",    3},
+    {"superseded",             4},
+    {"cessation-of-operation", 5},
+    {"certificate-hold",       6},
+    {"remove-from-crl",        8},
+    {"privilege-withdrawn",    9},
+    {"aa-compromise",          10}
+};
+static const size_t crl_reason_table_len = sizeof(crl_reason_table)/sizeof(crl_reason_table[0]);
+
+static int crl_reason_from_janet(Janet val) {
+    if (janet_checktype(val, JANET_NUMBER)) {
+        return (int)janet_unwrap_number(val);
+    }
+    if (janet_checktype(val, JANET_KEYWORD)) {
+        JanetKeyword kw = janet_unwrap_keyword(val);
+        for (size_t i = 0; i < crl_reason_table_len; i++) {
+            if (!janet_cstrcmp(kw, crl_reason_table[i].name))
+                return crl_reason_table[i].value;
+        }
+        janet_panicf("unknown CRL reason keyword :%s, expected one of: "
+                     ":unspecified, :key-compromise, :ca-compromise, "
+                     ":affiliation-changed, :superseded, :cessation-of-operation, "
+                     ":certificate-hold, :remove-from-crl, :privilege-withdrawn, "
+                     ":aa-compromise", kw);
+    }
+    janet_panic("CRL reason must be a keyword or integer");
+    return 0;
+}
+
 /* Janet functions x509-crl-entry */
+static Janet x509_crl_entry_create(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 2);
+
+    botan_x509_cert_obj_t *cert_obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    int reason_code = crl_reason_from_janet(argv[1]);
+
+    botan_x509_crl_entry_obj_t *entry_obj = janet_abstract(&x509_crl_entry_obj_type, sizeof(botan_x509_crl_entry_obj_t));
+    memset(entry_obj, 0, sizeof(botan_x509_crl_entry_obj_t));
+
+    int ret = botan_x509_crl_entry_create(&entry_obj->entry, cert_obj->x509_cert, reason_code);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(entry_obj);
+}
+
 static Janet x509_crl_entry_reason(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
 
