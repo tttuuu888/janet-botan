@@ -23,7 +23,7 @@ static Janet pk_key_agreement_public_value(int32_t argc, Janet *argv);
 static Janet pk_key_agreement_agree(int32_t argc, Janet *argv);
 
 static JanetAbstractType pk_key_agreement_obj_type = {
-    "botan/pk-key_agreement",
+    "botan/pk-key-agreement",
     pk_key_agreement_gc_fn,
     NULL,
     pk_key_agreement_get_fn,
