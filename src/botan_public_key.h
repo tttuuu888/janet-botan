@@ -479,11 +479,15 @@ static Janet public_key_to_raw(int32_t argc, Janet *argv) {
 static Janet public_key_export(int32_t argc, Janet *argv) {
     janet_arity(argc, 1, 2);
 
-    if (argc == 2) {
+    JanetKeyword format = janet_optkeyword(argv, argc, 1, (const uint8_t *)"der");
+    if (!janet_cstrcmp(format, "pem")) {
         return public_key_to_pem(1, argv);
-    } else {
+    }
+    if (!janet_cstrcmp(format, "der")) {
         return public_key_to_der(1, argv);
     }
+
+    janet_panicf("unknown format :%s, expected :pem or :der", format);
 }
 
 static Janet public_key_check_key(int32_t argc, Janet *argv) {
@@ -718,10 +722,10 @@ static JanetReg public_key_cfuns[] = {
      "Load a Classic McEliece public key with the given `mode`."
     },
     {"pubkey/export", public_key_export,
-     "(pubkey/export pubkey &opt pem)\n\n"
+     "(pubkey/export pubkey &opt format)\n\n"
      "Exports the public key using the usual X.509 SPKI representation. "
-     "If `pem` is provided, the result is a PEM encoded string. Otherwise "
-     "it is a binary DER value."
+     "`format` is :pem for a PEM encoded string or :der for a binary DER "
+     "value, defaulting to :der."
     },
     {"pubkey/to-pem", public_key_to_pem,
      "(pubkey/to-pem pubkey)\n\n"

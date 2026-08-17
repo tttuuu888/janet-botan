@@ -594,11 +594,15 @@ static Janet private_key_algo_name(int32_t argc, Janet *argv) {
 static Janet private_key_export(int32_t argc, Janet *argv) {
     janet_arity(argc, 1, 2);
 
-    if (argc == 2) {
+    JanetKeyword format = janet_optkeyword(argv, argc, 1, (const uint8_t *)"der");
+    if (!janet_cstrcmp(format, "pem")) {
         return private_key_to_pem(1, argv);
-    } else {
+    }
+    if (!janet_cstrcmp(format, "der")) {
         return private_key_to_der(1, argv);
     }
+
+    janet_panicf("unknown format :%s, expected :pem or :der", format);
 }
 
 static Janet private_key_get_field(int32_t argc, Janet *argv) {
@@ -817,9 +821,9 @@ static JanetReg private_key_cfuns[] = {
      "Returns the algorithm name."
     },
     {"privkey/export", private_key_export,
-     "(privkey/export privkey &opt pem)\n\n"
-     "Exports the private key in PKCS8 format. If `pem` is provided, the "
-     "result is a PEM encoded string. Otherwise it is a binary DER value. "
+     "(privkey/export privkey &opt format)\n\n"
+     "Exports the private key in PKCS8 format. `format` is :pem for a PEM "
+     "encoded string or :der for a binary DER value, defaulting to :der. "
      "The key will not be encrypted."
     },
     {"privkey/get-field", private_key_get_field,
