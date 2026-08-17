@@ -121,7 +121,7 @@ static JanetReg fpe_cfuns[] = {
      "(fpe/new modulus key &opt round compat-mode)\n\n"
      "Create a new FPE instance, FE1 scheme Rounds should be 16 or higher "
      "for best security. If omitted, default value for `round` is 5, "
-     "`compact-mode` is false. Returns `fpe-obj`."
+     "`compat-mode` is false. Returns `fpe-obj`."
     },
     {"fpe/encrypt", fpe_encrypt,
      "(fpe/encrypt fpe-obj tweak)\n\n"

@@ -83,13 +83,13 @@ static Janet nist_key_unwrap(int32_t argc, Janet *argv) {
 
 static JanetReg nist_key_wrap_cfuns[] = {
     {"nist-key-wrap", nist_key_wrap,
-     "(nist_key_wrap kek key &opt cipher)\n\n"
+     "(nist-key-wrap kek key &opt cipher)\n\n"
      "This performs KW (key wrap) mode. The input must be a multiple of "
      "8 bytes long. If omitted, \"AES\" is used for `cipher`."
     },
     {"nist-key-unwrap", nist_key_unwrap,
-     "(nist_key_wrap kek wrapperd &opt cipher)\n\n"
-     "This unwraps the result of nist_key_wrap. If omitted, \"AES\" is "
+     "(nist-key-unwrap kek wrapped &opt cipher)\n\n"
+     "This unwraps the result of nist-key-wrap. If omitted, \"AES\" is "
      "used for `cipher`."
     },
     {NULL, NULL, NULL}

@@ -817,13 +817,13 @@ static JanetReg private_key_cfuns[] = {
      "Returns the algorithm name."
     },
     {"privkey/export", private_key_export,
-     "(privkey/export &opt pem)\n\n"
+     "(privkey/export privkey &opt pem)\n\n"
      "Exports the private key in PKCS8 format. If `pem` is provided, the "
      "result is a PEM encoded string. Otherwise it is a binary DER value. "
      "The key will not be encrypted."
     },
     {"privkey/get-field", private_key_get_field,
-     "(privkey/get-field filed-name)\n\n"
+     "(privkey/get-field privkey field-name)\n\n"
      "Return an integer field related to the private key. The valid field "
      "names vary depending on the algorithm. For example first RSA secret "
      "prime can be extracted with `(privkey/get-field key \"p\")`. This "

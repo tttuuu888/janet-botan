@@ -747,7 +747,7 @@ static JanetReg mpi_cfuns[] = {
      "either `mpi-obj` or u32 number."
     },
     {"mpi/mul", mpi_mul,
-     "(mpi/sub mpi-obj-1 mpi-obj-2)\n\n"
+     "(mpi/mul mpi-obj-1 mpi-obj-2)\n\n"
      "Multiply two `mpi-obj` and return the new `mpi-obj` as a result."
     },
     {"mpi/div", mpi_div,

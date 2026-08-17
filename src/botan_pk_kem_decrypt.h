@@ -125,7 +125,7 @@ static JanetReg pk_kem_decrypt_cfuns[] = {
      "is provided."
     },
     {"pk-kem-decrypt/decrypt-shared-key", pk_kem_decrypt_kem_decrypt_shared_key,
-     "pk-kem-decrypt/decrypt-shared-key op salt desired-key-len encapsulated-key)\n\n"
+     "(pk-kem-decrypt/decrypt-shared-key op salt desired-key-len encapsulated-key)\n\n"
      "Decrypt an encapsulated key and return the shared secret."
     },
 

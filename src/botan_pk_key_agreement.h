@@ -124,11 +124,11 @@ static JanetReg pk_key_agreement_cfuns[] = {
      "specified KDF."
     },
     {"pk-key-agreement/public-value", pk_key_agreement_public_value,
-     "(pk-key_agreement/public-value op)\n\n"
+     "(pk-key-agreement/public-value op)\n\n"
      "Returns the public value to be passed to the other party"
     },
     {"pk-key-agreement/agree", pk_key_agreement_agree,
-     "(pk-key_agreement/agree op other-key salt &opt key-len)\n\n"
+     "(pk-key-agreement/agree op other-key salt &opt key-len)\n\n"
      "Returns a key derived by the KDF. If `key-len` is omitted, default "
      "agreement size will be used."
     },

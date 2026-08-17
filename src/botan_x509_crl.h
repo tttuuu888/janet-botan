@@ -470,7 +470,7 @@ static JanetReg x509_crl_cfuns[] = {
      "Load a CRL from the DER or PEM representation."
     },
     {"x509-crl/load-file", x509_crl_load_file,
-     "(x509-crl/load file-name)\n\n"
+     "(x509-crl/load-file file-name)\n\n"
      "Load a CRL from a file."
     },
     {"x509-crl/this-update", x509_crl_this_update,

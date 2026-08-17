@@ -728,7 +728,7 @@ static JanetReg public_key_cfuns[] = {
      "Return the unencrypted PEM encoding of the public key."
     },
     {"pubkey/to-der", public_key_to_der,
-     "(pubkey/to-pem pubkey)\n\n"
+     "(pubkey/to-der pubkey)\n\n"
      "Return the unencrypted DER encoding of the public key."
     },
     {"pubkey/to-raw", public_key_to_raw,
@@ -742,7 +742,7 @@ static JanetReg public_key_cfuns[] = {
      "tests are performed."
     },
     {"pubkey/get-field", public_key_get_field,
-     "(pubkey/get-field pubkey filed-name)\n\n"
+     "(pubkey/get-field pubkey field-name)\n\n"
      "Return an integer field related to the public key. The valid field "
      "names vary depending on the algorithm. For example RSA public modulus "
      "can be extracted with (pubkey/get-field \"n\")."
