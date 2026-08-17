@@ -69,10 +69,8 @@ static Janet fpe_new(int32_t argc, Janet *argv) {
 
     JanetByteView key = janet_getbytes(argv, 1);
     size_t rounds = janet_optsize(argv, argc, 2, 5);
-    uint32_t flags = 0;
-    if (argc >= 4) {
-        flags = 1;
-    }
+    int compat_mode = janet_optboolean(argv, argc, 3, 0);
+    uint32_t flags = compat_mode ? 1 : 0;
 
     int ret = botan_fpe_fe1_init(&obj->fpe, mpi, key.bytes, key.len, rounds, flags);
     JANET_BOTAN_ASSERT(ret);

@@ -558,11 +558,8 @@ static Janet private_key_check_key(int32_t argc, Janet *argv) {
     botan_privkey_t key = obj->private_key;
     botan_rng_obj_t *obj_rng = janet_getabstract(argv, 1, get_rng_obj_type());
     botan_rng_t rng = obj_rng->rng;
-    uint32_t flag = 1;
-
-    if (argc == 3) {
-        flag = 0;
-    }
+    int weak = janet_optboolean(argv, argc, 2, 0);
+    uint32_t flag = weak ? 0 : 1;
 
     int ret = botan_privkey_check_key(key, rng, flag);
     return janet_wrap_boolean(ret == 0);
@@ -813,7 +810,7 @@ static JanetReg private_key_cfuns[] = {
     },
     {"privkey/check-key", private_key_check_key,
      "(privkey/check-key privkey rng &opt weak)\n\n"
-     "Test the key for consistency. If `weak` is provided then less expensive "
+     "Test the key for consistency. If `weak` is true then less expensive "
      "tests are performed."
     },
     {"privkey/algo-name", private_key_algo_name,
