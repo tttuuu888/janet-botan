@@ -160,12 +160,12 @@ static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer) {
     x509_cert_describe(obj->x509_cert, buffer);
 }
 
-struct key_usage_pair {
+struct x509_key_usage_pair {
     const char *name;
     unsigned int value;
 };
 
-static struct key_usage_pair key_usage_table[] = {
+static struct x509_key_usage_pair x509_key_usage_table[] = {
     {"no-constraints",    0},
     {"digital-signature", 32768},
     {"non-repudiation",   16384},
@@ -177,12 +177,12 @@ static struct key_usage_pair key_usage_table[] = {
     {"encipher-only",     256},
     {"decipher-only",     128}
 };
-static const size_t key_usage_table_len = sizeof(key_usage_table)/sizeof(key_usage_table[0]);
+static const size_t x509_key_usage_table_len = sizeof(x509_key_usage_table)/sizeof(x509_key_usage_table[0]);
 
-static unsigned int key_usage_from_keyword(JanetKeyword kw) {
-    for (size_t i = 0; i < key_usage_table_len; i++) {
-        if (!janet_cstrcmp(kw, key_usage_table[i].name))
-            return key_usage_table[i].value;
+static unsigned int x509_key_usage_from_keyword(JanetKeyword kw) {
+    for (size_t i = 0; i < x509_key_usage_table_len; i++) {
+        if (!janet_cstrcmp(kw, x509_key_usage_table[i].name))
+            return x509_key_usage_table[i].value;
     }
     janet_panicf("unknown key-usage keyword :%s, expected one of: "
                  ":no-constraints, :digital-signature, :non-repudiation, "
@@ -286,9 +286,9 @@ static Janet x509_cert_create_self_signed(int32_t argc, Janet *argv) {
                 int32_t len;
                 janet_indexed_view(val, &items, &len);
                 for (int32_t j = 0; j < len && constraints_count < 16; j++)
-                    constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(items, j));
+                    constraints[constraints_count++] = x509_key_usage_from_keyword(janet_getkeyword(items, j));
             } else {
-                constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(argv, i + 1));
+                constraints[constraints_count++] = x509_key_usage_from_keyword(janet_getkeyword(argv, i + 1));
             }
         } else if (!janet_cstrcmp(keyword, "ext-key-usage")) {
             Janet val = argv[i + 1];
@@ -429,9 +429,9 @@ static Janet x509_cert_issue(int32_t argc, Janet *argv) {
                 int32_t len;
                 janet_indexed_view(val, &items, &len);
                 for (int32_t j = 0; j < len && constraints_count < 16; j++)
-                    constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(items, j));
+                    constraints[constraints_count++] = x509_key_usage_from_keyword(janet_getkeyword(items, j));
             } else {
-                constraints[constraints_count++] = key_usage_from_keyword(janet_getkeyword(argv, i + 1));
+                constraints[constraints_count++] = x509_key_usage_from_keyword(janet_getkeyword(argv, i + 1));
             }
         } else if (!janet_cstrcmp(keyword, "ext-key-usage")) {
             Janet val = argv[i + 1];
@@ -887,7 +887,7 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv) {
     botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
     botan_x509_cert_t cert = obj->x509_cert;
     JanetKeyword usage = janet_getkeyword(argv, 1);
-    unsigned int key = key_usage_from_keyword(usage);
+    unsigned int key = x509_key_usage_from_keyword(usage);
 
     int ret = botan_x509_cert_allowed_usage(cert, key);
     JANET_BOTAN_ASSERT(ret);
