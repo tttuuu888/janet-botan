@@ -59,6 +59,8 @@ static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv);
 static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 static Janet x509_cert_ext_ip_addr_blocks(int32_t argc, Janet *argv);
+static Janet x509_cert_ext_as_blocks_asnum(int32_t argc, Janet *argv);
+static Janet x509_cert_ext_as_blocks_rdi(int32_t argc, Janet *argv);
 
 static JanetMethod x509_cert_methods[] = {
     {"dup", x509_cert_dup},
@@ -83,6 +85,8 @@ static JanetMethod x509_cert_methods[] = {
     {"verify", x509_cert_verify},
     {"validation-status", x509_cert_validation_status},
     {"ext-ip-addr-blocks", x509_cert_ext_ip_addr_blocks},
+    {"ext-as-blocks-asnum", x509_cert_ext_as_blocks_asnum},
+    {"ext-as-blocks-rdi", x509_cert_ext_as_blocks_rdi},
     {NULL, NULL},
 };
 
@@ -1097,6 +1101,54 @@ static Janet x509_cert_ext_ip_addr_blocks(int32_t argc, Janet *argv) {
     return janet_wrap_tuple(janet_tuple_n(families->data, families->count));
 }
 
+static Janet x509_cert_get_as_blocks_values(botan_x509_cert_t cert, int asnum) {
+    int present = 0;
+    size_t count = 0;
+
+    int ret = botan_x509_ext_as_blocks_get_info(cert, asnum, &present, &count);
+    if (ret == BOTAN_FFI_ERROR_NO_VALUE) {
+        return janet_wrap_nil();
+    }
+
+    JANET_BOTAN_ASSERT(ret);
+
+    if (present == 0) {
+        return janet_ckeywordv("inherit");
+    }
+
+    Janet *values = janet_tuple_begin((int32_t)count);
+    for (size_t i=0; i<count; i++) {
+        uint32_t min_val = 0;
+        uint32_t max_val = 0;
+
+        ret = botan_x509_ext_as_blocks_get_entry_at(cert, asnum, i, &min_val, &max_val);
+        JANET_BOTAN_ASSERT(ret);
+
+        Janet tup[2] = {janet_wrap_number((double)min_val), janet_wrap_number((double)max_val)};
+        values[i] = janet_wrap_tuple(janet_tuple_n(tup, 2));
+    }
+
+    return janet_wrap_tuple(janet_tuple_end(values));
+}
+
+static Janet x509_cert_ext_as_blocks_asnum(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    return x509_cert_get_as_blocks_values(cert, 1);
+}
+
+static Janet x509_cert_ext_as_blocks_rdi(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    return x509_cert_get_as_blocks_values(cert, 0);
+}
+
 static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/create-self-signed", x509_cert_create_self_signed,
      "(x509-cert/create-self-signed key &keys {:rng rng :hash hash "
@@ -1330,6 +1382,20 @@ static JanetReg x509_cert_cfuns[] = {
      "     {:version :v6 :safi nil :ranges :inherit}]\n\n"
      "describes one IPv4 family with a single range and one IPv6 family "
      "that inherits from its issuer."
+    },
+    {"x509-cert/ext-as-blocks-asnum", x509_cert_ext_as_blocks_asnum,
+     "(x509-cert/ext-as-blocks-asnum cert-obj)\n\n"
+     "Get the AS numbers from the AS Blocks extension.\n\n"
+     "Returns :inherit if the AS numbers are inherited from the issuer, or "
+     "nil if the extension or the field is absent. Otherwise returns a tuple "
+     "of [min max] ranges, for example [[0 999] [65536 65551]]."
+    },
+    {"x509-cert/ext-as-blocks-rdi", x509_cert_ext_as_blocks_rdi,
+     "(x509-cert/ext-as-blocks-rdi cert-obj)\n\n"
+     "Get the routing domain identifiers from the AS Blocks extension. "
+     "Returns :inherit if the identifiers are inherited from the issuer, or "
+     "nil if the extension or the field is absent. Otherwise returns a tuple "
+     "of [min max] ranges, for example [[0 999] [65536 65551]]."
     },
 
     {NULL, NULL, NULL}

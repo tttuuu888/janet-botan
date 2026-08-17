@@ -149,7 +149,7 @@ e8BeRHCpaJGitg==
   (assert (not (:allowed-ext-usage cert2 "PKIX.CodeSigning"))))
 
 (let [crl (x509-crl/load crl-pem)
-     cert (x509-cert/load cert-pem2)]
+      cert (x509-cert/load cert-pem2)]
   (assert (:is-revoked crl cert))
   (assert (> (:this-update crl) 0))
   (assert (> (:next-update crl) (:this-update crl)))
@@ -341,29 +341,49 @@ e8BeRHCpaJGitg==
     # The DER holds six families; the two adjacent unicast ranges
     # 192.168.0.0-192.168.2.1 and 192.168.2.2-200.0.0.0 merge into one.
     (assert (= (length blocks) 5))
-    (assert (deep= blocks
-                   [{:version :v4 :ranges :inherit}
-                    {:version :v4 :safi 1 :ranges [["192.168.0.0" "200.0.0.0"]]}
-                    {:version :v4 :safi 2 :ranges :inherit}
-                    {:version :v6 :ranges [[v6-max v6-max]]}
-                    {:version :v6 :safi 1 :ranges :inherit}]))
-  (assert (= (x509-cert/ext-ip-addr-blocks ip-cert)
-             (:ext-ip-addr-blocks ip-cert)))
+    (assert (= blocks
+               [{:version :v4 :ranges :inherit}
+                {:version :v4 :safi 1 :ranges [["192.168.0.0" "200.0.0.0"]]}
+                {:version :v4 :safi 2 :ranges :inherit}
+                {:version :v6 :ranges [[v6-max v6-max]]}
+                {:version :v6 :safi 1 :ranges :inherit}]))
+    (assert (= (x509-cert/ext-ip-addr-blocks ip-cert)
+               (:ext-ip-addr-blocks ip-cert)))
 
-  (assert (= (x509-cert/ext-ip-addr-blocks ip-all-cert)
-             [{:version :v4
-               :ranges [["192.168.0.0" "192.168.127.255"]
-                        ["193.168.0.0" "193.169.255.255"]
-                        ["194.168.0.0" "195.175.1.2"]
-                        ["196.168.0.1" "196.168.0.1"]]}
-              {:version :v6
-               :ranges [["2003:0:6829:3435:420:10c5:0:c4"
-                         "2003:0:6829:3435:420:10c5:0:c4"]
-                        ["ab01::1" "cd02::2"]
-                        ["fa80::" "fa80::7fff:ffff:ffff:ffff"]
-                        ["fe20::" "fe20:0:7ff:ffff:ffff:ffff:ffff:ffff"]]}]))
+    (assert (= (x509-cert/ext-ip-addr-blocks ip-all-cert)
+               [{:version :v4
+                   :ranges [["192.168.0.0" "192.168.127.255"]
+                            ["193.168.0.0" "193.169.255.255"]
+                            ["194.168.0.0" "195.175.1.2"]
+                            ["196.168.0.1" "196.168.0.1"]]}
+                {:version :v6
+                   :ranges [["2003:0:6829:3435:420:10c5:0:c4"
+                             "2003:0:6829:3435:420:10c5:0:c4"]
+                            ["ab01::1" "cd02::2"]
+                            ["fa80::" "fa80::7fff:ffff:ffff:ffff"]
+                            ["fe20::" "fe20:0:7ff:ffff:ffff:ffff:ffff:ffff"]]}]))
 
-  (assert (nil? (x509-cert/ext-ip-addr-blocks no-ext-cert)))
-  (assert (nil? (x509-cert/ext-ip-addr-blocks as-cert)))))
+    (assert (nil? (x509-cert/ext-ip-addr-blocks no-ext-cert)))
+    (assert (nil? (x509-cert/ext-ip-addr-blocks as-cert))))
+
+  (let [full-range [[0 4294967295]]]
+    (assert (= (x509-cert/ext-as-blocks-asnum as-cert) full-range))
+    (assert (= (x509-cert/ext-as-blocks-rdi as-cert) full-range))
+
+    (assert (= (x509-cert/ext-as-blocks-asnum as-inherit-cert) :inherit))
+    (assert (= (x509-cert/ext-as-blocks-rdi as-inherit-cert) full-range))
+
+    (assert (nil? (x509-cert/ext-as-blocks-asnum as-rdi-cert)))
+    (assert (= (x509-cert/ext-as-blocks-rdi as-rdi-cert) full-range)))
+
+  (assert (= (x509-cert/ext-as-blocks-asnum as-cert)
+             (:ext-as-blocks-asnum as-cert)))
+  (assert (= (x509-cert/ext-as-blocks-rdi as-cert)
+             (:ext-as-blocks-rdi as-cert)))
+
+  # both asnum and rdi are nil when the extension itself is missing
+  (each cert [no-ext-cert ip-cert]
+    (assert (nil? (x509-cert/ext-as-blocks-asnum cert)))
+    (assert (nil? (x509-cert/ext-as-blocks-rdi cert)))))
 
 (end-suite)
