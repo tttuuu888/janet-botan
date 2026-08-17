@@ -200,25 +200,6 @@ static void x509_crl_tostring_fn(void *p, JanetBuffer *buffer) {
     x509_crl_describe(obj->x509_crl, buffer);
 }
 
-/* Abstract Object functions x509-crl-entry */
-static int x509_crl_entry_gc_fn(void *data, size_t len) {
-    botan_x509_crl_entry_obj_t *obj = (botan_x509_crl_entry_obj_t *)data;
-
-    int ret = botan_x509_crl_entry_destroy(obj->entry);
-    JANET_BOTAN_ASSERT(ret);
-
-    return 0;
-}
-
-static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out) {
-    (void)data;
-    if (!janet_checktype(key, JANET_KEYWORD)) {
-        return 0;
-    }
-
-    return janet_getmethod(janet_unwrap_keyword(key), x509_crl_entry_methods, out);
-}
-
 struct crl_reason_pair {
     const char *name;
     int value;
@@ -370,42 +351,6 @@ static Janet x509_crl_get_entry(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(entry_obj);
-}
-
-static Janet x509_crl_entry_reason(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-
-    botan_x509_crl_entry_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_entry_obj_type());
-    int reason_code;
-
-    int ret = botan_x509_crl_entry_reason(obj->entry, &reason_code);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_number((double)reason_code);
-}
-
-static Janet x509_crl_entry_revocation_date(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-
-    botan_x509_crl_entry_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_entry_obj_type());
-    uint64_t time_since_epoch;
-
-    int ret = botan_x509_crl_entry_revocation_date(obj->entry, &time_since_epoch);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_number((double)time_since_epoch);
-}
-
-static Janet x509_crl_entry_serial_number(int32_t argc, Janet *argv) {
-    janet_fixarity(argc, 1);
-
-    botan_x509_crl_entry_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_entry_obj_type());
-
-    view_data_t data;
-    int ret = botan_x509_crl_entry_view_serial_number(obj->entry, &data, (botan_view_bin_fn)view_bin_func);
-    JANET_BOTAN_ASSERT(ret);
-
-    return janet_wrap_string(janet_string(data.data, data.len));
 }
 
 static Janet x509_crl_is_revoked(int32_t argc, Janet *argv) {

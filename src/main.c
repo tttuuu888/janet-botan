@@ -46,6 +46,7 @@
 #include "botan_x509_common.h"
 #include "botan_x509_cert.h"
 #include "botan_x509_crl.h"
+#include "botan_x509_crl_entry.h"
 #include "botan_srp6_server_session.h"
 #include "botan_zfec.h"
 

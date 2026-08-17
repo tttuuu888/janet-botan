@@ -59,12 +59,6 @@ static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv);
 static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
 
-/* Janet functions x509-crl-entry */
-static Janet x509_crl_entry_create(int32_t argc, Janet *argv);
-static Janet x509_crl_entry_reason(int32_t argc, Janet *argv);
-static Janet x509_crl_entry_revocation_date(int32_t argc, Janet *argv);
-static Janet x509_crl_entry_serial_number(int32_t argc, Janet *argv);
-
 static JanetMethod x509_cert_methods[] = {
     {"dup", x509_cert_dup},
     {"to-pem", x509_cert_to_pem},
@@ -87,13 +81,6 @@ static JanetMethod x509_cert_methods[] = {
     {"allowed-ext-usage", x509_cert_allowed_ext_usage},
     {"verify", x509_cert_verify},
     {"validation-status", x509_cert_validation_status},
-    {NULL, NULL},
-};
-
-static JanetMethod x509_crl_entry_methods[] = {
-    {"reason", x509_crl_entry_reason},
-    {"revocation-date", x509_crl_entry_revocation_date},
-    {"serial-number", x509_crl_entry_serial_number},
     {NULL, NULL},
 };
 
@@ -1252,56 +1239,9 @@ static JanetReg x509_cert_cfuns[] = {
     {NULL, NULL, NULL}
 };
 
-static JanetReg x509_crl_entry_cfuns[] = {
-    {"x509-crl-entry/create", x509_crl_entry_create,
-     "(x509-crl-entry/create cert reason)\n\n"
-     "Create a CRL entry for the given certificate with a revocation reason.\n\n"
-     "* `cert` - The certificate to mark as revoked.\n\n"
-     "* `reason` - The revocation reason, either an integer or a keyword:\n\n"
-     "  0: :unspecified\n\n"
-     "  1: :key-compromise\n\n"
-     "  2: :ca-compromise\n\n"
-     "  3: :affiliation-changed\n\n"
-     "  4: :superseded\n\n"
-     "  5: :cessation-of-operation\n\n"
-     "  6: :certificate-hold\n\n"
-     "  8: :remove-from-crl\n\n"
-     "  9: :privilege-withdrawn\n\n"
-     "  10: :aa-compromise"
-    },
-    {"x509-crl-entry/reason", x509_crl_entry_reason,
-     "(x509-crl-entry/reason crl-entry)\n\n"
-     "Return the revocation reason code for the CRL entry.\n\n"
-     "0: Unspecified\n\n"
-     "1: Key Compromise\n\n"
-     "2: CA Compromise\n\n"
-     "3: Affiliation Changed\n\n"
-     "4: Superseded\n\n"
-     "5: Cessation of Operation\n\n"
-     "6: Certificate Hold\n\n"
-     "8: Remove from CRL\n\n"
-     "9: Privilege Withdrawn\n\n"
-     "10: AA Compromise"
-    },
-    {"x509-crl-entry/revocation-date", x509_crl_entry_revocation_date,
-     "(x509-crl-entry/revocation-date crl-entry)\n\n"
-     "Return the revocation date as seconds since epoch."
-    },
-    {"x509-crl-entry/serial-number", x509_crl_entry_serial_number,
-     "(x509-crl-entry/serial-number crl-entry)\n\n"
-     "Return the serial number of the revoked certificate."
-    },
-    {NULL, NULL, NULL}
-};
-
 static void submod_x509_cert(JanetTable *env) {
     janet_cfuns(env, "botan", x509_cert_cfuns);
     janet_register_abstract_type(get_x509_cert_obj_type());
-}
-
-static void submod_x509_crl_entry(JanetTable *env) {
-    janet_cfuns(env, "botan", x509_crl_entry_cfuns);
-    janet_register_abstract_type(get_x509_crl_entry_obj_type());
 }
 
 #endif /* BOTAN_X509_CERT_H */
