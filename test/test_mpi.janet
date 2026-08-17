@@ -16,7 +16,7 @@
       mpi9  (assert (:lshift mpi1 1))]
   (assert (= (mpi/new) (mpi/new 0)))
   (assert (= mpi1 mpi2 mpi3 mpi4 mpi5))
-  (assert (not (= mpi6 mpi7 mpi8)))
+  (assert (not= mpi6 mpi7 mpi8))
   (assert (< mpi1 mpi6))
   (assert (not (:is-zero mpi1)))
   (assert (:is-zero mpi8))
@@ -71,7 +71,7 @@
 
 (let [mpi1 (mpi/new-random 10)
       mpi2 (mpi/new-random 10 (rng/new))]
-  (assert (not (= mpi1 mpi2))))
+  (assert (not= mpi1 mpi2)))
 
 # Test num-bits
 (let [mpi (mpi/new "255")]

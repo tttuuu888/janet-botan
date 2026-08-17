@@ -9,7 +9,7 @@
       g (assert (ec-point/generator grp))]
   (assert (:is-identity id))
   (assert (not (:is-identity g)))
-  (assert (deep-not= id g)))
+  (assert (not= id g)))
 
 # from-xy with the group's generator coordinates equals generator
 (let [grp (ec-group/from-name "secp256r1")

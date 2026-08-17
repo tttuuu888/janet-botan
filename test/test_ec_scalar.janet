@@ -8,7 +8,7 @@
       s1 (assert (ec-scalar/random grp rng))
       s2 (assert (ec-scalar/random grp rng))]
   # Two random scalars are extremely unlikely to be equal
-  (assert (deep-not= (:to-mp s1) (:to-mp s2))))
+  (assert (not= (:to-mp s1) (:to-mp s2))))
 
 # from-mp / to-mp round trip
 (let [grp (ec-group/from-name "secp256r1")
