@@ -43,7 +43,9 @@
 #include "botan_hotp.h"
 #include "botan_totp.h"
 #include "botan_nist_key_wrap.h"
+#include "botan_x509_common.h"
 #include "botan_x509_cert.h"
+#include "botan_x509_crl.h"
 #include "botan_srp6_server_session.h"
 #include "botan_zfec.h"
 
@@ -80,6 +82,7 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_nist_key_wrap(env);
     submod_x509_cert(env);
     submod_x509_crl(env);
+    submod_x509_crl_entry(env);
     submod_srp6_server_session(env);
     submod_zfec(env);
 }
