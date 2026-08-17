@@ -34,7 +34,7 @@ static Janet zfec_encode(int32_t argc, Janet *argv) {
         tup[i] = janet_wrap_string(janet_string(encoded[i], block_size));
     }
 
-    return janet_wrap_tuple(janet_tuple_n(tup, n));
+    return janet_wrap_tuple(janet_tuple_end(tup));
 }
 
 static Janet zfec_decode(int32_t argc, Janet *argv) {
@@ -83,7 +83,7 @@ static Janet zfec_decode(int32_t argc, Janet *argv) {
         tup[i] = janet_wrap_string(janet_string(decoded[i], share_size));
     }
 
-    return janet_wrap_tuple(janet_tuple_n(tup, k));
+    return janet_wrap_tuple(janet_tuple_end(tup));
 }
 
 static JanetReg zfec_cfuns[] = {
