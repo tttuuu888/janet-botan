@@ -7,32 +7,6 @@
 #ifndef BOTAN_X509_CERT_H
 #define BOTAN_X509_CERT_H
 
-typedef struct botan_x509_cert_obj {
-    botan_x509_cert_t x509_cert;
-} botan_x509_cert_obj_t;
-
-typedef struct botan_x509_crl_obj {
-    botan_x509_crl_t x509_crl;
-} botan_x509_crl_obj_t;
-
-typedef struct botan_x509_crl_entry_obj {
-    botan_x509_crl_entry_t entry;
-} botan_x509_crl_entry_obj_t;
-
-/* Abstract Object functions x509-cert */
-static int x509_cert_gc_fn(void *data, size_t len);
-static int x509_cert_get_fn(void *data, Janet key, Janet *out);
-static void x509_cert_tostring_fn(void *p, JanetBuffer *buffer);
-
-/* Abstract Object functions x509-crl */
-static int x509_crl_gc_fn(void *data, size_t len);
-static int x509_crl_get_fn(void *data, Janet key, Janet *out);
-static void x509_crl_tostring_fn(void *p, JanetBuffer *buffer);
-
-/* Abstract Object functions x509-crl-entry */
-static int x509_crl_entry_gc_fn(void *data, size_t len);
-static int x509_crl_entry_get_fn(void *data, Janet key, Janet *out);
-
 /* External C++ functions for x509 cert creation */
 extern int jbotan_x509_crl_to_pem(
     botan_x509_crl_t crl, botan_view_ctx ctx, botan_view_str_fn view);
@@ -107,38 +81,6 @@ static Janet x509_crl_entry_reason(int32_t argc, Janet *argv);
 static Janet x509_crl_entry_revocation_date(int32_t argc, Janet *argv);
 static Janet x509_crl_entry_serial_number(int32_t argc, Janet *argv);
 
-static JanetAbstractType x509_cert_obj_type = {
-    "botan/x509_cert",
-    x509_cert_gc_fn,
-    NULL,
-    x509_cert_get_fn,
-    NULL,                       /* put */
-    NULL,                       /* marshal */
-    NULL,                       /* unmarshal */
-    x509_cert_tostring_fn,
-    JANET_ATEND_TOSTRING
-};
-
-static JanetAbstractType x509_crl_obj_type = {
-    "botan/x509_crl",
-    x509_crl_gc_fn,
-    NULL,
-    x509_crl_get_fn,
-    NULL,                       /* put */
-    NULL,                       /* marshal */
-    NULL,                       /* unmarshal */
-    x509_crl_tostring_fn,
-    JANET_ATEND_TOSTRING
-};
-
-static JanetAbstractType x509_crl_entry_obj_type = {
-    "botan/x509_crl_entry",
-    x509_crl_entry_gc_fn,
-    NULL,
-    x509_crl_entry_get_fn,
-    JANET_ATEND_GET
-};
-
 static JanetMethod x509_cert_methods[] = {
     {"dup", x509_cert_dup},
     {"to-pem", x509_cert_to_pem},
@@ -183,18 +125,6 @@ static JanetMethod x509_crl_methods[] = {
     {"verify", x509_crl_verify},
     {NULL, NULL},
 };
-
-static JanetAbstractType *get_x509_cert_obj_type() {
-    return &x509_cert_obj_type;
-}
-
-static JanetAbstractType *get_x509_crl_obj_type() {
-    return &x509_crl_obj_type;
-}
-
-static JanetAbstractType *get_x509_crl_entry_obj_type() {
-    return &x509_crl_entry_obj_type;
-}
 
 /* Abstract Object functions x509-cert */
 static int x509_cert_gc_fn(void *data, size_t len) {
