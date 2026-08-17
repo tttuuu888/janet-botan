@@ -87,6 +87,7 @@
 
   (let [pri2 (privkey/load enc-der passphrase)]
     (assert (= (:algo-name pri2) "Ed25519"))
+    (assert (= (privkey/algo-name pri2) "Ed25519"))
     (assert (= (:to-raw pri) (:to-raw pri2))))
 
   (let [pri3 (privkey/load enc-pem passphrase)]

@@ -812,7 +812,7 @@ static JanetReg private_key_cfuns[] = {
      "Test the key for consistency. If `weak` is provided then less expensive "
      "tests are performed."
     },
-    {"privkey/algo-name", private_key_check_key,
+    {"privkey/algo-name", private_key_algo_name,
      "(privkey/algo-name privkey)\n\n"
      "Returns the algorithm name."
     },
