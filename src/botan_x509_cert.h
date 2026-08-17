@@ -58,6 +58,7 @@ static Janet x509_cert_allowed_usage(int32_t argc, Janet *argv);
 static Janet x509_cert_allowed_ext_usage(int32_t argc, Janet *argv);
 static Janet x509_cert_verify(int32_t argc, Janet *argv);
 static Janet x509_cert_validation_status(int32_t argc, Janet *argv);
+static Janet x509_cert_ext_ip_addr_blocks(int32_t argc, Janet *argv);
 
 static JanetMethod x509_cert_methods[] = {
     {"dup", x509_cert_dup},
@@ -81,6 +82,7 @@ static JanetMethod x509_cert_methods[] = {
     {"allowed-ext-usage", x509_cert_allowed_ext_usage},
     {"verify", x509_cert_verify},
     {"validation-status", x509_cert_validation_status},
+    {"ext-ip-addr-blocks", x509_cert_ext_ip_addr_blocks},
     {NULL, NULL},
 };
 
@@ -1020,6 +1022,81 @@ static Janet x509_cert_validation_status(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string((const uint8_t *)ret, strlen(ret)));
 }
 
+static Janet x509_format_ip_address(const uint8_t *bytes, size_t len) {
+    char buf[INET6_ADDRSTRLEN];
+    int family = (len == 16) ? AF_INET6 : AF_INET;
+
+    if (!inet_ntop(family, bytes, buf, sizeof(buf))) {
+        janet_panic("unable to format IP address");
+    }
+
+    return janet_cstringv(buf);
+}
+
+static Janet x509_cert_ext_ip_addr_blocks(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+
+    botan_x509_cert_obj_t *obj = janet_getabstract(argv, 0, get_x509_cert_obj_type());
+    botan_x509_cert_t cert = obj->x509_cert;
+
+    size_t v4_count = 0;
+    size_t v6_count = 0;
+    int ret = botan_x509_ext_ip_addr_blocks_get_counts(cert, &v4_count, &v6_count);
+    if (ret == BOTAN_FFI_ERROR_NO_VALUE) {
+        return janet_wrap_nil();
+    }
+    JANET_BOTAN_ASSERT(ret);
+
+    JanetArray *families = janet_array((int32_t)(v4_count + v6_count));
+
+    for (int ipv6 = 0; ipv6 < 2; ipv6++) {
+        size_t family_count = ipv6 ? v6_count : v4_count;
+
+        for (size_t i = 0; i < family_count; i++) {
+            int has_safi = 0;
+            uint8_t safi = 0;
+            int present = 0;
+            size_t range_count = 0;
+
+            ret = botan_x509_ext_ip_addr_blocks_get_family(cert, ipv6, i, &has_safi,
+                                                           &safi, &present, &range_count);
+            JANET_BOTAN_ASSERT(ret);
+
+            Janet ranges = janet_ckeywordv("inherit");
+            if (present) {
+                JanetArray *arr = janet_array((int32_t)range_count);
+
+                for (size_t j = 0; j < range_count; j++) {
+                    uint8_t min_addr[16];
+                    uint8_t max_addr[16];
+                    size_t addr_len = sizeof(min_addr);
+
+                    ret = botan_x509_ext_ip_addr_blocks_get_address(cert, ipv6, i, j, min_addr,
+                                                                    max_addr, &addr_len);
+                    JANET_BOTAN_ASSERT(ret);
+
+                    Janet range[2] = {x509_format_ip_address(min_addr, addr_len),
+                                      x509_format_ip_address(max_addr, addr_len)};
+                    janet_array_push(arr, janet_wrap_tuple(janet_tuple_n(range, 2)));
+                }
+
+                ranges = janet_wrap_tuple(janet_tuple_n(arr->data, arr->count));
+            }
+
+            JanetKV *family = janet_struct_begin(3);
+            janet_struct_put(family, janet_ckeywordv("version"),
+                             janet_ckeywordv(ipv6 ? "v6" : "v4"));
+            janet_struct_put(family, janet_ckeywordv("safi"),
+                             has_safi ? janet_wrap_integer(safi) : janet_wrap_nil());
+            janet_struct_put(family, janet_ckeywordv("ranges"), ranges);
+
+            janet_array_push(families, janet_wrap_struct(janet_struct_end(family)));
+        }
+    }
+
+    return janet_wrap_tuple(janet_tuple_n(families->data, families->count));
+}
+
 static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/create-self-signed", x509_cert_create_self_signed,
      "(x509-cert/create-self-signed key &keys {:rng rng :hash hash "
@@ -1237,6 +1314,22 @@ static JanetReg x509_cert_cfuns[] = {
     {"x509-cert/validation-status", x509_cert_validation_status,
      "(x509-cert/validation-status error-code)\n\n"
      "Return an informative string explaining the verification return code."
+    },
+    {"x509-cert/ext-ip-addr-blocks", x509_cert_ext_ip_addr_blocks,
+     "(x509-cert/ext-ip-addr-blocks cert-obj)\n\n"
+     "Get values from the IP Address Blocks extension.\n\n"
+     "Returns a tuple of address families, or nil if the extension is absent. "
+     "Each family is a struct with the following keys:\n\n"
+     "* `:version` - :v4 or :v6\n\n"
+     "* `:safi` - the SAFI as an integer, or nil if the family has none\n\n"
+     "* `:ranges` - :inherit if the family inherits its ranges from the "
+     "issuer, otherwise a tuple of [min max] address pairs, each address "
+     "a string\n\n"
+     "For example,\n\n"
+     "    [{:version :v4 :safi 1 :ranges [[\"192.168.0.0\" \"200.0.0.0\"]]}\n"
+     "     {:version :v6 :safi nil :ranges :inherit}]\n\n"
+     "describes one IPv4 family with a single range and one IPv6 family "
+     "that inherits from its issuer."
     },
 
     {NULL, NULL, NULL}

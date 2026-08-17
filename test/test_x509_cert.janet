@@ -59,6 +59,89 @@ Y7wGfXPSUXOIN/kwdGObaQspbiSFewV7HBRH7J74BnK3RUjdtruA9hFBQ/Ga/nMq
 knl2gdOvpiIRf3P4HjNPPYgDiqE=
 -----END CERTIFICATE-----`)
 
+# From IPAddrBlocksUnsorted.pem
+(def ip-addr-blocks-unsorted-pem `-----BEGIN CERTIFICATE-----
+MIICqzCCAmKgAwIBAgIRANPort9DlhqMt2QI6bFLA+IwCgYIKoZIzj0EAwIwSTEQ
+MA4GA1UEAxMHVGVzdCBDQTELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUJvdGFuIFBy
+b2plY3QxEDAOBgNVBAsTB1Rlc3RpbmcwHhcNMjUwNjE0MTkxNjEzWhcNMjYwNjE0
+MTkxNjEzWjBJMRAwDgYDVQQDEwdUZXN0IENBMQswCQYDVQQGEwJVUzEWMBQGA1UE
+ChMNQm90YW4gUHJvamVjdDEQMA4GA1UECxMHVGVzdGluZzBJMBMGByqGSM49AgEG
+CCqGSM49AwEBAzIABN0stcHCSpEww/+tZrO2Uv36ZJmjLel058Rdr5tdShPCNEmy
+MeXB+cGQ1kWVMh+sp6OCATkwggE1MHMGCCsGAQUFBwEHBGcwZTAHBAMAAgEFADAZ
+BAIAAjATAxEA/////////////////////zAHBAMAAQIFADAVBAMAAQEwDjAMAwMD
+wKgDBQHAqAIAMBcEAwABATAQMA4DBQHAqAICAwUAyAAAADAGBAIAAQUAMCEGA1Ud
+DgQaBBgub8YveBEYQ3Q3XbeiHtrh38tnkuzOOtQwDgYDVR0PAQH/BAQDAgGGMFIG
+A1UdEQRLMEmBFXRlc3RpbmdAcmFuZG9tYml0Lm5ldIITYm90YW4ucmFuZG9tYml0
+Lm5ldIYbaHR0cHM6Ly9ib3Rhbi5yYW5kb21iaXQubmV0MBIGA1UdEwEB/wQIMAYB
+Af8CAQEwIwYDVR0jBBwwGoAYLm/GL3gRGEN0N123oh7a4d/LZ5LszjrUMAoGCCqG
+SM49BAMCAzcAMDQCGF6Idq8d0ibVHxOTBA7xzFrquTz7crUfBAIYMNxljBJPw+CX
+VaIdhfLji2fOE9P8vx9O
+-----END CERTIFICATE-----`)
+
+# From IPAddrBlocksAll.pem
+(def ip-addr-blocks-all-pem `-----BEGIN CERTIFICATE-----
+MIID2TCCAsGgAwIBAgIIDCV8W/5Tqq8wDQYJKoZIhvcNAQELBQAwYTENMAsGA1UE
+AxMEWk9SQjELMAkGA1UEBhMCREUxDTALBgNVBAgTBFRodXIxEzARBgNVBAoTClRV
+IElsbWVuYXUxHzAdBgNVBAsTFlRlbGVtYXRpay9SZWNobmVybmV0emUwHhcNMjQx
+MDAyMTIxMDM4WhcNMjcxMDAyMTIxMDM4WjBhMQ0wCwYDVQQDEwRaT1JCMQswCQYD
+VQQGEwJERTENMAsGA1UECBMEVGh1cjETMBEGA1UEChMKVFUgSWxtZW5hdTEfMB0G
+A1UECxMWVGVsZW1hdGlrL1JlY2huZXJuZXR6ZTCCASIwDQYJKoZIhvcNAQEBBQAD
+ggEPADCCAQoCggEBAKS8eqobCYN9/Gj41lEVvYxkBBj0tWTVKCavNRPtAPpATsbO
+hGEDO0Cvt2WZZMBTjXdiCjJkdy8aHfsg4SDOK9GUlxCAR7jL1XfFeHE2Q2CWBM8J
+NDk+Kx7Nxj1TBY//rTf2gPiu/CDMQPpihTH0kGUw+dR2zybjj0d3h1nQAiVWaauf
+A+QZ1qcgpXpSp9r0Jds+GzCW9119oglPVMgbQGR8ExO9/gU3VS15MowZ+lonGCa7
+KSd8rO+rUbDvdZ3Gu3C00yR8Dsft4/1YqSYtdeKD87AdGu3wkx62Ia4lwarjWYwE
+mmbOzEXddy/rM7eFEgCIPecxk/8eMb3MxB1Y2tsCAwEAAaOBlDCBkTCBjgYIKwYB
+BQUHAQcEgYEwfzAmBAIAATAgAwQHwKgAAwMBwagwDAMDA8KoAwUAw68BAgMFAMSo
+AAEwVQQCAAIwTwMKB/qAAAAAAAAAAAMGA/4gAAAAAxEAIAMAAGgpNDUEIBDFAAAA
+xDAmAxEAqwEAAAAAAAAAAAAAAAAAAQMRAM0CAAAAAAAAAAAAAAAAAAIwDQYJKoZI
+hvcNAQELBQADggEBAA1vysHUycl6/ij2b6pXlvei4Qni1laHGJT/8b2YW2Q3U0uc
+V4WMy+nKR9/IDpFc03kZW9ihe7zbbJcoINaKq3UTfEeMcLbzDSzFFaKUANv/C2vx
+sUihUo1ojle4EmmVYyYXeiZiu+46aUzuUJuWddTs4kJdNUxFkTKMmhdiGSosGKvz
+wRqXj5pG1iEQZmZYDWrricVFkGuwcbAbWTtQqh+cSTt+1sKi4FwL6kkCH9kG5D+1
+/zugVwhXRgguSmqMixpNowMmiDJggzIruGGeJc3ubKuvAnRJmW4VZCXXbVDNAPXi
+HDOjomC4OO17uOrWnLht/oiJ+VUhjkFtorO2RLY=
+-----END CERTIFICATE-----`)
+
+# From ASNumberCert.pem
+(def as-number-cert-pem `-----BEGIN CERTIFICATE-----
+MIIBqDCCAU6gAwIBAgIRALPImt78hhfZi1Y9pXp9uPkwCgYIKoZIzj0EAwIwADAe
+Fw0yNDEwMjExNDQ1MTBaFw0yNTEwMjExNDQ1MTBaMAAwWTATBgcqhkjOPQIBBggq
+hkjOPQMBBwNCAAQYLa6kWGm3hE1ug3BVUaui+Ui013pu/ZTeCKYU++tQEjGydJyO
+UCzFDjuMZgu76+iaGWfa0PlN2pPFoIQoJduAo4GoMIGlME0GCCsGAQUFBwEIAQH/
+BD4wPKAbMBkwBwIBAAICA+cCAhOyMAoCAQACBQD/////oR0wGzAIAgIE0gICFi4C
+AwCAADAKAgEAAgUA/////zAhBgNVHQ4EGgQYGz6Wu2X5h8+j64aiGIj9ts4i+J6R
+lBMHMAwGA1UdEwEB/wQCMAAwIwYDVR0jBBwwGoAYGz6Wu2X5h8+j64aiGIj9ts4i
++J6RlBMHMAoGCCqGSM49BAMCA0gAMEUCIG+x6GaNAKDT2Gs9Jh7rTtAd8KAP/MCC
+orUYhAug4kzQAiEApwyX0MvUoZV9fUg0AyN79OCbt0XPneyjdwYPSk3nmyI=
+-----END CERTIFICATE-----`)
+
+# From ASNumberInherit.pem
+(def as-number-inherit-pem `-----BEGIN CERTIFICATE-----
+MIIBiTCCATCgAwIBAgIRAIxkvUFe24qH+RH0D814mEswCgYIKoZIzj0EAwIwADAe
+Fw0yNDEwMjIxMDQwMTNaFw0yNTEwMjIxMDQwMTNaMAAwWTATBgcqhkjOPQIBBggq
+hkjOPQMBBwNCAAS8OgRLt85kZt8M5MGKcwXyOkUXoylpsp3gKVnQukeEVUPzhYUT
+t/nAC9s6tlqQx06aLo4NMpC/ZiLjfqRoh7/Co4GKMIGHMC8GCCsGAQUFBwEIAQH/
+BCAwHqACBQChGDAWMAgCAgTSAgIWLjAKAgEAAgUA/////zAhBgNVHQ4EGgQYEekx
+OowtPJb0QL2dSh4YuqEhfAEZh6g6MAwGA1UdEwEB/wQCMAAwIwYDVR0jBBwwGoAY
+EekxOowtPJb0QL2dSh4YuqEhfAEZh6g6MAoGCCqGSM49BAMCA0cAMEQCIG5s6rM9
+fpV76Ydij83G5dfNw8xq/PKohCQAsRc5BFP1AiANm2/BiqB6yzNO3t+1PFdjgpFu
+8zYpwnxA4Q4yEvKDxg==
+-----END CERTIFICATE-----`)
+
+# From ASRdiOnly.pem
+(def as-rdi-only-pem `-----BEGIN CERTIFICATE-----
+MIIBhjCCASygAwIBAgIRANz2VZ/ccV2i/GgObA+fDU4wCgYIKoZIzj0EAwIwADAe
+Fw0yNDEwMjIxMDM5MjZaFw0yNTEwMjIxMDM5MjZaMAAwWTATBgcqhkjOPQIBBggq
+hkjOPQMBBwNCAATpsmi/80tOyt9nDOqJzNTVox3wOGZSEwGXeMNTR0cbytK9h+t8
+Ea3+dl6LeXvo423FZd0TNPxRrjaLYFpFjX4Ko4GGMIGDMCsGCCsGAQUFBwEIAQH/
+BBwwGqEYMBYwCAICBNICAhYuMAoCAQACBQD/////MCEGA1UdDgQaBBhMamGZIJk1
+k//8v1K14lioRkSxGj2ryhIwDAYDVR0TAQH/BAIwADAjBgNVHSMEHDAagBhMamGZ
+IJk1k//8v1K14lioRkSxGj2ryhIwCgYIKoZIzj0EAwIDSAAwRQIhAMHro3vcKus9
+Id+1hnMeffZL/CWFOSTgtKjX7OMbQOK8AiBijOvIranrc1X0OwtvM2A4bJi035G9
+e8BeRHCpaJGitg==
+-----END CERTIFICATE-----`)
+
 (let [cert2 (x509-cert/load cert-pem2)]
   (assert (not (:is-ca cert2)))
   (assert (:allowed-ext-usage cert2 "PKIX.ServerAuth"))
@@ -238,5 +321,49 @@ knl2gdOvpiIRf3P4HjNPPYgDiqE=
         other-key (privkey/new "RSA" "2048")
         other-pubkey (privkey/get-pubkey other-key)]
     (assert (not (:verify crl other-pubkey)))))
+
+# Test RFC 3779 extensions
+(let [ip-cert (x509-cert/load ip-addr-blocks-unsorted-pem)
+      ip-all-cert (x509-cert/load ip-addr-blocks-all-pem)
+      as-cert (x509-cert/load as-number-cert-pem)
+      as-inherit-cert (x509-cert/load as-number-inherit-pem)
+      as-rdi-cert (x509-cert/load as-rdi-only-pem)
+      no-ext-cert (x509-cert/load cert-pem2)]
+  (assert (= (:subject-dn ip-cert :CN 0) "Test CA"))
+  (assert (:is-ca ip-cert))
+  (each cert [as-cert as-inherit-cert as-rdi-cert]
+    (assert (not (:is-ca cert))))
+  (assert (not (:is-ca no-ext-cert)))
+
+  (let [blocks (x509-cert/ext-ip-addr-blocks ip-cert)
+        v6-max "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"]
+
+    # The DER holds six families; the two adjacent unicast ranges
+    # 192.168.0.0-192.168.2.1 and 192.168.2.2-200.0.0.0 merge into one.
+    (assert (= (length blocks) 5))
+    (assert (deep= blocks
+                   [{:version :v4 :ranges :inherit}
+                    {:version :v4 :safi 1 :ranges [["192.168.0.0" "200.0.0.0"]]}
+                    {:version :v4 :safi 2 :ranges :inherit}
+                    {:version :v6 :ranges [[v6-max v6-max]]}
+                    {:version :v6 :safi 1 :ranges :inherit}]))
+  (assert (= (x509-cert/ext-ip-addr-blocks ip-cert)
+             (:ext-ip-addr-blocks ip-cert)))
+
+  (assert (= (x509-cert/ext-ip-addr-blocks ip-all-cert)
+             [{:version :v4
+               :ranges [["192.168.0.0" "192.168.127.255"]
+                        ["193.168.0.0" "193.169.255.255"]
+                        ["194.168.0.0" "195.175.1.2"]
+                        ["196.168.0.1" "196.168.0.1"]]}
+              {:version :v6
+               :ranges [["2003:0:6829:3435:420:10c5:0:c4"
+                         "2003:0:6829:3435:420:10c5:0:c4"]
+                        ["ab01::1" "cd02::2"]
+                        ["fa80::" "fa80::7fff:ffff:ffff:ffff"]
+                        ["fe20::" "fe20:0:7ff:ffff:ffff:ffff:ffff:ffff"]]}]))
+
+  (assert (nil? (x509-cert/ext-ip-addr-blocks no-ext-cert)))
+  (assert (nil? (x509-cert/ext-ip-addr-blocks as-cert)))))
 
 (end-suite)

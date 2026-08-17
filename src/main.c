@@ -10,6 +10,13 @@
 #include <string.h>
 #include <time.h>
 
+#ifdef JANET_WINDOWS
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#endif
+
 #include "botan_errors.h"
 #include "botan_view_functions.h"
 
