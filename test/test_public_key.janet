@@ -29,7 +29,7 @@
       sha256-hash-of-pubkey (:final (:update (hash/new "SHA-256") (hex-decode pub-point)))]
   (assert (= pub-point (string "04" pub-x pub-y)))
   (assert (= fingerprint sha256-hash-of-pubkey))
-  (assert (= (:estimated-strength pubkey) 128)))
+  (assert (= (:estimated-strength pubkey) (pubkey/estimated-strength pubkey) 128)))
 
 (let [curve "secp256r1"
       ecdsa-prikey (privkey/new "ECDSA" curve)

@@ -760,8 +760,8 @@ static JanetReg public_key_cfuns[] = {
      "Returns a hash of the public key. \"SHA-256\" is used as a default "
      "hash, if `hash` is not provided."
     },
-    {"pubkey/estimated_strength", public_key_estimated_strength,
-     "(pubkey/estimated_strength pubkey)\n\n"
+    {"pubkey/estimated-strength", public_key_estimated_strength,
+     "(pubkey/estimated-strength pubkey)\n\n"
      "Returns the estimated strength of this key against known attacks "
      "(NFS, Pollard’s rho, etc)"
     },
