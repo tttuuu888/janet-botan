@@ -41,6 +41,7 @@
       ecdsa-pubkey1 (pubkey/load-ecdsa curve (mpi/new pub-x 16) (mpi/new pub-y 16))
       ecdsa-pubkey2 (pubkey/load-ecdsa-sec1 curve uncompressed-sec1)
       ecdsa-pubkey3 (pubkey/load-ecdsa-sec1 curve compressed-sec1)]
+  (assert (= (:to-raw ecdsa-pubkey) (pubkey/to-raw ecdsa-pubkey)))
   (assert (= (:get-field ecdsa-pubkey1 "public_x")
              (:get-field ecdsa-pubkey2 "public_x")
              (:get-field ecdsa-pubkey3 "public_x")))

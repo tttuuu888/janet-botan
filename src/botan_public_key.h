@@ -731,7 +731,7 @@ static JanetReg public_key_cfuns[] = {
      "(pubkey/to-pem pubkey)\n\n"
      "Return the unencrypted DER encoding of the public key."
     },
-    {"pubkey/to-raw", public_key_to_der,
+    {"pubkey/to-raw", public_key_to_raw,
      "(pubkey/to-raw pubkey)\n\n"
      "Return the unencrypted canonical raw encoding of the public key. "
      "This might not be defined for all key types."
