@@ -814,9 +814,7 @@ static Janet x509_cert_san(int32_t argc, Janet *argv) {
 
     size_t san_count = 0;
     int ret = botan_x509_cert_subject_alternative_names_count(cert, &san_count);
-    if (ret != 0) {
-        return has_index ? janet_wrap_nil() : janet_wrap_tuple(janet_tuple_n(NULL, 0));
-    }
+    JANET_BOTAN_ASSERT(ret);
 
     JanetArray *arr = has_index ? NULL : janet_array(4);
     size_t match_index = 0;
