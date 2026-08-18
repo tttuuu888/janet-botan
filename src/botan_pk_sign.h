@@ -122,20 +122,21 @@ static Janet pk_sign_finish(int32_t argc, Janet *argv) {
 static JanetReg pk_sign_cfuns[] = {
     {"pk-sign/new", pk_sign_new,
      "(pk-sign/new privkey hash-and-padding)\n\n"
-     "Create a signature operator for the provided key. The padding string "
-     "specifies what hash function and padding should be used, for example "
-     "\"PKCS1v15(SHA-256)\" for PKCS #1 v1.5 padding (used with RSA) or "
-     "\"SHA-384\". Generally speaking only RSA has special padding modes; "
-     "for other algorithms like ECDSA one just names the hash."
+     "Create a signature operator for the `privkey`. The "
+     "`hash-and-padding` string specifies what hash function and padding "
+     "should be used, for example \"PKCS1v15(SHA-256)\" for PKCS #1 v1.5 "
+     "padding (used with RSA) or \"SHA-384\". Generally speaking only RSA "
+     "has special padding modes; for other algorithms like ECDSA one just "
+     "names the hash. Returns `pk-sign-obj`."
     },
     {"pk-sign/update", pk_sign_update,
-     "(pk-sign/update op message)\n\n"
-     "Add the message to be signed. Return the self object."
+     "(pk-sign/update pk-sign-obj message)\n\n"
+     "Add the `message` to be signed. Returns `pk-sign-obj`."
     },
     {"pk-sign/finish", pk_sign_finish,
-     "(pk-sign/finish op &opt rng)\n\n"
-     "Return a signature over all of the messages provided. Afterwards, "
-     "the sign operator is reset and may be used to sign a new message."
+     "(pk-sign/finish pk-sign-obj &opt rng)\n\n"
+     "Returns a signature over all of the messages provided. Afterwards, "
+     "the `pk-sign-obj` is reset and may be used to sign a new message. "
      "New rng is used by default, if `rng` is not provided."
     },
 

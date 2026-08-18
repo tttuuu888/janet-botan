@@ -108,20 +108,21 @@ static Janet pk_verify_finish(int32_t argc, Janet *argv) {
 static JanetReg pk_verify_cfuns[] = {
     {"pk-verify/new", pk_verify_new,
      "(pk-verify/new pubkey hash-and-padding)\n\n"
-     "Create a verifyature operator for the provided key. The padding string "
-     "specifies what hash function and padding should be used, for example "
-     "\"PKCS1v15(SHA-256)\" for PKCS #1 v1.5 padding (used with RSA) or "
-     "\"SHA-384\". Generally speaking only RSA has special padding modes; "
-     "for other algorithms like ECDSA one just names the hash."
+     "Create a verification operator for the `pubkey`. The "
+     "`hash-and-padding` string specifies what hash function and padding "
+     "should be used, for example \"PKCS1v15(SHA-256)\" for PKCS #1 v1.5 "
+     "padding (used with RSA) or \"SHA-384\". Generally speaking only RSA "
+     "has special padding modes; for other algorithms like ECDSA one just "
+     "names the hash. Returns `pk-verify-obj`."
     },
     {"pk-verify/update", pk_verify_update,
-     "(pk-verify/update op message)\n\n"
-     "Add the message to be verifyed. Return the self object."
+     "(pk-verify/update pk-verify-obj message)\n\n"
+     "Add the `message` to be verified. Returns `pk-verify-obj`."
     },
     {"pk-verify/finish", pk_verify_finish,
-     "(pk-verify/finish op signature)\n\n"
-     "Verify if the signature provided matches with the message provided. "
-     "Return boolean."
+     "(pk-verify/finish pk-verify-obj signature)\n\n"
+     "Verify if the `signature` provided matches with the message "
+     "provided. Returns boolean."
     },
 
     {NULL, NULL, NULL}

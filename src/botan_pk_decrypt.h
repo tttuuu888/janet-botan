@@ -96,12 +96,12 @@ static JanetReg pk_decrypt_cfuns[] = {
     {"pk-decrypt/new", pk_decrypt_new,
      "(pk-decrypt/new privkey padding)\n\n"
      "Create a new operation object which can be used to decrypt using "
-     "the provided key and the specified padding scheme (such as "
-     "\"OAEP(SHA-256)\" for use with RSA)"
+     "`privkey` and the specified `padding` scheme (such as "
+     "\"OAEP(SHA-256)\" for use with RSA). Returns `pk-decrypt-obj`."
     },
     {"pk-decrypt/decrypt", pk_decrypt_decrypt,
-     "(pk-decrypt/decrypt op message)\n\n"
-     "Decrypt the provided data using the key."
+     "(pk-decrypt/decrypt pk-decrypt-obj message)\n\n"
+     "Decrypt the `message` using `pk-decrypt-obj`. Returns the plaintext."
     },
 
     {NULL, NULL, NULL}
