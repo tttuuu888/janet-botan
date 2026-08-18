@@ -109,13 +109,13 @@ static JanetReg pk_encrypt_cfuns[] = {
     {"pk-encrypt/new", pk_encrypt_new,
      "(pk-encrypt/new pubkey padding)\n\n"
      "Create a new operation object which can be used to encrypt using "
-     "the provided key and the specified padding scheme (such as "
-     "\"OAEP(SHA-256)\" for use with RSA)"
+     "`pubkey` and the specified `padding` scheme (such as "
+     "\"OAEP(SHA-256)\" for use with RSA). Returns `pk-encrypt-obj`."
     },
     {"pk-encrypt/encrypt", pk_encrypt_encrypt,
-     "(pk-encrypt/encrypt op message &opt rng)\n\n"
-     "Encrypt the provided data using the key`. New rng is used by "
-     "default, if `rng` is not provided."
+     "(pk-encrypt/encrypt pk-encrypt-obj message &opt rng)\n\n"
+     "Encrypt the `message` using `pk-encrypt-obj`. Returns the ciphertext. "
+     "New rng is used by default, if `rng` is not provided."
     },
 
     {NULL, NULL, NULL}
