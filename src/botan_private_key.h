@@ -840,7 +840,7 @@ static JanetReg private_key_cfuns[] = {
      "an error will be occurred."
     },
     {"privkey/oid", private_key_oid,
-     "(privkey/oid pubkey)\n\n"
+     "(privkey/oid privkey)\n\n"
      "Return the key's associated OID."
     },
     {"privkey/get-ec-group", private_key_get_ec_group,
