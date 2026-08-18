@@ -118,7 +118,7 @@ static JanetReg hotp_cfuns[] = {
      "(hotp/new key &opt hash digits)\n\n"
      "Instantiate a new HOTP instance with the given parameters. If omitted, "
      "the default value for `hash` is \"SHA-1\" and the default value for "
-     "`digits` is 6. Returns `htop-obj`."
+     "`digits` is 6. Returns `hotp-obj`."
     },
     {"hotp/generate", hotp_generate,
      "(hotp/generate hotp-obj counter)\n\n"

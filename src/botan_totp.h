@@ -119,15 +119,16 @@ static JanetReg totp_cfuns[] = {
      "(totp/new key &opt hash digits timestep)\n\n"
      "Instantiate a new TOTP instance with the given parameters. If omitted, "
      "the default value for `hash` is \"SHA-1\", the default value for "
-     "`digits` is 6 and the default value for `timestep` is 30."
+     "`digits` is 6 and the default value for `timestep` is 30. "
+     "Returns `totp-obj`."
     },
     {"totp/generate", totp_generate,
-     "(totp/generate totp &opt timestamp)\n\n"
+     "(totp/generate totp-obj &opt timestamp)\n\n"
      "Generate an TOTP code for the provided `timestamp`. If omitted, current "
      "timestamp is used."
     },
     {"totp/check", totp_check,
-     "(totp/check totp code &opt timestamp acceptable-drift)\n\n"
+     "(totp/check totp-obj code &opt timestamp acceptable-drift)\n\n"
      "Return true if the provided OTP `code` is correct for the provided "
      "`timestamp`. If required, use clock `acceptable-drift` to deal with the "
      "client and server having slightly different clocks. If omitted, current "
