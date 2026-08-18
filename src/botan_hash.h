@@ -192,14 +192,15 @@ static JanetReg hash_cfuns[] = {
     {"hash/new", hash_new, "(hash/new name)\n\n"
      "Creates a hash of the given name, e.g., \"SHA-384\". Returns `hash-obj`."
     },
-    {"hash/name", hash_name, "(hash/name hash)\n\n"
+    {"hash/name", hash_name, "(hash/name hash-obj)\n\n"
      "Return the name of the hash function."
     },
     {"hash/copy", hash_copy_state, "(hash/copy hash-obj)\n\n"
-     "Return a new hash object copied from `hash`. Returns new `hash-obj`."
+     "Return a new hash object copied from `hash-obj`. Returns new "
+     "`hash-obj`."
     },
     {"hash/clear", hash_clear, "(hash/clear hash-obj)\n\n"
-     "Reset the state of `hash` back to clean, "
+     "Reset the state of `hash-obj` back to clean, "
      "as if no input has been supplied. Returns `hash-obj`."
     },
     {"hash/output-length", hash_output_length,
@@ -215,7 +216,7 @@ static JanetReg hash_cfuns[] = {
      "(hash/block-size hash-obj)\n\n"
      "Return the block size of the `hash-obj`."
     },
-    {"hash/update", hash_update, "(hash/update hash-boj input)\n\n"
+    {"hash/update", hash_update, "(hash/update hash-obj input)\n\n"
      "Add input to the hash computation. Returns `hash-obj`."
     },
     {"hash/final", hash_final, "(hash/final hash-obj)\n\n"

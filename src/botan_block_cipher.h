@@ -207,8 +207,8 @@ static JanetReg block_cipher_cfuns[] = {
     },
     {"block-cipher/name", block_cipher_name,
      "(block-cipher/name bc-obj)\n\n"
-     "Return the name of this block cipher algorithm, which may nor may not "
-     " exactly match what was passed to `block-cipher/init`."
+     "Return the name of this block cipher algorithm, which may or may not "
+     "exactly match what was passed to `block-cipher/new`."
     },
     {"block-cipher/get-keyspec", block_cipher_get_keyspec,
      "(block-cipher/get-keyspec bc-obj)\n\n"
