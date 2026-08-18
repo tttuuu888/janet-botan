@@ -1342,11 +1342,12 @@ static JanetReg x509_cert_cfuns[] = {
      "the specified cert-usage."
     },
     {"x509-cert/verify", x509_cert_verify,
-     "(x509-cert/verify cert-obj &keys {:intermediates intermediates :trusted "
-     "trusted :truste trusted-path :required-strength required-strength "
-     ":hostname hostname :reference-time reference-time :crl crls})\n\n"
+     "(x509-cert/verify cert-obj &keys {:intermediates intermediates "
+     ":trusted trusted :trusted-path trusted-path "
+     ":required-strength required-strength :hostname hostname "
+     ":reference-time reference-time :crls crls})\n\n"
      "Verify a certificate. Returns 0 if validation was successful, returns a "
-     "positive error code if the validation was unsuccesful.\n\n"
+     "positive error code if the validation was unsuccessful.\n\n"
      "* `:intermediates` - A tuple of untrusted subauthorities.\n\n"
      "* `:trusted` - A tuple of trusted root CAs.\n\n"
      "* `:trusted-path` - A path refers to a directory where one or more "
@@ -1357,8 +1358,9 @@ static JanetReg x509_cert_cfuns[] = {
      "to zero to accept a default. Default value is 0, if omitted.\n\n"
      "* `:hostname` - Check against the certificates CN field.\n\n"
      "* `:reference-time` - Time value which the certificate chain is "
-     "validated against. Use zero(default) to use the current system clock.\n\n"
-     "* `crls` - A tuple of CRLs issued by either trusted or untrusted "
+     "validated against. Use zero (default) to use the current system "
+     "clock.\n\n"
+     "* `:crls` - A tuple of CRLs issued by either trusted or untrusted "
      "authorities."
     },
     {"x509-cert/validation-status", x509_cert_validation_status,

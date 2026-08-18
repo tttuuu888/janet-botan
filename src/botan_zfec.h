@@ -89,19 +89,20 @@ static Janet zfec_decode(int32_t argc, Janet *argv) {
 static JanetReg zfec_cfuns[] = {
     {"zfec-encode", zfec_encode,
      "(zfec-encode k n input)\n\n"
-     "Perform forward error correction encoding. `k` is the number of shares required "
-     "to recover the original. `n` is the total number of shares. The `input` length "
-     "must be a multiple of K bytes. Return n list of strings, each one containing a "
-     "single share."
+     "Perform forward error correction encoding. `k` is the number of "
+     "shares required to recover the original. `n` is the total number of "
+     "shares. The `input` length must be a multiple of `k` bytes. Return a "
+     "list of `n` strings, each one containing a single share."
     },
     {"zfec-decode", zfec_decode,
      "(zfec-decode k n indexes inputs)\n\n"
-     "Decode some FEC shares. `k` is the number of shares required to recover the "
-     "original. `n` is the total number of shares. The `indexes` is the list specifies "
-     "which shares are presented in `inputs`. `inputs` is the list of the input "
-     "shares (e.g. from a previous call to zfec_encode) which all must be the same "
-     "length. Return a list of strings containing the original shares decoded from the "
-     "provided shares (in `inputs`)."
+     "Decode some FEC shares. `k` is the number of shares required to "
+     "recover the original. `n` is the total number of shares. The "
+     "`indexes` is the list that specifies which shares are present in "
+     "`inputs`. `inputs` is the list of the input shares (e.g. from a "
+     "previous call to `zfec-encode`) which all must be the same length. "
+     "Return a list of strings containing the original shares decoded "
+     "from the provided shares (in `inputs`)."
     },
     {NULL, NULL, NULL}
 };
