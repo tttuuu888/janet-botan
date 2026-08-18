@@ -120,15 +120,16 @@ static Janet pk_key_agreement_agree(int32_t argc, Janet *argv) {
 static JanetReg pk_key_agreement_cfuns[] = {
     {"pk-key-agreement/new", pk_key_agreement_new,
      "(pk-key-agreement/new privkey kdf)\n\n"
-     "Set up to perform key derivation using the given private key and "
-     "specified KDF."
+     "Set up to perform key derivation using the `privkey` and the "
+     "specified `kdf`. Returns `pk-key-agreement-obj`."
     },
     {"pk-key-agreement/public-value", pk_key_agreement_public_value,
-     "(pk-key-agreement/public-value op)\n\n"
-     "Returns the public value to be passed to the other party"
+     "(pk-key-agreement/public-value pk-key-agreement-obj)\n\n"
+     "Returns the public value to be passed to the other party."
     },
     {"pk-key-agreement/agree", pk_key_agreement_agree,
-     "(pk-key-agreement/agree op other-key salt &opt key-len)\n\n"
+     "(pk-key-agreement/agree pk-key-agreement-obj other-key salt "
+     "&opt key-len)\n\n"
      "Returns a key derived by the KDF. If `key-len` is omitted, default "
      "agreement size will be used."
     },

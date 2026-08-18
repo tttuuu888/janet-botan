@@ -117,16 +117,22 @@ static Janet pk_kem_decrypt_kem_decrypt_shared_key(int32_t argc, Janet *argv) {
 static JanetReg pk_kem_decrypt_cfuns[] = {
     {"pk-kem-decrypt/new", pk_kem_decrypt_new,
      "(pk-kem-decrypt/new privkey kdf)\n\n"
-     "Create a KEM operation, decrypt version."
+     "Create a KEM operation, decrypt version, using the `privkey` and the "
+     "specified `kdf`. Returns `pk-kem-decrypt-obj`."
     },
     {"pk-kem-decrypt/shared-key-length", pk_kem_decrypt_kem_shared_key_length,
-     "(pk-kem-decrypt/shared-key-length op desired-shared-key-length)\n\n"
-     "Return the output shared key length, assuming desired-shared-key-length "
-     "is provided."
+     "(pk-kem-decrypt/shared-key-length pk-kem-decrypt-obj "
+     "desired-shared-key-length)\n\n"
+     "Returns the output shared key length, assuming "
+     "`desired-shared-key-length` is provided.\n\n"
+     "Normally this will just return `desired-shared-key-length` but may "
+     "return a different value if a \"Raw\" KDF is used (returning the "
+     "unhashed output), or potentially depending on KDF limitations."
     },
     {"pk-kem-decrypt/decrypt-shared-key", pk_kem_decrypt_kem_decrypt_shared_key,
-     "(pk-kem-decrypt/decrypt-shared-key op salt desired-key-len encapsulated-key)\n\n"
-     "Decrypt an encapsulated key and return the shared secret."
+     "(pk-kem-decrypt/decrypt-shared-key pk-kem-decrypt-obj salt "
+     "desired-key-len encapsulated-key)\n\n"
+     "Decrypt the `encapsulated-key`. Returns the shared secret."
     },
 
     {NULL, NULL, NULL}

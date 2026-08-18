@@ -157,21 +157,28 @@ static Janet pk_kem_encrypt_kem_create_shared_key(int32_t argc, Janet *argv) {
 static JanetReg pk_kem_encrypt_cfuns[] = {
     {"pk-kem-encrypt/new", pk_kem_encrypt_new,
      "(pk-kem-encrypt/new pubkey kdf)\n\n"
-     "Create a KEM operation, encrypt version."
+     "Create a KEM operation, encrypt version, using the `pubkey` and the "
+     "specified `kdf`. Returns `pk-kem-encrypt-obj`."
     },
     {"pk-kem-encrypt/shared-key-length", pk_kem_encrypt_kem_shared_key_length,
-     "(pk-kem-encrypt/shared-key-length op desired-shared-key-length)\n\n"
-     "Return the output shared key length, assuming desired-shared-key-length "
-     "is provided."
+     "(pk-kem-encrypt/shared-key-length pk-kem-encrypt-obj "
+     "desired-shared-key-length)\n\n"
+     "Returns the output shared key length, assuming "
+     "`desired-shared-key-length` is provided.\n\n"
+     "Normally this will just return `desired-shared-key-length` but may "
+     "return a different value if a \"Raw\" KDF is used (returning the "
+     "unhashed output), or potentially depending on KDF limitations."
     },
     {"pk-kem-encrypt/encapsulated-key-length", pk_kem_encrypt_kem_encapsulated_key_length,
-     "(pk-kem-encrypt/encapsulated-key-length op)\n\n"
-     "Return the length of the encapsulated key."
+     "(pk-kem-encrypt/encapsulated-key-length pk-kem-encrypt-obj)\n\n"
+     "Returns the length of the encapsulated key."
     },
     {"pk-kem-encrypt/create-shared-key", pk_kem_encrypt_kem_create_shared_key,
-     "(pk-kem-encrypt/create-shared-key op salt desired-key-len &opt rng)\n\n"
-     "Create a new encapsulated key. If `rng` is not provided, new rng is "
-     "used by default. Return the tuple of (shared-key, encapsulated-key)"
+     "(pk-kem-encrypt/create-shared-key pk-kem-encrypt-obj salt "
+     "desired-key-len &opt rng)\n\n"
+     "Create a new encapsulated key. Returns the tuple of (shared-key, "
+     "encapsulated-key). New rng is used by default, if `rng` is not "
+     "provided."
     },
 
     {NULL, NULL, NULL}
