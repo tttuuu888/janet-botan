@@ -1346,7 +1346,7 @@ static JanetReg x509_cert_cfuns[] = {
      "trusted :truste trusted-path :required-strength required-strength "
      ":hostname hostname :reference-time reference-time :crl crls})\n\n"
      "Verify a certificate. Returns 0 if validation was successful, returns a "
-     " positive error code if the validation was unsuccesful.\n\n"
+     "positive error code if the validation was unsuccesful.\n\n"
      "* `:intermediates` - A tuple of untrusted subauthorities.\n\n"
      "* `:trusted` - A tuple of trusted root CAs.\n\n"
      "* `:trusted-path` - A path refers to a directory where one or more "

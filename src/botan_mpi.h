@@ -685,8 +685,8 @@ static JanetReg mpi_cfuns[] = {
     },
     {"mpi/inverse-mod", mpi_inverse_mod,
      "(mpi/inverse-mod mpi-obj modulus)\n\n"
-     "Create the inverse of `mpi-obj` modulo `modulus`, or nil if no inverse exists."
-     "Returns new `mpi-obj`."
+     "Create the inverse of `mpi-obj` modulo `modulus`, or nil if no "
+     "inverse exists. Returns new `mpi-obj`."
     },
     {"mpi/pow-mod", mpi_pow_mod,
      "(mpi/pow-mod mpi-obj exponent modulus)\n\n"

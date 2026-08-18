@@ -91,7 +91,7 @@ static JanetReg zfec_cfuns[] = {
      "(zfec-encode k n input)\n\n"
      "Perform forward error correction encoding. `k` is the number of shares required "
      "to recover the original. `n` is the total number of shares. The `input` length "
-     "must be a multiple of K bytes.  Return n list of strings, each one containing a "
+     "must be a multiple of K bytes. Return n list of strings, each one containing a "
      "single share."
     },
     {"zfec-decode", zfec_decode,

@@ -152,7 +152,7 @@ static JanetReg oid_cfuns[] = {
     },
     {"oid/register", oid_register,
      "(oid/register oid-obj name)\n\n"
-     "Register an OID so that it may later be retrieved by name."
+     "Register an OID so that it may later be retrieved by name. "
      "Returns the `oid-obj` itself."
     },
     {"oid/to-string", oid_to_string,
