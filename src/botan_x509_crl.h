@@ -458,16 +458,16 @@ static Janet x509_crl_verify(int32_t argc, Janet *argv) {
 
 static JanetReg x509_crl_cfuns[] = {
     {"x509-crl/to-pem", x509_crl_to_pem,
-     "(x509-crl/to-pem crl)\n\n"
+     "(x509-crl/to-pem crl-obj)\n\n"
      "Encode the CRL as a PEM string."
     },
     {"x509-crl/to-der", x509_crl_to_der,
-     "(x509-crl/to-der crl)\n\n"
+     "(x509-crl/to-der crl-obj)\n\n"
      "Encode the CRL as DER binary data."
     },
     {"x509-crl/load", x509_crl_load,
-     "(x509-crl/load crl)\n\n"
-     "Load a CRL from the DER or PEM representation."
+     "(x509-crl/load blob)\n\n"
+     "Load a CRL from the DER or PEM encoded `blob`."
     },
     {"x509-crl/load-file", x509_crl_load_file,
      "(x509-crl/load-file file-name)\n\n"
@@ -492,8 +492,8 @@ static JanetReg x509_crl_cfuns[] = {
      "to get the number of entries."
     },
     {"x509-crl/is-revoked", x509_crl_is_revoked,
-     "(x509-crl/is-revoked crl cert)\n\n"
-     "Check if the given `cert` is revoked on the given `crl`. "
+     "(x509-crl/is-revoked crl-obj cert-obj)\n\n"
+     "Check if the given `cert-obj` is revoked on the given `crl-obj`. "
      "Return true when the certificate is revoked."
     },
     {"x509-crl/create", x509_crl_create,
@@ -516,7 +516,7 @@ static JanetReg x509_crl_cfuns[] = {
      "&keys {:rng rng :hash hash :padding padding})\n\n"
      "Update a CRL with new revoked entries, creating a new CRL. "
      "The original CRL is not modified.\n\n"
-     "* `crl` - The existing CRL to update.\n\n"
+     "* `crl` - The existing CRL object to update.\n\n"
      "* `ca-cert` - The CA certificate object.\n\n"
      "* `ca-key` - The CA's private key object.\n\n"
      "* `issue-time` - The time when the new CRL becomes valid, as seconds "
@@ -531,7 +531,7 @@ static JanetReg x509_crl_cfuns[] = {
      "\"PKCS1v15\" for RSA, hash name for DSA/ECDSA, \"Pure\" for Ed25519/Ed448."
     },
     {"x509-crl/verify", x509_crl_verify,
-     "(x509-crl/verify crl pubkey)\n\n"
+     "(x509-crl/verify crl-obj pubkey)\n\n"
      "Verify the CRL signature against the given public key. "
      "Returns true if the signature is valid."
     },

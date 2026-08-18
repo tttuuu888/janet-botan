@@ -1227,16 +1227,16 @@ static JanetReg x509_cert_cfuns[] = {
      "\"PKIX.EmailProtection\", \"PKIX.TimeStamping\", \"PKIX.OCSPSigning\"."
     },
     {"x509-cert/to-pem", x509_cert_to_pem,
-     "(x509-cert/to-pem cert)\n\n"
+     "(x509-cert/to-pem cert-obj)\n\n"
      "Encode the certificate as a PEM string."
     },
     {"x509-cert/to-der", x509_cert_to_der,
-     "(x509-cert/to-der cert)\n\n"
+     "(x509-cert/to-der cert-obj)\n\n"
      "Encode the certificate as DER binary data."
     },
     {"x509-cert/load", x509_cert_load,
-     "(x509-cert/load cert)\n\n"
-     "Load a X.509 certificate from DER or PEM representation."
+     "(x509-cert/load blob)\n\n"
+     "Load an X.509 certificate from the DER or PEM encoded `blob`."
     },
     {"x509-cert/load-file", x509_cert_load_file,
      "(x509-cert/load-file file-name)\n\n"
