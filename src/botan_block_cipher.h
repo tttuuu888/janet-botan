@@ -211,7 +211,7 @@ static JanetReg block_cipher_cfuns[] = {
      " exactly match what was passed to `block-cipher/init`."
     },
     {"block-cipher/get-keyspec", block_cipher_get_keyspec,
-     "(block-cipher/get-keyspec mac)\n\n"
+     "(block-cipher/get-keyspec bc-obj)\n\n"
      "Return the key spec of this cipher in format of "
      "[max-key-length min-key-length mod-key-length]."
     },
