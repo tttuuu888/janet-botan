@@ -331,7 +331,7 @@ static JanetReg ec_group_cfuns[] = {
     {"ec-group/from-params", ec_group_from_params,
      "(ec-group/from-params oid p a b gx gy order)\n\n"
      "Create a new EC Group from the given parameters. "
-     "The `oid` is an OID object, `p`, `a`, `b`, `gx`, gy` and `order` are "
+     "The `oid` is an OID object, `p`, `a`, `b`, `gx`, `gy` and `order` are "
      "MPI objects."
     },
     {"ec-group/from-ber", ec_group_from_ber,
