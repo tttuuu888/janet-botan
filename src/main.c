@@ -55,6 +55,7 @@
 #include "botan_x509_crl.h"
 #include "botan_x509_crl_entry.h"
 #include "botan_srp6_server_session.h"
+#include "botan_spake2p_params.h"
 #include "botan_zfec.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
@@ -92,5 +93,6 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_x509_crl(env);
     submod_x509_crl_entry(env);
     submod_srp6_server_session(env);
+    submod_spake2p_params(env);
     submod_zfec(env);
 }

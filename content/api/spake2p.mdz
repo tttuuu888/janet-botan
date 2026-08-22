@@ -1,0 +1,14 @@
+{:title "SPAKE2+ Key Exchange"
+ :author "Seungki Kim"
+ :license "MIT license"
+ :template "docpage.html"
+ :order 27}
+---
+
+## Index
+
+@api-index[/build/botan][spake2p-]
+
+## Reference
+
+@api-docs[/build/botan][spake2p-]
