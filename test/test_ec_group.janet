@@ -37,3 +37,5 @@
     (assert (= gx (:get-gx ec-group) (:get-gx ec-group-from-name)))
     (assert (= gy (:get-gy ec-group) (:get-gy ec-group-from-name)))
     (assert (= order (:get-order ec-group) (:get-order ec-group-from-name))))
+
+(end-suite)
