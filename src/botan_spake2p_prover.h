@@ -169,7 +169,8 @@ static JanetReg spake2p_prover_cfuns[] = {
     {"spake2p-prover/generate-message", spake2p_prover_generate_message,
      "(spake2p-prover/generate-message spake2p-prover-obj &opt rng)\n\n"
      "Generate the prover's key share, which is sent to the verifier. "
-     "Can be called only once."
+     "Can be called only once. "
+     "New rng is used by default, if `rng` is not provided."
     },
     {"spake2p-prover/process-message", spake2p_prover_process_message,
      "(spake2p-prover/process-message spake2p-prover-obj "
@@ -177,11 +178,12 @@ static JanetReg spake2p_prover_cfuns[] = {
      "Consume the verifier's response and return the prover's "
      "key confirmation, which is sent to the verifier. "
      "Returns nil if the verifier's key confirmation is wrong, "
-     "typically meaning the passwords do not match."
+     "typically meaning the passwords do not match. "
+     "New rng is used by default, if `rng` is not provided."
     },
     {"spake2p-prover/shared-secret", spake2p_prover_shared_secret,
      "(spake2p-prover/shared-secret spake2p-prover-obj)\n\n"
-     "Returns the shared secret. Only valid after "
+     "Return the shared secret. Only valid after "
      "`spake2p-prover/process-message` succeeded."
     },
     {NULL, NULL, NULL}

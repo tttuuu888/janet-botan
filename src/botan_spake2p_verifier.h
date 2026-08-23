@@ -172,7 +172,8 @@ static JanetReg spake2p_verifier_cfuns[] = {
      "peer-message &opt rng)\n\n"
      "Consume the prover's key share and return the verifier's "
      "response (its own key share followed by a key confirmation), "
-     "which is sent to the prover. Can be called only once."
+     "which is sent to the prover. Can be called only once. "
+     "New rng is used by default, if `rng` is not provided."
     },
     {"spake2p-verifier/verify-confirmation", spake2p_verifier_verify_confirmation,
      "(spake2p-verifier/verify-confirmation spake2p-verifier-obj "

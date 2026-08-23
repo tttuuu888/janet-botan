@@ -203,7 +203,7 @@ static JanetReg spake2p_params_cfuns[] = {
      "secret &opt rng)\n\n"
      "Compute a SPAKE2+ registration record from a prover secret. "
      "The registration record is provided to the verifier during "
-     "registration. New rng is used if `rng` is not provided."
+     "registration. New rng is used by default, if `rng` is not provided."
     },
     {NULL, NULL, NULL}
 };
