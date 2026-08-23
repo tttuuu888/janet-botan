@@ -31,6 +31,43 @@
     (let [record (assert (spake2p-registration-record params secret))]
       (assert (= (length record) 97))
       (assert (= record
-                 (spake2p-registration-record params secret))))))
+                 (spake2p-registration-record params secret)))
+
+      # A full exchange between a prover and a verifier
+      (let [context "janet-botan"
+            prover (assert (spake2p-prover/new params secret
+                                               prover-id verifier-id context))
+            verifier (assert (spake2p-verifier/new params record
+                                                   prover-id verifier-id context))
+            share-p (assert (spake2p-prover/generate-message prover))
+            response (assert (spake2p-verifier/process-message verifier share-p))
+            confirm-p (assert (spake2p-prover/process-message prover response))]
+
+        (assert (= (length share-p) 65))
+        (assert (= (length response) 97))
+        (assert (= (length confirm-p) 32))
+        (assert (spake2p-verifier/verify-confirmation verifier confirm-p))
+        (assert (= (spake2p-prover/shared-secret prover)
+                   (:shared-secret prover)
+                   (spake2p-verifier/shared-secret verifier)
+                   (:shared-secret verifier))))
+
+      # A prover which does not know the password fails key confirmation
+      (let [wrong (spake2p-derive-secret params "wrong-password"
+                                         prover-id verifier-id salt)
+            prover (spake2p-prover/new params wrong prover-id verifier-id "")
+            verifier (spake2p-verifier/new params record prover-id verifier-id "")
+            response (:process-message verifier (:generate-message prover))]
+
+        (assert (nil? (:process-message prover response)))
+        (assert (not (:verify-confirmation verifier (string/repeat "\0" 32)))))
+
+      # skip-confirmation yields the shared secret without checking confirmP
+      (let [prover (spake2p-prover/new params secret prover-id verifier-id "")
+            verifier (spake2p-verifier/new params record prover-id verifier-id "")]
+
+        (:process-message verifier (:generate-message prover))
+        (assert (= verifier (:skip-confirmation verifier)))
+        (assert (= (length (:shared-secret verifier)) 32))))))
 
 (end-suite)
