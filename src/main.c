@@ -57,6 +57,7 @@
 #include "botan_srp6_server_session.h"
 #include "botan_spake2p_params.h"
 #include "botan_spake2p_prover.h"
+#include "botan_spake2p_verifier.h"
 #include "botan_zfec.h"
 
 JANET_MODULE_ENTRY(JanetTable *env) {
@@ -96,5 +97,6 @@ JANET_MODULE_ENTRY(JanetTable *env) {
     submod_srp6_server_session(env);
     submod_spake2p_params(env);
     submod_spake2p_prover(env);
+    submod_spake2p_verifier(env);
     submod_zfec(env);
 }
