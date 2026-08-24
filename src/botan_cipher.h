@@ -9,7 +9,7 @@
 
 typedef struct botan_cipher_obj {
     botan_cipher_t cipher;
-    JanetString name;
+    char *name;
     bool is_encrypt;
 } botan_cipher_obj_t;
 
@@ -77,6 +77,9 @@ static JanetAbstractType *get_cipher_obj_type() {
 static int cipher_gc_fn(void *data, size_t len) {
     botan_cipher_obj_t *obj = (botan_cipher_obj_t *)data;
 
+    janet_free(obj->name);
+    obj->name = NULL;
+
     int ret = botan_cipher_destroy(obj->cipher);
     JANET_BOTAN_ASSERT(ret);
 
@@ -120,7 +123,17 @@ static Janet cipher_new(int32_t argc, Janet *argv) {
     int ret = botan_cipher_init(&obj->cipher, name, flag);
     JANET_BOTAN_ASSERT(ret);
 
-    obj->name = janet_string((const uint8_t *)name, strlen(name));
+    size_t name_len = 0;
+    ret = botan_cipher_name(obj->cipher, NULL, &name_len);
+    if (ret != BOTAN_FFI_ERROR_INSUFFICIENT_BUFFER_SPACE) {
+        JANET_BOTAN_ASSERT(ret);
+    }
+
+    obj->name = janet_malloc(name_len);
+    if (!obj->name) JANET_OUT_OF_MEMORY;
+
+    ret = botan_cipher_name(obj->cipher, obj->name, &name_len);
+    JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_abstract(obj);
 }
