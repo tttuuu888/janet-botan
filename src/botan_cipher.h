@@ -10,6 +10,7 @@
 typedef struct botan_cipher_obj {
     botan_cipher_t cipher;
     char *name;
+    size_t name_len;
     bool is_encrypt;
 } botan_cipher_obj_t;
 
@@ -135,24 +136,19 @@ static Janet cipher_new(int32_t argc, Janet *argv) {
     ret = botan_cipher_name(obj->cipher, obj->name, &name_len);
     JANET_BOTAN_ASSERT(ret);
 
+    if (name_len > 0 && obj->name[name_len - 1] == 0) {
+        name_len -= 1;
+    }
+    obj->name_len = name_len;
+
     return janet_wrap_abstract(obj);
 }
 
 static Janet cipher_name(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_cipher_obj_t *obj = janet_getabstract(argv, 0, get_cipher_obj_type());
-    botan_cipher_t cipher = obj->cipher;
-    char name_buf[32];
-    size_t name_len = 32;
 
-    int ret = botan_cipher_name(cipher, name_buf, &name_len);
-    JANET_BOTAN_ASSERT(ret);
-
-    if (name_len > 0 && name_buf[name_len - 1] == 0) {
-        name_len -= 1;
-    }
-
-    return janet_wrap_string(janet_string((const uint8_t *)name_buf, name_len));
+    return janet_wrap_string(janet_string((const uint8_t *)obj->name, obj->name_len));
 }
 
 static Janet cipher_output_length(int32_t argc, Janet *argv) {
