@@ -71,14 +71,6 @@ static Janet rng_new(int32_t argc, Janet *argv) {
 
     janet_arity(argc, 0, 1);
     JanetKeyword type = janet_optkeyword(argv, argc, 0, (const uint8_t *)"system");
-    if (!janet_cstrcmp(type, "system")          &&
-        !janet_cstrcmp(type, "user")            &&
-        !janet_cstrcmp(type, "user-threadsafe") &&
-        !janet_cstrcmp(type, "null")            &&
-        !janet_cstrcmp(type, "hwrnd")           &&
-        !janet_cstrcmp(type, "rdrand")) {
-        janet_panic("Invalid argument");
-    }
 
     int ret = botan_rng_init(&obj->rng, (const char *)type);
     JANET_BOTAN_ASSERT(ret);
