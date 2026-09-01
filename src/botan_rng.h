@@ -171,7 +171,7 @@ static JanetReg rng_cfuns[] = {
      "* :user - AutoSeeded-RNG\n\n"
      "* :user-threadsafe - serialized AutoSeeded-RNG\n\n"
      "* :null - Null-RNG (always fails)\n\n"
-     "* :hwrnd or :rdrand - Processor-RNG (if available)\n\n"
+     "* :hwrng or :rdrand - Processor-RNG (if available)\n\n"
      "Returns `rng-obj`."
     },
     {"rng/new-drbg", rng_new_drbg, "(rng/new-drbg name seed)\n\n"
