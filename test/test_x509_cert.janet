@@ -59,87 +59,72 @@ Y7wGfXPSUXOIN/kwdGObaQspbiSFewV7HBRH7J74BnK3RUjdtruA9hFBQ/Ga/nMq
 knl2gdOvpiIRf3P4HjNPPYgDiqE=
 -----END CERTIFICATE-----`)
 
-# From IPAddrBlocksUnsorted.pem
-(def ip-addr-blocks-unsorted-pem `-----BEGIN CERTIFICATE-----
-MIICqzCCAmKgAwIBAgIRANPort9DlhqMt2QI6bFLA+IwCgYIKoZIzj0EAwIwSTEQ
-MA4GA1UEAxMHVGVzdCBDQTELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUJvdGFuIFBy
-b2plY3QxEDAOBgNVBAsTB1Rlc3RpbmcwHhcNMjUwNjE0MTkxNjEzWhcNMjYwNjE0
-MTkxNjEzWjBJMRAwDgYDVQQDEwdUZXN0IENBMQswCQYDVQQGEwJVUzEWMBQGA1UE
-ChMNQm90YW4gUHJvamVjdDEQMA4GA1UECxMHVGVzdGluZzBJMBMGByqGSM49AgEG
-CCqGSM49AwEBAzIABN0stcHCSpEww/+tZrO2Uv36ZJmjLel058Rdr5tdShPCNEmy
-MeXB+cGQ1kWVMh+sp6OCATkwggE1MHMGCCsGAQUFBwEHBGcwZTAHBAMAAgEFADAZ
-BAIAAjATAxEA/////////////////////zAHBAMAAQIFADAVBAMAAQEwDjAMAwMD
-wKgDBQHAqAIAMBcEAwABATAQMA4DBQHAqAICAwUAyAAAADAGBAIAAQUAMCEGA1Ud
-DgQaBBgub8YveBEYQ3Q3XbeiHtrh38tnkuzOOtQwDgYDVR0PAQH/BAQDAgGGMFIG
-A1UdEQRLMEmBFXRlc3RpbmdAcmFuZG9tYml0Lm5ldIITYm90YW4ucmFuZG9tYml0
-Lm5ldIYbaHR0cHM6Ly9ib3Rhbi5yYW5kb21iaXQubmV0MBIGA1UdEwEB/wQIMAYB
-Af8CAQEwIwYDVR0jBBwwGoAYLm/GL3gRGEN0N123oh7a4d/LZ5LszjrUMAoGCCqG
-SM49BAMCAzcAMDQCGF6Idq8d0ibVHxOTBA7xzFrquTz7crUfBAIYMNxljBJPw+CX
-VaIdhfLji2fOE9P8vx9O
+# From botan/src/tests/data/x509/rfc3779/ip_safi.pem
+(def ip-safi-pem `-----BEGIN CERTIFICATE-----
+MIIByDCCAW+gAwIBAgIUSogXVtmuRrEw8sT/R/jemwSM/F0wCgYIKoZIzj0EAwIw
+GjEYMBYGA1UEAwwPUkZDMzc3OSBpcF9zYWZpMB4XDTI2MDcxOTAyNTkyNVoXDTQ2
+MDcxNDAyNTkyNVowGjEYMBYGA1UEAwwPUkZDMzc3OSBpcF9zYWZpMFkwEwYHKoZI
+zj0CAQYIKoZIzj0DAQcDQgAEee7sJZUhkB14Y5kGU0c1hDeX8jTiGjL/7NO2CvB3
+w9bqkAzNIQVzTpzQkAQHLmqWkHYOJgIMcGj7ludehutvTKOBkjCBjzAPBgNVHRMB
+Af8EBTADAQH/MF0GCCsGAQUFBwEHAQH/BE4wTDAGBAIAAQUAMBUEAwABATAOMAwD
+AwPAqAMFAMgAAAAwBwQDAAECBQAwGQQCAAIwEwMRAP////////////////////8w
+BwQDAAIBBQAwHQYDVR0OBBYEFHdolVoNBDnZthSK/uxvh7oiIq6zMAoGCCqGSM49
+BAMCA0cAMEQCIDG28uec4HJytTc5eHahhqnuVBDRqtciMol/Puh48rMkAiA4Mv1g
+0dKXZu2e1NWuTuJ1/qB+hsfYwaCYlcACw2XWhQ==
 -----END CERTIFICATE-----`)
 
-# From IPAddrBlocksAll.pem
-(def ip-addr-blocks-all-pem `-----BEGIN CERTIFICATE-----
-MIID2TCCAsGgAwIBAgIIDCV8W/5Tqq8wDQYJKoZIhvcNAQELBQAwYTENMAsGA1UE
-AxMEWk9SQjELMAkGA1UEBhMCREUxDTALBgNVBAgTBFRodXIxEzARBgNVBAoTClRV
-IElsbWVuYXUxHzAdBgNVBAsTFlRlbGVtYXRpay9SZWNobmVybmV0emUwHhcNMjQx
-MDAyMTIxMDM4WhcNMjcxMDAyMTIxMDM4WjBhMQ0wCwYDVQQDEwRaT1JCMQswCQYD
-VQQGEwJERTENMAsGA1UECBMEVGh1cjETMBEGA1UEChMKVFUgSWxtZW5hdTEfMB0G
-A1UECxMWVGVsZW1hdGlrL1JlY2huZXJuZXR6ZTCCASIwDQYJKoZIhvcNAQEBBQAD
-ggEPADCCAQoCggEBAKS8eqobCYN9/Gj41lEVvYxkBBj0tWTVKCavNRPtAPpATsbO
-hGEDO0Cvt2WZZMBTjXdiCjJkdy8aHfsg4SDOK9GUlxCAR7jL1XfFeHE2Q2CWBM8J
-NDk+Kx7Nxj1TBY//rTf2gPiu/CDMQPpihTH0kGUw+dR2zybjj0d3h1nQAiVWaauf
-A+QZ1qcgpXpSp9r0Jds+GzCW9119oglPVMgbQGR8ExO9/gU3VS15MowZ+lonGCa7
-KSd8rO+rUbDvdZ3Gu3C00yR8Dsft4/1YqSYtdeKD87AdGu3wkx62Ia4lwarjWYwE
-mmbOzEXddy/rM7eFEgCIPecxk/8eMb3MxB1Y2tsCAwEAAaOBlDCBkTCBjgYIKwYB
-BQUHAQcEgYEwfzAmBAIAATAgAwQHwKgAAwMBwagwDAMDA8KoAwUAw68BAgMFAMSo
-AAEwVQQCAAIwTwMKB/qAAAAAAAAAAAMGA/4gAAAAAxEAIAMAAGgpNDUEIBDFAAAA
-xDAmAxEAqwEAAAAAAAAAAAAAAAAAAQMRAM0CAAAAAAAAAAAAAAAAAAIwDQYJKoZI
-hvcNAQELBQADggEBAA1vysHUycl6/ij2b6pXlvei4Qni1laHGJT/8b2YW2Q3U0uc
-V4WMy+nKR9/IDpFc03kZW9ihe7zbbJcoINaKq3UTfEeMcLbzDSzFFaKUANv/C2vx
-sUihUo1ojle4EmmVYyYXeiZiu+46aUzuUJuWddTs4kJdNUxFkTKMmhdiGSosGKvz
-wRqXj5pG1iEQZmZYDWrricVFkGuwcbAbWTtQqh+cSTt+1sKi4FwL6kkCH9kG5D+1
-/zugVwhXRgguSmqMixpNowMmiDJggzIruGGeJc3ubKuvAnRJmW4VZCXXbVDNAPXi
-HDOjomC4OO17uOrWnLht/oiJ+VUhjkFtorO2RLY=
+# From botan/src/tests/data/x509/rfc3779/ip_canonical.pem
+(def ip-canonical-pem `-----BEGIN CERTIFICATE-----
+MIICCTCCAa6gAwIBAgIURyOF6a+/5gsiYSedrL1HhSChwj8wCgYIKoZIzj0EAwIw
+HzEdMBsGA1UEAwwUUkZDMzc3OSBpcF9jYW5vbmljYWwwHhcNMjYwNzE5MDI1OTI1
+WhcNNDYwNzE0MDI1OTI1WjAfMR0wGwYDVQQDDBRSRkMzNzc5IGlwX2Nhbm9uaWNh
+bDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABHnu7CWVIZAdeGOZBlNHNYQ3l/I0
+4hoy/+zTtgrwd8PW6pAMzSEFc06c0JAEBy5qlpB2DiYCDHBo+5bnXobrb0yjgccw
+gcQwDwYDVR0TAQH/BAUwAwEB/zCBkQYIKwYBBQUHAQcBAf8EgYEwfzAmBAIAATAg
+AwQHwKgAAwMBwagwDAMDA8KoAwUAw68BAgMFAMSoAAEwVQQCAAIwTwMRACADAABo
+KTQ1BCAQxQAAAMQwJgMRAKsBAAAAAAAAAAAAAAAAAAEDEQDNAgAAAAAAAAAAAAAA
+AAACAwoH+oAAAAAAAAAAAwYD/iAAAAAwHQYDVR0OBBYEFHdolVoNBDnZthSK/uxv
+h7oiIq6zMAoGCCqGSM49BAMCA0kAMEYCIQCRiG3Zfn4puAu83uM336bt1wLyenGq
+p4kfMBnqcTv6egIhAIm3JVEAyr89HIF16htjwkbFtzz/uMv+SorCBN/Cs+Vr
 -----END CERTIFICATE-----`)
 
-# From ASNumberCert.pem
-(def as-number-cert-pem `-----BEGIN CERTIFICATE-----
-MIIBqDCCAU6gAwIBAgIRALPImt78hhfZi1Y9pXp9uPkwCgYIKoZIzj0EAwIwADAe
-Fw0yNDEwMjExNDQ1MTBaFw0yNTEwMjExNDQ1MTBaMAAwWTATBgcqhkjOPQIBBggq
-hkjOPQMBBwNCAAQYLa6kWGm3hE1ug3BVUaui+Ui013pu/ZTeCKYU++tQEjGydJyO
-UCzFDjuMZgu76+iaGWfa0PlN2pPFoIQoJduAo4GoMIGlME0GCCsGAQUFBwEIAQH/
-BD4wPKAbMBkwBwIBAAICA+cCAhOyMAoCAQACBQD/////oR0wGzAIAgIE0gICFi4C
-AwCAADAKAgEAAgUA/////zAhBgNVHQ4EGgQYGz6Wu2X5h8+j64aiGIj9ts4i+J6R
-lBMHMAwGA1UdEwEB/wQCMAAwIwYDVR0jBBwwGoAYGz6Wu2X5h8+j64aiGIj9ts4i
-+J6RlBMHMAoGCCqGSM49BAMCA0gAMEUCIG+x6GaNAKDT2Gs9Jh7rTtAd8KAP/MCC
-orUYhAug4kzQAiEApwyX0MvUoZV9fUg0AyN79OCbt0XPneyjdwYPSk3nmyI=
+# From botan/src/tests/data/x509/rfc3779/as_canonical.pem
+(def as-canonical-pem `-----BEGIN CERTIFICATE-----
+MIIBqjCCAU+gAwIBAgIUXV3uG4nXsSaqJyUsw8tzKzeLC+UwCgYIKoZIzj0EAwIw
+HzEdMBsGA1UEAwwUUkZDMzc3OSBhc19jYW5vbmljYWwwHhcNMjYwNzE5MDI1OTI1
+WhcNNDYwNzE0MDI1OTI1WjAfMR0wGwYDVQQDDBRSRkMzNzc5IGFzX2Nhbm9uaWNh
+bDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABHnu7CWVIZAdeGOZBlNHNYQ3l/I0
+4hoy/+zTtgrwd8PW6pAMzSEFc06c0JAEBy5qlpB2DiYCDHBo+5bnXobrb0yjaTBn
+MA8GA1UdEwEB/wQFMAMBAf8wNQYIKwYBBQUHAQgBAf8EJjAkoA8wDTAHAgEAAgID
+5wICE7KhETAPMAgCAgTSAgIWLgIDAIAAMB0GA1UdDgQWBBR3aJVaDQQ52bYUiv7s
+b4e6IiKuszAKBggqhkjOPQQDAgNJADBGAiEApKlT+qH0uLNKgm2o3t3Fbb4HEO0b
+MrYD5dB1KnULte0CIQDiCn2U3+6hsIkP4Qtd6T7XP8HmNhRfsMf1GWnbSTVU5g==
 -----END CERTIFICATE-----`)
 
-# From ASNumberInherit.pem
-(def as-number-inherit-pem `-----BEGIN CERTIFICATE-----
-MIIBiTCCATCgAwIBAgIRAIxkvUFe24qH+RH0D814mEswCgYIKoZIzj0EAwIwADAe
-Fw0yNDEwMjIxMDQwMTNaFw0yNTEwMjIxMDQwMTNaMAAwWTATBgcqhkjOPQIBBggq
-hkjOPQMBBwNCAAS8OgRLt85kZt8M5MGKcwXyOkUXoylpsp3gKVnQukeEVUPzhYUT
-t/nAC9s6tlqQx06aLo4NMpC/ZiLjfqRoh7/Co4GKMIGHMC8GCCsGAQUFBwEIAQH/
-BCAwHqACBQChGDAWMAgCAgTSAgIWLjAKAgEAAgUA/////zAhBgNVHQ4EGgQYEekx
-OowtPJb0QL2dSh4YuqEhfAEZh6g6MAwGA1UdEwEB/wQCMAAwIwYDVR0jBBwwGoAY
-EekxOowtPJb0QL2dSh4YuqEhfAEZh6g6MAoGCCqGSM49BAMCA0cAMEQCIG5s6rM9
-fpV76Ydij83G5dfNw8xq/PKohCQAsRc5BFP1AiANm2/BiqB6yzNO3t+1PFdjgpFu
-8zYpwnxA4Q4yEvKDxg==
+# From botan/src/tests/data/x509/rfc3779/as_inherit.pem
+(def as-inherit-pem `-----BEGIN CERTIFICATE-----
+MIIBmDCCAT6gAwIBAgIUPZiOVDWzmGN6/eATXZhmJpzfOfIwCgYIKoZIzj0EAwIw
+HTEbMBkGA1UEAwwSUkZDMzc3OSBhc19pbmhlcml0MB4XDTI2MDcxOTAyNTkyNVoX
+DTQ2MDcxNDAyNTkyNVowHTEbMBkGA1UEAwwSUkZDMzc3OSBhc19pbmhlcml0MFkw
+EwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEee7sJZUhkB14Y5kGU0c1hDeX8jTiGjL/
+7NO2CvB3w9bqkAzNIQVzTpzQkAQHLmqWkHYOJgIMcGj7ludehutvTKNcMFowDwYD
+VR0TAQH/BAUwAwEB/zAoBggrBgEFBQcBCAEB/wQZMBegAgUAoREwDzAIAgIE0gIC
+Fi4CAwCAADAdBgNVHQ4EFgQUd2iVWg0EOdm2FIr+7G+HuiIirrMwCgYIKoZIzj0E
+AwIDSAAwRQIhANaH5R29V7qN0Tbq8pfxOMjm9c2RnZIh1YttBwNlWagXAiBY3nCB
+fACNCYSk5/EUYXi5Qur40DJH9p5iXjFG2NaljA==
 -----END CERTIFICATE-----`)
 
-# From ASRdiOnly.pem
+# From botan/src/tests/data/x509/rfc3779/as_rdi_only.pem
 (def as-rdi-only-pem `-----BEGIN CERTIFICATE-----
-MIIBhjCCASygAwIBAgIRANz2VZ/ccV2i/GgObA+fDU4wCgYIKoZIzj0EAwIwADAe
-Fw0yNDEwMjIxMDM5MjZaFw0yNTEwMjIxMDM5MjZaMAAwWTATBgcqhkjOPQIBBggq
-hkjOPQMBBwNCAATpsmi/80tOyt9nDOqJzNTVox3wOGZSEwGXeMNTR0cbytK9h+t8
-Ea3+dl6LeXvo423FZd0TNPxRrjaLYFpFjX4Ko4GGMIGDMCsGCCsGAQUFBwEIAQH/
-BBwwGqEYMBYwCAICBNICAhYuMAoCAQACBQD/////MCEGA1UdDgQaBBhMamGZIJk1
-k//8v1K14lioRkSxGj2ryhIwDAYDVR0TAQH/BAIwADAjBgNVHSMEHDAagBhMamGZ
-IJk1k//8v1K14lioRkSxGj2ryhIwCgYIKoZIzj0EAwIDSAAwRQIhAMHro3vcKus9
-Id+1hnMeffZL/CWFOSTgtKjX7OMbQOK8AiBijOvIranrc1X0OwtvM2A4bJi035G9
-e8BeRHCpaJGitg==
+MIIBlzCCATygAwIBAgIUaKxBTn6/+QXUz9qAdzJOcbPTfOMwCgYIKoZIzj0EAwIw
+HjEcMBoGA1UEAwwTUkZDMzc3OSBhc19yZGlfb25seTAeFw0yNjA3MTkwMjU5MjVa
+Fw00NjA3MTQwMjU5MjVaMB4xHDAaBgNVBAMME1JGQzM3NzkgYXNfcmRpX29ubHkw
+WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAR57uwllSGQHXhjmQZTRzWEN5fyNOIa
+Mv/s07YK8HfD1uqQDM0hBXNOnNCQBAcuapaQdg4mAgxwaPuW516G629Mo1gwVjAP
+BgNVHRMBAf8EBTADAQH/MCQGCCsGAQUFBwEIAQH/BBUwE6ERMA8wCAICBNICAhYu
+AgMAgAAwHQYDVR0OBBYEFHdolVoNBDnZthSK/uxvh7oiIq6zMAoGCCqGSM49BAMC
+A0kAMEYCIQCWHUKcxhVmGc5gDGyIQBrmhcx8gyLCAgABi3pNkWYZIAIhAIBpIKQy
+Bbc9BHqh4x/w17QXnzHJdqq9N2cjihkpj28+
 -----END CERTIFICATE-----`)
 
 (let [cert2 (x509-cert/load cert-pem2)]
@@ -323,23 +308,20 @@ e8BeRHCpaJGitg==
     (assert (not (:verify crl other-pubkey)))))
 
 # Test RFC 3779 extensions
-(let [ip-cert (x509-cert/load ip-addr-blocks-unsorted-pem)
-      ip-all-cert (x509-cert/load ip-addr-blocks-all-pem)
-      as-cert (x509-cert/load as-number-cert-pem)
-      as-inherit-cert (x509-cert/load as-number-inherit-pem)
+(let [ip-cert (x509-cert/load ip-safi-pem)
+      ip-all-cert (x509-cert/load ip-canonical-pem)
+      as-cert (x509-cert/load as-canonical-pem)
+      as-inherit-cert (x509-cert/load as-inherit-pem)
       as-rdi-cert (x509-cert/load as-rdi-only-pem)
       no-ext-cert (x509-cert/load cert-pem2)]
-  (assert (= (:subject-dn ip-cert :CN 0) "Test CA"))
-  (assert (:is-ca ip-cert))
-  (each cert [as-cert as-inherit-cert as-rdi-cert]
-    (assert (not (:is-ca cert))))
+  (assert (= (:subject-dn ip-cert :CN 0) "RFC3779 ip_safi"))
+  (each cert [ip-cert ip-all-cert as-cert as-inherit-cert as-rdi-cert]
+    (assert (:is-ca cert)))
   (assert (not (:is-ca no-ext-cert)))
 
   (let [blocks (x509-cert/ext-ip-addr-blocks ip-cert)
         v6-max "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"]
 
-    # The DER holds six families; the two adjacent unicast ranges
-    # 192.168.0.0-192.168.2.1 and 192.168.2.2-200.0.0.0 merge into one.
     (assert (= (length blocks) 5))
     (assert (= blocks
                [{:version :v4 :ranges :inherit}
@@ -366,15 +348,16 @@ e8BeRHCpaJGitg==
     (assert (nil? (x509-cert/ext-ip-addr-blocks no-ext-cert)))
     (assert (nil? (x509-cert/ext-ip-addr-blocks as-cert))))
 
-  (let [full-range [[0 4294967295]]]
-    (assert (= (x509-cert/ext-as-blocks-asnum as-cert) full-range))
-    (assert (= (x509-cert/ext-as-blocks-rdi as-cert) full-range))
+  (let [asnum-ranges [[0 999] [5042 5042]]
+        rdi-ranges [[1234 5678] [32768 32768]]]
+    (assert (= (x509-cert/ext-as-blocks-asnum as-cert) asnum-ranges))
+    (assert (= (x509-cert/ext-as-blocks-rdi as-cert) rdi-ranges))
 
     (assert (= (x509-cert/ext-as-blocks-asnum as-inherit-cert) :inherit))
-    (assert (= (x509-cert/ext-as-blocks-rdi as-inherit-cert) full-range))
+    (assert (= (x509-cert/ext-as-blocks-rdi as-inherit-cert) rdi-ranges))
 
     (assert (nil? (x509-cert/ext-as-blocks-asnum as-rdi-cert)))
-    (assert (= (x509-cert/ext-as-blocks-rdi as-rdi-cert) full-range)))
+    (assert (= (x509-cert/ext-as-blocks-rdi as-rdi-cert) rdi-ranges)))
 
   (assert (= (x509-cert/ext-as-blocks-asnum as-cert)
              (:ext-as-blocks-asnum as-cert)))
