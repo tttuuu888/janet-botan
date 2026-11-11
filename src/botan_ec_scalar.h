@@ -19,6 +19,7 @@ static int ec_scalar_get_fn(void *data, Janet key, Janet *out);
 static Janet ec_scalar_random(int32_t argc, Janet *argv);
 static Janet ec_scalar_from_mp(int32_t argc, Janet *argv);
 static Janet ec_scalar_to_mp(int32_t argc, Janet *argv);
+static Janet ec_scalar_get_group(int32_t argc, Janet *argv);
 
 static JanetAbstractType ec_scalar_obj_type = {
     "botan/ec-scalar",
@@ -30,6 +31,7 @@ static JanetAbstractType ec_scalar_obj_type = {
 
 static JanetMethod ec_scalar_methods[] = {
     {"to-mp", ec_scalar_to_mp},
+    {"get-group", ec_scalar_get_group},
     {NULL, NULL},
 };
 
@@ -105,6 +107,19 @@ static Janet ec_scalar_to_mp(int32_t argc, Janet *argv) {
     return janet_wrap_abstract(mp_obj);
 }
 
+static Janet ec_scalar_get_group(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_ec_scalar_obj_t *obj = janet_getabstract(argv, 0, get_ec_scalar_obj_type());
+
+    botan_ec_group_obj_t *grp_obj = janet_abstract(&ec_group_obj_type, sizeof(botan_ec_group_obj_t));
+    memset(grp_obj, 0, sizeof(botan_ec_group_obj_t));
+
+    int ret = botan_ec_scalar_get_group(obj->ec_scalar, &grp_obj->ec_group);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(grp_obj);
+}
+
 static JanetReg ec_scalar_cfuns[] = {
     {"ec-scalar/random", ec_scalar_random,
      "(ec-scalar/random ec-group-obj rng-obj)\n\n"
@@ -118,6 +133,10 @@ static JanetReg ec_scalar_cfuns[] = {
     {"ec-scalar/to-mp", ec_scalar_to_mp,
      "(ec-scalar/to-mp ec-scalar-obj)\n\n"
      "Returns the MPI object representing the value of `ec-scalar-obj`."
+    },
+    {"ec-scalar/get-group", ec_scalar_get_group,
+     "(ec-scalar/get-group ec-scalar-obj)\n\n"
+     "Returns the EC group object associated with `ec-scalar-obj`."
     },
     {NULL, NULL, NULL}
 };

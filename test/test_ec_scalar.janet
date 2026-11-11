@@ -16,6 +16,13 @@
       sc (assert (ec-scalar/from-mp grp mp))]
   (assert (= mp (:to-mp sc))))
 
+# get-group returns the group the scalar was created in
+(let [grp (ec-group/from-name "secp256r1")
+      sc (ec-scalar/from-mp grp (mpi/new "7"))
+      grp2 (assert (:get-group sc))]
+  (assert (= grp grp2))
+  (assert (= (ec-scalar/get-group sc) grp2)))
+
 # Scalar 0 is out of range (allowed range is 1..order-1)
 (let [grp (ec-group/from-name "secp256r1")
       zero (mpi/new "0")]
