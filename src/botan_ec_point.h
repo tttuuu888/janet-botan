@@ -24,6 +24,8 @@ static Janet ec_point_from_bytes(int32_t argc, Janet *argv);
 static Janet ec_point_get_x(int32_t argc, Janet *argv);
 static Janet ec_point_get_y(int32_t argc, Janet *argv);
 static Janet ec_point_get_xy(int32_t argc, Janet *argv);
+static Janet ec_point_to_mp_xy(int32_t argc, Janet *argv);
+static Janet ec_point_get_group(int32_t argc, Janet *argv);
 static Janet ec_point_to_uncompressed(int32_t argc, Janet *argv);
 static Janet ec_point_to_compressed(int32_t argc, Janet *argv);
 static Janet ec_point_is_identity(int32_t argc, Janet *argv);
@@ -48,6 +50,8 @@ static JanetMethod ec_point_methods[] = {
     {"get-x", ec_point_get_x},
     {"get-y", ec_point_get_y},
     {"get-xy", ec_point_get_xy},
+    {"to-mp-xy", ec_point_to_mp_xy},
+    {"get-group", ec_point_get_group},
     {"to-uncompressed", ec_point_to_uncompressed},
     {"to-compressed", ec_point_to_compressed},
     {"is-identity", ec_point_is_identity},
@@ -185,6 +189,35 @@ static Janet ec_point_get_xy(int32_t argc, Janet *argv) {
     return janet_wrap_string(janet_string(data.data, data.len));
 }
 
+static Janet ec_point_to_mp_xy(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_ec_point_obj_t *obj = janet_getabstract(argv, 0, get_ec_point_obj_type());
+
+    botan_mpi_obj_t *x_obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
+    memset(x_obj, 0, sizeof(botan_mpi_obj_t));
+    botan_mpi_obj_t *y_obj = janet_abstract(&mpi_obj_type, sizeof(botan_mpi_obj_t));
+    memset(y_obj, 0, sizeof(botan_mpi_obj_t));
+
+    int ret = botan_ec_point_to_mp_xy(obj->ec_point, &x_obj->mpi, &y_obj->mpi);
+    JANET_BOTAN_ASSERT(ret);
+
+    Janet xy[2] = {janet_wrap_abstract(x_obj), janet_wrap_abstract(y_obj)};
+    return janet_wrap_tuple(janet_tuple_n(xy, 2));
+}
+
+static Janet ec_point_get_group(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    botan_ec_point_obj_t *obj = janet_getabstract(argv, 0, get_ec_point_obj_type());
+
+    botan_ec_group_obj_t *grp_obj = janet_abstract(&ec_group_obj_type, sizeof(botan_ec_group_obj_t));
+    memset(grp_obj, 0, sizeof(botan_ec_group_obj_t));
+
+    int ret = botan_ec_point_get_group(obj->ec_point, &grp_obj->ec_group);
+    JANET_BOTAN_ASSERT(ret);
+
+    return janet_wrap_abstract(grp_obj);
+}
+
 static Janet ec_point_to_uncompressed(int32_t argc, Janet *argv) {
     janet_fixarity(argc, 1);
     botan_ec_point_obj_t *obj = janet_getabstract(argv, 0, get_ec_point_obj_type());
@@ -295,6 +328,15 @@ static JanetReg ec_point_cfuns[] = {
      "(ec-point/get-xy ec-point-obj)\n\n"
      "Returns the fixed-length concatenated encoding of the affine x and y "
      "coordinates of `ec-point-obj`."
+    },
+    {"ec-point/to-mp-xy", ec_point_to_mp_xy,
+     "(ec-point/to-mp-xy ec-point-obj)\n\n"
+     "Returns a tuple `[x y]` of MPI objects holding the affine coordinates "
+     "of `ec-point-obj`."
+    },
+    {"ec-point/get-group", ec_point_get_group,
+     "(ec-point/get-group ec-point-obj)\n\n"
+     "Returns the EC group object associated with `ec-point-obj`."
     },
     {"ec-point/to-uncompressed", ec_point_to_uncompressed,
      "(ec-point/to-uncompressed ec-point-obj)\n\n"

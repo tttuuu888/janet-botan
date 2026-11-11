@@ -75,6 +75,26 @@
   (assert (= (:add g g) (:mul g two rng)))
   (assert (= (:add g (:add g g)) (:mul g three rng))))
 
+# to-mp-xy returns the affine coordinates as MPIs
+(let [grp (ec-group/from-name "secp256r1")
+      g (ec-point/generator grp)
+      [x y] (assert (:to-mp-xy g))]
+  (assert (= x (:get-gx grp)))
+  (assert (= y (:get-gy grp)))
+  (assert (= (:to-bin x) (:get-x g)))
+  (assert (= (:to-bin y) (:get-y g)))
+  (assert (= g (ec-point/from-xy grp x y)))
+  (let [[x2 y2] (ec-point/to-mp-xy g)]
+    (assert (= x x2))
+    (assert (= y y2))))
+
+# get-group returns the group the point belongs to
+(let [grp (ec-group/from-name "secp256r1")
+      g (ec-point/generator grp)
+      grp2 (assert (:get-group g))]
+  (assert (= grp grp2))
+  (assert (= (ec-point/get-group g) grp2)))
+
 # from-bytes rejects garbage
 (let [grp (ec-group/from-name "secp256r1")]
   (assert-error "Error expected"
