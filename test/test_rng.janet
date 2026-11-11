@@ -39,6 +39,10 @@
   (assert (:get drbg 32))
   (assert (rng/add-entropy drbg (string/from-bytes ;(range 16)))))
 
+# DRBG: seed shorter than the security level must fail
+(assert-error "Error expected"
+              (rng/new-drbg "HMAC_DRBG(SHA-256)" (string/from-bytes ;(range 16))))
+
 # DRBG: invalid name must fail
 (assert-error "Error expected"
               (rng/new-drbg "Not_A_DRBG" (string/from-bytes ;(range 64))))
