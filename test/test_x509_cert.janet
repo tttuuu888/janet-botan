@@ -281,6 +281,14 @@ Bbc9BHqh4x/w17QXnzHJdqq9N2cjihkpj28+
     (assert (:verify crl ca-pubkey))
     (assert (not (:is-revoked crl server-cert)))
 
+    # Issuer DN of the CRL comes from the CA certificate's subject
+    (assert (= (:issuer-dn crl :CN 0) (:subject-dn ca-cert :CN 0)))
+    (assert (= (:issuer-dn crl :CN) (:subject-dn ca-cert :CN)))
+    (assert (= (x509-crl/issuer-dn crl :O) (:subject-dn ca-cert :O)))
+    (assert (= (:issuer-dn crl :OU) []))
+    (assert-error "Error expected" (:issuer-dn crl :OU 0))
+    (assert-error "Error expected" (:issuer-dn crl :invalid-keyword))
+
     # Create CRL entry with keyword reason
     (let [entry (x509-crl-entry/create server-cert :key-compromise)]
       (assert (= (:reason entry) 1))

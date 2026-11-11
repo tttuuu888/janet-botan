@@ -24,6 +24,7 @@ static Janet x509_crl_next_update(int32_t argc, Janet *argv);
 static Janet x509_crl_entries_count(int32_t argc, Janet *argv);
 static Janet x509_crl_get_entry(int32_t argc, Janet *argv);
 static Janet x509_crl_is_revoked(int32_t argc, Janet *argv);
+static Janet x509_crl_issuer_dn(int32_t argc, Janet *argv);
 
 static JanetMethod x509_crl_methods[] = {
     {"to-pem", x509_crl_to_pem},
@@ -33,6 +34,7 @@ static JanetMethod x509_crl_methods[] = {
     {"entries-count", x509_crl_entries_count},
     {"get-entry", x509_crl_get_entry},
     {"is-revoked", x509_crl_is_revoked},
+    {"issuer-dn", x509_crl_issuer_dn},
     {"revoke", x509_crl_revoke},
     {"verify", x509_crl_verify},
     {NULL, NULL},
@@ -253,6 +255,41 @@ static Janet x509_crl_to_der(int32_t argc, Janet *argv) {
     JANET_BOTAN_ASSERT(ret);
 
     return janet_wrap_string(janet_string(data.data, data.len));
+}
+
+static Janet x509_crl_issuer_dn(int32_t argc, Janet *argv) {
+    janet_arity(argc, 2, 3);
+
+    botan_x509_crl_obj_t *obj = janet_getabstract(argv, 0, get_x509_crl_obj_type());
+    botan_x509_crl_t crl = obj->x509_crl;
+    JanetKeyword kw = janet_getkeyword(argv, 1);
+
+    const char *key = x509_dn_key_from_keyword(kw);
+    if (!key) janet_panicf("unknown DN keyword :%s, expected one of: :CN, :C, :O, :OU, :ST, :L, :serial-number", kw);
+
+    if (argc == 3) {
+        size_t index = janet_getsize(argv, 2);
+
+        view_data_t data;
+        int ret = botan_x509_crl_view_issuer_dn(crl, key, index, &data, (botan_view_str_fn)view_str_func);
+        JANET_BOTAN_ASSERT(ret);
+
+        return janet_wrap_string(janet_string(data.data, data.len));
+    }
+
+    size_t count = 0;
+    int ret = botan_x509_crl_view_issuer_dn_count(crl, key, &count);
+    JANET_BOTAN_ASSERT(ret);
+
+    JanetArray *arr = janet_array((int32_t)count);
+    for (size_t i = 0; i < count; i++) {
+        view_data_t data;
+        ret = botan_x509_crl_view_issuer_dn(crl, key, i, &data, (botan_view_str_fn)view_str_func);
+        JANET_BOTAN_ASSERT(ret);
+
+        janet_array_push(arr, janet_wrap_string(janet_string(data.data, data.len)));
+    }
+    return janet_wrap_tuple(janet_tuple_n(arr->data, arr->count));
 }
 
 static Janet x509_crl_this_update(int32_t argc, Janet *argv) {
@@ -490,6 +527,13 @@ static JanetReg x509_crl_cfuns[] = {
      "(x509-crl/get-entry crl-obj index)\n\n"
      "Return the CRL entry at the given `index`. Use `x509-crl/entries-count` "
      "to get the number of entries."
+    },
+    {"x509-crl/issuer-dn", x509_crl_issuer_dn,
+     "(x509-crl/issuer-dn crl-obj key &opt index)\n\n"
+     "Get a value from the issuer DN field of the CRL. "
+     "`key` is one of :CN, :C, :O, :OU, :ST, :L, :serial-number. "
+     "If `index` is given, returns the value at that zero-based index. "
+     "If omitted, returns a tuple of all values for that field."
     },
     {"x509-crl/is-revoked", x509_crl_is_revoked,
      "(x509-crl/is-revoked crl-obj cert-obj)\n\n"
