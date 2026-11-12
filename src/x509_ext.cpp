@@ -7,7 +7,6 @@
 #include <botan/x509self.h>
 #include <botan/x509_ca.h>
 #include <botan/x509_crl.h>
-#include <botan/pem.h>
 #include <botan/internal/ffi_util.h>
 #include <botan/internal/ffi_cert.h>
 #include <botan/internal/ffi_pkey.h>
@@ -161,8 +160,7 @@ int jbotan_x509_cert_to_pem(botan_x509_cert_t cert,
                             botan_view_ctx ctx,
                             botan_view_str_fn view) {
     return ffi_guard_thunk(__func__, [=]() -> int {
-        auto der = safe_get(cert).BER_encode();
-        auto pem = Botan::PEM_Code::encode(der, "CERTIFICATE");
+        auto pem = safe_get(cert).PEM_encode();
         return view(ctx, pem.data(), pem.size());
     });
 }
@@ -180,8 +178,7 @@ int jbotan_x509_crl_to_pem(botan_x509_crl_t crl,
                            botan_view_ctx ctx,
                            botan_view_str_fn view) {
     return ffi_guard_thunk(__func__, [=]() -> int {
-        auto der = safe_get(crl).BER_encode();
-        auto pem = Botan::PEM_Code::encode(der, "X509 CRL");
+        auto pem = safe_get(crl).PEM_encode();
         return view(ctx, pem.data(), pem.size());
     });
 }
