@@ -23,6 +23,22 @@ static Janet cfun_ffi_supports_api(int32_t argc, Janet *argv) {
     return janet_wrap_boolean(ret == 0);
 }
 
+static Janet cfun_ffi_tls_api_version(int32_t argc, Janet *argv) {
+    (void)argv;
+    janet_fixarity(argc, 0);
+
+    uint32_t version = botan_ffi_tls_api_version();
+    return janet_wrap_number((double)version);
+}
+
+static Janet cfun_ffi_tls_supports_api(int32_t argc, Janet *argv) {
+    janet_fixarity(argc, 1);
+    int64_t version = janet_getinteger64(argv, 0);
+
+    int ret = botan_ffi_tls_supports_api((uint32_t)version);
+    return janet_wrap_boolean(ret == 0);
+}
+
 static Janet cfun_version_string(int32_t argc, Janet *argv) {
     (void)argv;
     janet_fixarity(argc, 0);
@@ -71,6 +87,17 @@ static JanetReg versioning_cfuns[] = {
      "(ffi-supports-api version)\n\n"
      "Check if the FFI version specified is supported by this library. "
      "Returns a boolean."
+    },
+    {"ffi-tls-api-version", cfun_ffi_tls_api_version,
+     "(ffi-tls-api-version)\n\n"
+     "Return the version of the experimental TLS FFI API as an integer "
+     "YYYYMMDD, or 0 if the library was built without the ffi_tls module."
+    },
+    {"ffi-tls-supports-api", cfun_ffi_tls_supports_api,
+     "(ffi-tls-supports-api version)\n\n"
+     "Check if the TLS FFI version specified is supported by this library. "
+     "Returns a boolean. Always false if the library was built without the "
+     "ffi_tls module."
     },
     {"version-string", cfun_version_string, "(version-string)\n\n"
      "Returns a string describing the version."

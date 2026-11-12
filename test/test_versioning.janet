@@ -17,4 +17,9 @@
   (assert (= (version-patch) ver-patch))
   (assert (= (version-datestamp) ver-date)))
 
+# Janet-botan currently builds Botan without the ffi_tls module
+(assert (= (ffi-tls-api-version) 0))
+(assert (not (ffi-tls-supports-api 20260916)))
+(assert (not (ffi-tls-supports-api 0)))
+
 (end-suite)
