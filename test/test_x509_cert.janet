@@ -131,7 +131,9 @@ Bbc9BHqh4x/w17QXnzHJdqq9N2cjihkpj28+
   (assert (not (:is-ca cert2)))
   (assert (:allowed-ext-usage cert2 "PKIX.ServerAuth"))
   (assert (not (:allowed-ext-usage cert2 "PKIX.ClientAuth")))
-  (assert (not (:allowed-ext-usage cert2 "PKIX.CodeSigning"))))
+  (assert (not (:allowed-ext-usage cert2 "PKIX.CodeSigning")))
+  (assert (= (:to-pem cert2) (string cert-pem2 "\n")))
+  (assert (= (:to-pem (x509-cert/load (:to-der cert2))) (:to-pem cert2))))
 
 (let [crl (x509-crl/load crl-pem)
       cert (x509-cert/load cert-pem2)]
@@ -139,6 +141,8 @@ Bbc9BHqh4x/w17QXnzHJdqq9N2cjihkpj28+
   (assert (> (:this-update crl) 0))
   (assert (> (:next-update crl) (:this-update crl)))
   (assert (= (:entries-count crl) 1))
+  (assert (= (:to-pem crl) (string crl-pem "\n")))
+  (assert (= (:to-pem (x509-crl/load (:to-der crl))) (:to-pem crl)))
 
   # Test CRL entry inspection
   (let [entry (:get-entry crl 0)]
